@@ -59,7 +59,7 @@
 	NSString *_guid;
 }
 
-@property (nonatomic, retain, readonly) NSString *guid;
+@property (nonatomic, readonly) NSString *guid;
 
 - (id)initWithGUID:(NSString *)guid;
 

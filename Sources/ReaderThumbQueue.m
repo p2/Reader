@@ -40,11 +40,9 @@
 #endif
 
 	static dispatch_once_t predicate = 0;
-
 	static ReaderThumbQueue *object = nil; // Object
-
 	dispatch_once(&predicate, ^{ object = [self new]; });
-
+	
 	return object; // ReaderThumbQueue singleton
 }
 
@@ -59,15 +57,11 @@
 	if ((self = [super init])) // Initialize
 	{
 		loadQueue = [NSOperationQueue new];
-
 		[loadQueue setName:@"ReaderThumbLoadQueue"];
-
 		[loadQueue setMaxConcurrentOperationCount:1];
-
+		
 		workQueue = [NSOperationQueue new];
-
 		[workQueue setName:@"ReaderThumbWorkQueue"];
-
 		[workQueue setMaxConcurrentOperationCount:1];
 	}
 
@@ -79,12 +73,8 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
-	[loadQueue release], loadQueue = nil;
-
-	[workQueue release], workQueue = nil;
-
-	[super dealloc];
+	loadQueue = nil;
+	workQueue = nil;
 }
 
 - (void)addLoadOperation:(NSOperation *)operation
@@ -92,7 +82,7 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
+	
 	if ([operation isKindOfClass:[ReaderThumbOperation class]])
 	{
 		[loadQueue addOperation:operation]; // Add to load queue
@@ -104,7 +94,7 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
+	
 	if ([operation isKindOfClass:[ReaderThumbOperation class]])
 	{
 		[workQueue addOperation:operation]; // Add to work queue
@@ -116,9 +106,10 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
-	[loadQueue setSuspended:YES]; [workQueue setSuspended:YES];
-
+	
+	[loadQueue setSuspended:YES];
+	[workQueue setSuspended:YES];
+	
 	for (ReaderThumbOperation *operation in loadQueue.operations)
 	{
 		if ([operation isKindOfClass:[ReaderThumbOperation class]])
@@ -169,7 +160,7 @@
 
 	if ((self = [super init]))
 	{
-		_guid = [guid retain];
+		_guid = guid;
 	}
 
 	return self;
@@ -181,9 +172,8 @@
 	NSLog(@"%s", __FUNCTION__);
 #endif
 
-	[_guid release], _guid = nil;
+	_guid = nil;
 
-	[super dealloc];
 }
 
 @end

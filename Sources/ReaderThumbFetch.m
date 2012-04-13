@@ -46,7 +46,7 @@
 
 	if ((self = [super initWithGUID:object.guid]))
 	{
-		request = [object retain];
+		request = object;
 	}
 
 	return self;
@@ -63,9 +63,8 @@
 		request.thumbView.operation = nil; // Done
 	}
 
-	[request release], request = nil;
+	request = nil;
 
-	[super dealloc];
 }
 
 - (void)cancel
@@ -104,7 +103,7 @@
 
 	NSURL *thumbURL = [self thumbFileURL]; CGImageRef imageRef = NULL;
 
-	CGImageSourceRef loadRef = CGImageSourceCreateWithURL((CFURLRef)thumbURL, NULL);
+	CGImageSourceRef loadRef = CGImageSourceCreateWithURL((__bridge CFURLRef)thumbURL, NULL);
 
 	if (loadRef != NULL) // Load the existing thumb image
 	{
@@ -125,7 +124,7 @@
 			[[ReaderThumbQueue sharedInstance] addWorkOperation:thumbRender]; // Queue the operation
 		}
 
-		[thumbRender release]; // Release ReaderThumbRender object
+		 // Release ReaderThumbRender object
 	}
 
 	if (imageRef != NULL) // Create UIImage from CGImage and show it

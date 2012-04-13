@@ -145,11 +145,10 @@
 	NSLog(@"%s", __FUNCTION__);
 #endif
 
-	[readerViewController release], readerViewController = nil;
+	readerViewController = nil;
 
-	[mainWindow release], mainWindow = nil;
+	mainWindow = nil;
 
-	[super dealloc];
 }
 
 #pragma mark ReaderViewControllerDelegate methods

@@ -61,7 +61,7 @@
 	BOOL showBookmarked;
 }
 
-@property (nonatomic, assign, readwrite) id <ThumbsViewControllerDelegate> delegate;
+@property (nonatomic, unsafe_unretained, readwrite) id <ThumbsViewControllerDelegate> delegate;
 
 - (id)initWithReaderDocument:(ReaderDocument *)object;
 

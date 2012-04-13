@@ -81,36 +81,33 @@
 	if (pages > 1) // Only update frame if more than one page
 	{
 		CGFloat controlWidth = trackControl.bounds.size.width;
-
 		CGFloat useableWidth = (controlWidth - THUMB_LARGE_WIDTH);
-
 		CGFloat stride = (useableWidth / (pages - 1)); // Page stride
-
 		NSInteger X = (stride * (page - 1)); CGFloat pageThumbX = X;
-
+		
 		CGRect pageThumbRect = pageThumbView.frame; // Current frame
-
 		if (pageThumbX != pageThumbRect.origin.x) // Only if different
 		{
 			pageThumbRect.origin.x = pageThumbX; // The new X position
-
 			pageThumbView.frame = pageThumbRect; // Update the frame
 		}
 	}
 
 	if (page != pageThumbView.tag) // Only if page number changed
 	{
-		pageThumbView.tag = page; [pageThumbView reuse]; // Reuse the thumb view
-
+		pageThumbView.tag = page;
+		[pageThumbView reuse]; // Reuse the thumb view
+		
 		CGSize size = CGSizeMake(THUMB_LARGE_WIDTH, THUMB_LARGE_HEIGHT); // Maximum thumb size
-
-		NSURL *fileURL = document.fileURL; NSString *guid = document.guid; NSString *phrase = document.password;
-
+		NSURL *fileURL = document.fileURL;
+		NSString *guid = document.guid;
+		NSString *phrase = document.password;
+		
 		ReaderThumbRequest *request = [ReaderThumbRequest forView:pageThumbView fileURL:fileURL password:phrase guid:guid page:page size:size];
-
 		UIImage *image = [[ReaderThumbCache sharedInstance] thumbRequest:request priority:YES]; // Request the thumb
-
-		UIImage *thumb = ([image isKindOfClass:[UIImage class]] ? image : nil); [pageThumbView showImage:thumb];
+		UIImage *thumb = ([image isKindOfClass:[UIImage class]] ? image : nil);
+		
+		[pageThumbView showImage:thumb];
 	}
 }
 
@@ -123,13 +120,10 @@
 	if (page != pageNumberLabel.tag) // Only if page number changed
 	{
 		NSInteger pages = [document.pageCount integerValue]; // Total pages
-
 		NSString *format = NSLocalizedString(@"%d of %d", @"format"); // Format
-
 		NSString *number = [NSString stringWithFormat:format, page, pages]; // Text
-
+		
 		pageNumberLabel.text = number; // Update the page number label text
-
 		pageNumberLabel.tag = page; // Update the last page number tag
 	}
 }
@@ -153,13 +147,13 @@
 		CAGradientLayer *layer = (CAGradientLayer *)self.layer;
 		CGColorRef liteColor = [UIColor colorWithWhite:0.82f alpha:0.8f].CGColor;
 		CGColorRef darkColor = [UIColor colorWithWhite:0.32f alpha:0.8f].CGColor;
-		layer.colors = [NSArray arrayWithObjects:(id)liteColor, (id)darkColor, nil];
+		layer.colors = [NSArray arrayWithObjects:(__bridge id)liteColor, (__bridge id)darkColor, nil];
 
 		CGRect shadowRect = self.bounds; shadowRect.size.height = 4.0f; shadowRect.origin.y -= shadowRect.size.height;
 
 		ReaderPagebarShadow *shadowView = [[ReaderPagebarShadow alloc] initWithFrame:shadowRect];
 
-		[self addSubview:shadowView]; [shadowView release]; // Add the shadow to the view
+		[self addSubview:shadowView];  // Add the shadow to the view
 
 		CGFloat numberY = (0.0f - (PAGE_NUMBER_HEIGHT + PAGE_NUMBER_SPACE));
 		CGFloat numberX = ((self.bounds.size.width - PAGE_NUMBER_WIDTH) / 2.0f);
@@ -206,7 +200,7 @@
 
 		[self addSubview:trackControl]; // Add the track control and thumbs view
 
-		document = [object retain]; // Retain the document object for our use
+		document = object; // Retain the document object for our use
 
 		[self updatePageNumberText:[document.pageNumber integerValue]];
 
@@ -221,9 +215,7 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
 	[trackTimer invalidate]; [enableTimer invalidate];
-
 	[super removeFromSuperview];
 }
 
@@ -232,24 +224,14 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
-	[trackTimer release], trackTimer = nil;
-
-	[enableTimer release], enableTimer = nil;
-
-	[trackControl release], trackControl = nil;
-
-	[miniThumbViews release], miniThumbViews = nil;
-
-	[pageNumberLabel release], pageNumberLabel = nil;
-
-	[pageNumberView release], pageNumberView = nil;
-
-	[pageThumbView release], pageThumbView = nil;
-
-	[document release], document = nil;
-
-	[super dealloc];
+	trackTimer = nil;
+	enableTimer = nil;
+	trackControl = nil;
+	miniThumbViews = nil;
+	pageNumberLabel = nil;
+	pageNumberView = nil;
+	pageThumbView = nil;
+	document = nil;
 }
 
 - (void)layoutSubviews
@@ -259,84 +241,65 @@
 #endif
 
 	CGRect controlRect = CGRectInset(self.bounds, 4.0f, 0.0f);
-
 	CGFloat thumbWidth = (THUMB_SMALL_WIDTH + THUMB_SMALL_GAP);
-
 	NSInteger thumbs = (controlRect.size.width / thumbWidth);
-
 	NSInteger pages = [document.pageCount integerValue]; // Pages
-
 	if (thumbs > pages) thumbs = pages; // No more than total pages
-
+	
 	CGFloat controlWidth = ((thumbs * thumbWidth) - THUMB_SMALL_GAP);
-
 	controlRect.size.width = controlWidth; // Update control width
-
 	CGFloat widthDelta = (self.bounds.size.width - controlWidth);
-
 	NSInteger X = (widthDelta / 2.0f); controlRect.origin.x = X;
-
 	trackControl.frame = controlRect; // Update track control frame
-
+	
 	if (pageThumbView == nil) // Create the page thumb view when needed
 	{
 		CGFloat heightDelta = (controlRect.size.height - THUMB_LARGE_HEIGHT);
-
 		NSInteger thumbY = (heightDelta / 2.0f); NSInteger thumbX = 0; // Thumb X, Y
-
 		CGRect thumbRect = CGRectMake(thumbX, thumbY, THUMB_LARGE_WIDTH, THUMB_LARGE_HEIGHT);
-
+		
 		pageThumbView = [[ReaderPagebarThumb alloc] initWithFrame:thumbRect]; // Create the thumb view
-
 		pageThumbView.layer.zPosition = 1.0f; // Z position so that it sits on top of the small thumbs
-
 		[trackControl addSubview:pageThumbView]; // Add as the first subview of the track control
 	}
 
 	[self updatePageThumbView:[document.pageNumber integerValue]]; // Update page thumb view
 
 	NSInteger strideThumbs = (thumbs - 1); if (strideThumbs < 1) strideThumbs = 1;
-
 	CGFloat stride = ((CGFloat)pages / (CGFloat)strideThumbs); // Page stride
-
 	CGFloat heightDelta = (controlRect.size.height - THUMB_SMALL_HEIGHT);
-
 	NSInteger thumbY = (heightDelta / 2.0f); NSInteger thumbX = 0; // Initial X, Y
-
+	
 	CGRect thumbRect = CGRectMake(thumbX, thumbY, THUMB_SMALL_WIDTH, THUMB_SMALL_HEIGHT);
-
-	NSMutableDictionary *thumbsToHide = [[miniThumbViews mutableCopy] autorelease];
-
+	
+	NSMutableDictionary *thumbsToHide = [miniThumbViews mutableCopy];
 	for (NSInteger thumb = 0; thumb < thumbs; thumb++) // Iterate through needed thumbs
 	{
 		NSInteger page = ((stride * thumb) + 1); if (page > pages) page = pages; // Page
-
 		NSNumber *key = [NSNumber numberWithInteger:page]; // Page number key for thumb view
-
+		
 		ReaderPagebarThumb *smallThumbView = [miniThumbViews objectForKey:key]; // Thumb view
-
 		if (smallThumbView == nil) // We need to create a new small thumb view for the page number
 		{
 			CGSize size = CGSizeMake(THUMB_SMALL_WIDTH, THUMB_SMALL_HEIGHT); // Maximum thumb size
-
 			NSURL *fileURL = document.fileURL; NSString *guid = document.guid; NSString *phrase = document.password;
-
+			
 			smallThumbView = [[ReaderPagebarThumb alloc] initWithFrame:thumbRect small:YES]; // Create a small thumb view
-
 			ReaderThumbRequest *thumbRequest = [ReaderThumbRequest forView:smallThumbView fileURL:fileURL password:phrase guid:guid page:page size:size];
-
+			
 			UIImage *image = [[ReaderThumbCache sharedInstance] thumbRequest:thumbRequest priority:NO]; // Request the thumb
-
-			if ([image isKindOfClass:[UIImage class]]) [smallThumbView showImage:image]; // Use thumb image from cache
+			if ([image isKindOfClass:[UIImage class]]) {
+				[smallThumbView showImage:image]; // Use thumb image from cache
+			}
 
 			[trackControl addSubview:smallThumbView]; [miniThumbViews setObject:smallThumbView forKey:key];
-
-			[smallThumbView release], smallThumbView = nil; // Cleanup
+			smallThumbView = nil; // Cleanup
 		}
 		else // Resue existing small thumb view for the page number
 		{
-			smallThumbView.hidden = NO; [thumbsToHide removeObjectForKey:key];
-
+			smallThumbView.hidden = NO;
+			[thumbsToHide removeObjectForKey:key];
+			
 			if (CGRectEqualToRect(smallThumbView.frame, thumbRect) == false)
 			{
 				smallThumbView.frame = thumbRect; // Update thumb frame
@@ -345,7 +308,7 @@
 
 		thumbRect.origin.x += thumbWidth; // Next thumb X position
 	}
-
+	
 	[thumbsToHide enumerateKeysAndObjectsUsingBlock: // Hide unused thumbs
 		^(id key, id object, BOOL *stop)
 		{
@@ -359,11 +322,8 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
 	NSInteger page = [document.pageNumber integerValue]; // #
-
 	[self updatePageNumberText:page]; // Update page number text
-
 	[self updatePageThumbView:page]; // Update page thumb view
 }
 
@@ -372,7 +332,6 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
 	if (self.hidden == NO) // Only if visible
 	{
 		[self updatePagebarViews]; // Update views
@@ -384,7 +343,7 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
+	
 	if (self.hidden == NO) // Only if visible
 	{
 		[UIView animateWithDuration:0.25 delay:0.0
@@ -430,9 +389,8 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
-	[trackTimer invalidate]; [trackTimer release], trackTimer = nil; // Cleanup
-
+	[trackTimer invalidate]; trackTimer = nil; // Cleanup
+	
 	if (trackControl.tag != [document.pageNumber integerValue]) // Only if different
 	{
 		[delegate pagebar:self gotoPage:trackControl.tag]; // Go to document page
@@ -445,8 +403,7 @@
 	NSLog(@"%s", __FUNCTION__);
 #endif
 
-	[enableTimer invalidate]; [enableTimer release], enableTimer = nil; // Cleanup
-
+	[enableTimer invalidate]; enableTimer = nil; // Cleanup
 	trackControl.userInteractionEnabled = YES; // Enable track control interaction
 }
 
@@ -456,9 +413,8 @@
 	NSLog(@"%s", __FUNCTION__);
 #endif
 
-	if (trackTimer != nil) { [trackTimer invalidate]; [trackTimer release], trackTimer = nil; } // Invalidate and release previous timer
-
-	trackTimer = [[NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(trackTimerFired:) userInfo:nil repeats:NO] retain];
+	if (trackTimer != nil) { [trackTimer invalidate]; trackTimer = nil; } // Invalidate and release previous timer
+	trackTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(trackTimerFired:) userInfo:nil repeats:NO];
 }
 
 - (void)startEnableTimer
@@ -467,9 +423,12 @@
 	NSLog(@"%s", __FUNCTION__);
 #endif
 
-	if (enableTimer != nil) { [enableTimer invalidate]; [enableTimer release], enableTimer = nil; } // Invalidate and release previous timer
-
-	enableTimer = [[NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(enableTimerFired:) userInfo:nil repeats:NO] retain];
+	if (enableTimer != nil) {
+		[enableTimer invalidate];
+		enableTimer = nil;
+	} // Invalidate and release previous timer
+	
+	enableTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(enableTimerFired:) userInfo:nil repeats:NO];
 }
 
 - (NSInteger)trackViewPageNumber:(ReaderTrackControl *)trackView
@@ -479,11 +438,9 @@
 #endif
 
 	CGFloat controlWidth = trackView.bounds.size.width; // View width
-
 	CGFloat stride = (controlWidth / [document.pageCount integerValue]);
-
 	NSInteger page = (trackView.value / stride); // Integer page number
-
+	
 	return (page + 1); // + 1
 }
 
@@ -492,18 +449,15 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
+	
 	NSInteger page = [self trackViewPageNumber:trackView]; // Page
-
 	if (page != [document.pageNumber integerValue]) // Only if different
 	{
 		[self updatePageNumberText:page]; // Update page number text
-
 		[self updatePageThumbView:page]; // Update page thumb view
-
 		[self restartTrackTimer]; // Start the track timer
 	}
-
+	
 	trackView.tag = page; // Start page tracking
 }
 
@@ -512,17 +466,15 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
+	
 	NSInteger page = [self trackViewPageNumber:trackView]; // Page
-
+	
 	if (page != trackView.tag) // Only if the page number has changed
 	{
 		[self updatePageNumberText:page]; // Update page number text
-
 		[self updatePageThumbView:page]; // Update page thumb view
-
+		
 		trackView.tag = page; // Update the page tracking tag
-
 		[self restartTrackTimer]; // Restart the track timer
 	}
 }
@@ -532,15 +484,14 @@
 #ifdef DEBUGX
 	NSLog(@"%s", __FUNCTION__);
 #endif
-
-	[trackTimer invalidate]; [trackTimer release], trackTimer = nil; // Cleanup
-
+	
+	[trackTimer invalidate];
+	trackTimer = nil; // Cleanup
+	
 	if (trackView.tag != [document.pageNumber integerValue]) // Only if different
 	{
 		trackView.userInteractionEnabled = NO; // Disable track control interaction
-
 		[delegate pagebar:self gotoPage:trackView.tag]; // Go to document page
-
 		[self startEnableTimer]; // Start track control enable timer
 	}
 
@@ -581,14 +532,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	[super dealloc];
-}
 
 - (CGFloat)limitValue:(CGFloat)valueX
 {
@@ -614,9 +557,8 @@
 #endif
 
 	CGPoint point = [touch locationInView:self]; // Touch point
-
 	_value = [self limitValue:point.x]; // Limit control value
-
+	
 	return YES;
 }
 
@@ -629,9 +571,7 @@
 	if (self.touchInside == YES) // Only if inside the control
 	{
 		CGPoint point = [touch locationInView:touch.view]; // Touch point
-
 		CGFloat x = [self limitValue:point.x]; // Potential new control value
-
 		if (x != _value) // Only if the new value has changed since the last time
 		{
 			_value = x; [self sendActionsForControlEvents:UIControlEventValueChanged];
@@ -648,7 +588,6 @@
 #endif
 
 	CGPoint point = [touch locationInView:self]; // Touch point
-
 	_value = [self limitValue:point.x]; // Limit control value
 }
 
@@ -686,27 +625,17 @@
 	if ((self = [super initWithFrame:frame])) // Superclass init
 	{
 		CGFloat value = (small ? 0.6f : 0.7f); // Size based alpha value
-
 		UIColor *background = [UIColor colorWithWhite:0.8f alpha:value];
-
-		self.backgroundColor = background; imageView.backgroundColor = background;
-
+		
+		self.backgroundColor = background;
+		imageView.backgroundColor = background;
 		imageView.layer.borderColor = [UIColor colorWithWhite:0.4f alpha:0.6f].CGColor;
-
 		imageView.layer.borderWidth = 1.0f; // Give the thumb image view a border
 	}
 
 	return self;
 }
 
-- (void)dealloc
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	[super dealloc];
-}
 
 @end
 
@@ -752,19 +681,11 @@
 		CAGradientLayer *layer = (CAGradientLayer *)self.layer;
 		CGColorRef blackColor = [UIColor colorWithWhite:0.42f alpha:1.0f].CGColor;
 		CGColorRef clearColor = [UIColor colorWithWhite:0.42f alpha:0.0f].CGColor;
-		layer.colors = [NSArray arrayWithObjects:(id)clearColor, (id)blackColor, nil];
+		layer.colors = [NSArray arrayWithObjects:(__bridge id)clearColor, (__bridge id)blackColor, nil];
 	}
 
 	return self;
 }
 
-- (void)dealloc
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	[super dealloc];
-}
 
 @end

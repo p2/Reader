@@ -97,11 +97,11 @@
 	tapLabel.autoresizingMask |= UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 	tapLabel.center = CGPointMake(viewSize.width / 2.0f, viewSize.height / 2.0f);
 
-	[self.view addSubview:tapLabel]; [tapLabel release];
+	[self.view addSubview:tapLabel]; 
 
 	UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
 	//singleTap.numberOfTouchesRequired = 1; singleTap.numberOfTapsRequired = 1; //singleTap.delegate = self;
-	[self.view addGestureRecognizer:singleTap]; [singleTap release];
+	[self.view addGestureRecognizer:singleTap]; 
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -205,14 +205,6 @@
 	[super didReceiveMemoryWarning];
 }
 
-- (void)dealloc
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	[super dealloc];
-}
 
 #pragma mark UIGestureRecognizer methods
 
@@ -249,7 +241,7 @@
 
 #endif // DEMO_VIEW_CONTROLLER_PUSH
 
-		[readerViewController release]; // Release the ReaderViewController
+		 // Release the ReaderViewController
 	}
 }
 

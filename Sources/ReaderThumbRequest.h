@@ -52,12 +52,12 @@
 	CGFloat _scale;
 }
 
-@property (nonatomic, retain, readonly) NSURL *fileURL;
-@property (nonatomic, retain, readonly) NSString *guid;
-@property (nonatomic, retain, readonly) NSString *password;
-@property (nonatomic, retain, readonly) NSString *cacheKey;
-@property (nonatomic, retain, readonly) NSString *thumbName;
-@property (nonatomic, retain, readonly) ReaderThumbView *thumbView;
+@property (nonatomic, readonly) NSURL *fileURL;
+@property (nonatomic, readonly) NSString *guid;
+@property (nonatomic, readonly) NSString *password;
+@property (nonatomic, readonly) NSString *cacheKey;
+@property (nonatomic, readonly) NSString *thumbName;
+@property (nonatomic, readonly) ReaderThumbView *thumbView;
 @property (nonatomic, assign, readonly) NSUInteger targetTag;
 @property (nonatomic, assign, readonly) NSInteger thumbPage;
 @property (nonatomic, assign, readonly) CGSize thumbSize;

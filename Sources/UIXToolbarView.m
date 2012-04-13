@@ -63,26 +63,18 @@
 		CAGradientLayer *layer = (CAGradientLayer *)self.layer;
 		CGColorRef liteColor = [UIColor colorWithWhite:0.92f alpha:0.8f].CGColor;
 		CGColorRef darkColor = [UIColor colorWithWhite:0.32f alpha:0.8f].CGColor;
-		layer.colors = [NSArray arrayWithObjects:(id)liteColor, (id)darkColor, nil];
+		layer.colors = [NSArray arrayWithObjects:(__bridge id)liteColor, (__bridge id)darkColor, nil];
 
 		CGRect shadowRect = self.bounds; shadowRect.origin.y += shadowRect.size.height; shadowRect.size.height = 4.0f;
 
 		UIXToolbarShadow *shadowView = [[UIXToolbarShadow alloc] initWithFrame:shadowRect];
 
-		[self addSubview:shadowView]; [shadowView release];
+		[self addSubview:shadowView]; 
 	}
 
 	return self;
 }
 
-- (void)dealloc
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	[super dealloc];
-}
 
 @end
 
@@ -128,19 +120,11 @@
 		CAGradientLayer *layer = (CAGradientLayer *)self.layer;
 		CGColorRef blackColor = [UIColor colorWithWhite:0.24f alpha:1.0f].CGColor;
 		CGColorRef clearColor = [UIColor colorWithWhite:0.24f alpha:0.0f].CGColor;
-		layer.colors = [NSArray arrayWithObjects:(id)blackColor, (id)clearColor, nil];
+		layer.colors = [NSArray arrayWithObjects:(__bridge id)blackColor, (__bridge id)clearColor, nil];
 	}
 
 	return self;
 }
 
-- (void)dealloc
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	[super dealloc];
-}
 
 @end

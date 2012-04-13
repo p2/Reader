@@ -68,9 +68,8 @@
 	NSLog(@"%s", __FUNCTION__);
 #endif
 
-	[imageView release], imageView = nil;
+	imageView = nil;
 
-	[super dealloc];
 }
 
 - (void)showImage:(UIImage *)image

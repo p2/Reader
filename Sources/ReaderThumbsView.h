@@ -70,7 +70,7 @@
 	BOOL canUpdate;
 }
 
-@property (nonatomic, assign, readwrite) id <ReaderThumbsViewDelegate> delegate;
+@property (nonatomic, unsafe_unretained, readwrite) id <ReaderThumbsViewDelegate> delegate;
 
 - (void)setThumbSize:(CGSize)thumbSize;
 

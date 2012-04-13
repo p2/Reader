@@ -136,13 +136,12 @@
 	NSLog(@"%s", __FUNCTION__);
 #endif
 
-	[navigationController release], navigationController = nil;
+	navigationController = nil;
 
-	[readerDemoController release], readerDemoController = nil;
+	readerDemoController = nil;
 
-	[mainWindow release], mainWindow = nil;
+	mainWindow = nil;
 
-	[super dealloc];
 }
 
 @end
