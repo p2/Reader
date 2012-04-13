@@ -24,6 +24,7 @@
 //
 
 #import "ReaderThumbsView.h"
+#import "CGPDFDocument.h"
 
 @implementation ReaderThumbsView
 
@@ -69,9 +70,7 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	thumbCellsQueue = nil;
 	thumbCellsVisible = nil;
 	touchedCell = nil;
@@ -91,9 +90,7 @@
 
 - (void)requeueAllThumbCells
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (thumbCellsVisible.count > 0)
 	{
@@ -408,9 +405,7 @@
 
 - (void)refreshVisibleThumbs
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	for (ReaderThumbView *tvCell in thumbCellsVisible) // Enumerate visible cells
 	{
@@ -423,9 +418,7 @@
 
 - (CGPoint)insetContentOffset
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	CGPoint insetContentOffset = self.contentOffset; // Offset
 	insetContentOffset.y += self.contentInset.top; // Inset adjust
 	
@@ -436,9 +429,7 @@
 
 - (void)handleTapGesture:(UITapGestureRecognizer *)recognizer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if (recognizer.state == UIGestureRecognizerStateRecognized) // Handle the tap
 	{
@@ -450,9 +441,7 @@
 
 - (void)handlePressGesture:(UILongPressGestureRecognizer *)recognizer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if (recognizer.state == UIGestureRecognizerStateBegan) // Handle the press
 	{

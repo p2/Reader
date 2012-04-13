@@ -24,6 +24,7 @@
 //
 
 #import "ReaderContentTile.h"
+#import "CGPDFDocument.h"
 
 @implementation ReaderContentTile
 
@@ -40,9 +41,7 @@
 
 + (CFTimeInterval)fadeDuration
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	return 0.001; // iOS bug workaround
 	
@@ -53,9 +52,7 @@
 
 - (id)init
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ((self = [super init]))
 	{

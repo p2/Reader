@@ -27,6 +27,7 @@
 #import "ReaderContentView.h"
 #import "ReaderContentPage.h"
 #import "ReaderThumbCache.h"
+#import "CGPDFDocument.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -73,9 +74,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page password:(NSString *)phrase
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ((self = [super initWithFrame:frame]))
 	{
@@ -130,9 +129,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	[self removeObserver:self forKeyPath:@"frame"];
 	theContainerView = nil;
@@ -143,9 +140,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)showPageThumb:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase guid:(NSString *)guid
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	BOOL large = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad); // Page thumb size
 	
@@ -158,9 +153,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ((object == self) && [keyPath isEqualToString:@"frame"])
 	{
@@ -190,9 +183,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)layoutSubviews
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	[super layoutSubviews];
 	CGSize boundsSize = self.bounds.size;
@@ -210,18 +201,14 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (id)singleTap:(UITapGestureRecognizer *)recognizer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	return [theContentView singleTap:recognizer];
 }
 
 - (void)zoomIncrement
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	CGFloat zoomScale = self.zoomScale;
 	if (zoomScale < self.maximumZoomScale)
@@ -239,9 +226,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)zoomDecrement
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	CGFloat zoomScale = self.zoomScale;
 	if (zoomScale > self.minimumZoomScale)
@@ -259,9 +244,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)zoomReset
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if (self.zoomScale > self.minimumZoomScale)
 	{
@@ -318,9 +301,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ((self = [super initWithFrame:frame])) // Superclass init
 	{

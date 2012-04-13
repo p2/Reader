@@ -27,6 +27,7 @@
 #import "ReaderThumbQueue.h"
 #import "ReaderThumbFetch.h"
 #import "ReaderThumbView.h"
+#import "CGPDFDocument.h"
 
 @implementation ReaderThumbCache
 
@@ -42,9 +43,7 @@
 
 + (ReaderThumbCache *)sharedInstance
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	static dispatch_once_t predicate = 0;
 	static ReaderThumbCache *object = nil; // Object
 	dispatch_once(&predicate, ^{ object = [self new]; });
@@ -54,9 +53,7 @@
 
 + (NSString *)appCachesPath
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	static dispatch_once_t predicate = 0;
 	static NSString *theCachesPath = nil; // Application caches path string
 	
@@ -72,9 +69,7 @@
 
 + (NSString *)thumbCachePathForGUID:(NSString *)guid
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	NSString *cachesPath = [ReaderThumbCache appCachesPath]; // Caches path
 	
 	return [cachesPath stringByAppendingPathComponent:guid]; // Append GUID
@@ -82,9 +77,7 @@
 
 + (void)createThumbCacheWithGUID:(NSString *)guid
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSFileManager *fileManager = [NSFileManager new]; // File manager instance
 	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid]; // Thumb cache path
@@ -93,9 +86,7 @@
 
 + (void)removeThumbCacheWithGUID:(NSString *)guid
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0),
 	^{
 		NSFileManager *fileManager = [NSFileManager new]; // File manager instance
@@ -106,9 +97,7 @@
 
 + (void)touchThumbCacheWithGUID:(NSString *)guid
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSFileManager *fileManager = [NSFileManager new]; // File manager instance
 	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid]; // Thumb cache path
@@ -118,9 +107,7 @@
 
 + (void)purgeThumbCachesOlderThan:(NSTimeInterval)age
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0),
 	^{
@@ -158,9 +145,7 @@
 
 - (id)init
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	if ((self = [super init])) // Initialize
 	{
 		thumbCache = [NSCache new]; // Cache
@@ -173,18 +158,14 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	thumbCache = nil;
 
 }
 
 - (id)thumbRequest:(ReaderThumbRequest *)request priority:(BOOL)priority
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	@synchronized(thumbCache) // Mutex lock
 	{
@@ -207,9 +188,7 @@
 
 - (void)setObject:(UIImage *)image forKey:(NSString *)key
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	@synchronized(thumbCache) // Mutex lock
 	{
@@ -220,9 +199,7 @@
 
 - (void)removeObjectForKey:(NSString *)key
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	@synchronized(thumbCache) // Mutex lock
 	{
@@ -232,9 +209,7 @@
 
 - (void)removeNullForKey:(NSString *)key
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	@synchronized(thumbCache) // Mutex lock
 	{
@@ -248,9 +223,7 @@
 
 - (void)removeAllObjects
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	@synchronized(thumbCache) // Mutex lock
 	{

@@ -48,9 +48,7 @@
 
 - (id)initWithReaderDocument:(ReaderDocument *)object
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	id thumbs = nil; // ThumbsViewController object
 
@@ -70,9 +68,7 @@
 /*
 - (void)loadView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	// Implement loadView to create a view hierarchy programmatically, without using a nib.
 }
@@ -158,9 +154,7 @@
 
 - (void)viewDidUnload
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	theThumbsView = nil;
 	mainToolbar = nil;
@@ -202,18 +196,14 @@
 
 - (void)didReceiveMemoryWarning
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[super didReceiveMemoryWarning];
 }
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	bookmarked = nil;
 	theThumbsView = nil;
@@ -225,9 +215,7 @@
 
 - (void)tappedInToolbar:(ThumbsMainToolbar *)toolbar showControl:(UISegmentedControl *)control
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	switch (control.selectedSegmentIndex)
 	{
@@ -263,9 +251,7 @@
 
 - (void)tappedInToolbar:(ThumbsMainToolbar *)toolbar doneButton:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	[delegate dismissThumbsViewController:self]; // Dismiss thumbs display
 }
 
@@ -273,26 +259,20 @@
 
 - (NSUInteger)numberOfThumbsInThumbsView:(ReaderThumbsView *)thumbsView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	return (showBookmarked ? bookmarked.count : [document.pageCount integerValue]);
 }
 
 - (id)thumbsView:(ReaderThumbsView *)thumbsView thumbCellWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [[ThumbsPageThumb alloc] initWithFrame:frame];
 }
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView updateThumbCell:(ThumbsPageThumb *)thumbCell forIndex:(NSInteger)index
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	CGSize size = [thumbCell maximumContentSize]; // Get the cell's maximum content size
 	NSInteger page = (showBookmarked ? [[bookmarked objectAtIndex:index] integerValue] : (index + 1));
@@ -313,9 +293,7 @@
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView refreshThumbCell:(ThumbsPageThumb *)thumbCell forIndex:(NSInteger)index
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	NSInteger page = (showBookmarked ? [[bookmarked objectAtIndex:index] integerValue] : (index + 1));
 	[thumbCell showBookmark:[document.bookmarks containsIndex:page]]; // Show bookmarked status
@@ -323,9 +301,7 @@
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView didSelectThumbWithIndex:(NSInteger)index
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	NSInteger page = (showBookmarked ? [[bookmarked objectAtIndex:index] integerValue] : (index + 1));
 	[delegate thumbsViewController:self gotoPage:page]; // Show the selected page
@@ -334,9 +310,7 @@
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView didPressThumbWithIndex:(NSInteger)index
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	NSInteger page = (showBookmarked ? [[bookmarked objectAtIndex:index] integerValue] : (index + 1));
 	if ([document.bookmarks containsIndex:page]) [document.bookmarks removeIndex:page]; else [document.bookmarks addIndex:page];
@@ -365,9 +339,7 @@
 
 - (CGRect)markRectInImageView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	CGRect iconRect = bookMark.frame; iconRect.origin.y = (-2.0f);
 	iconRect.origin.x = (imageView.bounds.size.width - bookMark.image.size.width - 8.0f);
@@ -377,9 +349,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ((self = [super initWithFrame:frame]))
 	{
@@ -450,9 +420,7 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	backView = nil;
 	maskView = nil;
 	textLabel = nil;
@@ -461,17 +429,13 @@
 
 - (CGSize)maximumContentSize
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	return maximumSize;
 }
 
 - (void)showImage:(UIImage *)image
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSInteger x = (self.bounds.size.width / 2.0f);
 	NSInteger y = (self.bounds.size.height / 2.0f);
@@ -489,9 +453,7 @@
 
 - (void)reuse
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[super reuse]; // Reuse thumb view
 
@@ -506,27 +468,21 @@
 
 - (void)showBookmark:(BOOL)show
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	bookMark.hidden = (show ? NO : YES);
 }
 
 - (void)showTouched:(BOOL)touched
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	maskView.hidden = (touched ? NO : YES);
 }
 
 - (void)showText:(NSString *)text
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	textLabel.text = text;
 }
 

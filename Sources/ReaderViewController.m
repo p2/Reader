@@ -47,9 +47,7 @@
 
 - (void)updateScrollViewContentSize
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSInteger count = [document.pageCount integerValue];
 	if (count > PAGING_VIEWS) {
@@ -63,9 +61,7 @@
 
 - (void)updateScrollViewContentViews
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[self updateScrollViewContentSize]; // Update the content size
 	NSMutableIndexSet *pageSet = [NSMutableIndexSet indexSet]; // Page set
@@ -98,9 +94,7 @@
 
 - (void)updateToolbarBookmarkIcon
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSInteger page = [document.pageNumber integerValue];
 	BOOL bookmarked = [document.bookmarks containsIndex:page];
@@ -109,9 +103,7 @@
 
 - (void)showDocumentPage:(NSInteger)page
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (page != currentPage) // Only if different
 	{
@@ -225,9 +217,7 @@
 
 - (void)showDocument:(id)object
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[self updateScrollViewContentSize]; // Set content size
 	[self showDocumentPage:[document.pageNumber integerValue]]; // Show
@@ -239,9 +229,7 @@
 
 - (id)initWithReaderDocument:(ReaderDocument *)object
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	id reader = nil; // ReaderViewController object
 
@@ -265,9 +253,7 @@
 /*
 - (void)loadView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	// Implement loadView to create a view hierarchy programmatically, without using a nib.
 }
@@ -403,9 +389,7 @@
 
 - (void)viewDidUnload
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	mainToolbar = nil; mainPagebar = nil;
 	theScrollView = nil; contentViews = nil;
@@ -461,18 +445,14 @@
 
 - (void)didReceiveMemoryWarning
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[super didReceiveMemoryWarning];
 }
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
@@ -485,9 +465,7 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	__block NSInteger page = 0;
 
@@ -509,9 +487,7 @@
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[self showDocumentPage:theScrollView.tag]; // Show page
 
@@ -522,9 +498,7 @@
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)recognizer shouldReceiveTouch:(UITouch *)touch
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ([touch.view isKindOfClass:[UIScrollView class]]) return YES;
 
@@ -535,9 +509,7 @@
 
 - (void)decrementPageNumber
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (theScrollView.tag == 0) // Scroll view did end
 	{
@@ -557,9 +529,7 @@
 
 - (void)incrementPageNumber
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (theScrollView.tag == 0) // Scroll view did end
 	{
@@ -579,9 +549,7 @@
 
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (recognizer.state == UIGestureRecognizerStateRecognized)
 	{
@@ -661,9 +629,7 @@
 
 - (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (recognizer.state == UIGestureRecognizerStateRecognized)
 	{
@@ -716,9 +682,7 @@
 
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ((mainToolbar.hidden == NO) || (mainPagebar.hidden == NO))
 	{
@@ -739,9 +703,7 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar doneButton:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 #if (READER_STANDALONE == FALSE) // Option
 
@@ -765,9 +727,7 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar thumbsButton:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (printInteraction != nil) [printInteraction dismissAnimated:NO]; // Dismiss
 	
@@ -781,9 +741,7 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar printButton:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 #if (READER_ENABLE_PRINT == TRUE) // Option
 
@@ -835,9 +793,7 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar emailButton:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 #if (READER_ENABLE_MAIL == TRUE) // Option
 
@@ -869,9 +825,7 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar markButton:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (printInteraction != nil) [printInteraction dismissAnimated:YES];
 
@@ -892,9 +846,7 @@
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	#ifdef DEBUG
 		if ((result == MFMailComposeResultFailed) && (error != NULL)) NSLog(@"%@", error);
@@ -907,9 +859,7 @@
 
 - (void)dismissThumbsViewController:(ThumbsViewController *)viewController
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[self updateToolbarBookmarkIcon]; // Update bookmark icon
 	[self dismissModalViewControllerAnimated:NO]; // Dismiss
@@ -917,9 +867,7 @@
 
 - (void)thumbsViewController:(ThumbsViewController *)viewController gotoPage:(NSInteger)page
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[self showDocumentPage:page]; // Show the page
 }
@@ -928,9 +876,7 @@
 
 - (void)pagebar:(ReaderMainPagebar *)pagebar gotoPage:(NSInteger)page
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[self showDocumentPage:page]; // Show the page
 }
@@ -939,9 +885,7 @@
 
 - (void)applicationWill:(NSNotification *)notification
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	[document saveReaderDocument]; // Save any ReaderDocument object changes
 	

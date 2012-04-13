@@ -27,6 +27,7 @@
 #import "ReaderThumbRender.h"
 #import "ReaderThumbCache.h"
 #import "ReaderThumbView.h"
+#import "CGPDFDocument.h"
 
 #import <ImageIO/ImageIO.h>
 
@@ -40,9 +41,7 @@
 
 - (id)initWithRequest:(ReaderThumbRequest *)object
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super initWithGUID:object.guid]))
 	{
@@ -54,9 +53,7 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (request.thumbView.operation == self)
 	{
@@ -69,9 +66,7 @@
 
 - (void)cancel
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[[ReaderThumbCache sharedInstance] removeNullForKey:request.cacheKey];
 
@@ -80,9 +75,7 @@
 
 - (NSURL *)thumbFileURL
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:request.guid]; // Thumb cache path
 
@@ -93,9 +86,7 @@
 
 - (void)main
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (self.isCancelled == YES) return;
 

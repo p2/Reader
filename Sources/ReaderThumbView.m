@@ -24,6 +24,7 @@
 //
 
 #import "ReaderThumbView.h"
+#import "CGPDFDocument.h"
 
 @implementation ReaderThumbView
 
@@ -36,9 +37,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super initWithFrame:frame]))
 	{
@@ -64,9 +63,7 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	imageView = nil;
 
@@ -74,25 +71,19 @@
 
 - (void)showImage:(UIImage *)image
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	imageView.image = image; // Show image
 }
 
 - (void)showTouched:(BOOL)touched
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 }
 
 - (void)removeFromSuperview
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	_targetTag = 0; // Clear target tag
 
@@ -103,9 +94,7 @@
 
 - (void)reuse
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	_targetTag = 0; // Clear target tag
 

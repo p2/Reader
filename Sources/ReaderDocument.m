@@ -45,9 +45,7 @@
 
 + (NSString *)GUID
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	CFUUIDRef theUUID;
 	CFStringRef theString;
@@ -61,9 +59,7 @@
 
 + (NSString *)documentsPath
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	NSArray *documentsPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 	
 	return [documentsPaths objectAtIndex:0]; // Path to the application's "~/Documents" directory
@@ -71,9 +67,7 @@
 
 + (NSString *)applicationPath
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	NSArray *documentsPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 	
 	return [[documentsPaths objectAtIndex:0] stringByDeletingLastPathComponent]; // Strip "Documents" component
@@ -81,9 +75,7 @@
 
 + (NSString *)applicationSupportPath
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSFileManager *fileManager = [NSFileManager new]; // File manager instance
 
@@ -93,9 +85,7 @@
 
 + (NSString *)relativeFilePath:(NSString *)fullFilePath
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	assert(fullFilePath != nil); // Ensure that the full file path is not nil
 	NSString *applicationPath = [ReaderDocument applicationPath]; // Get the application path
 	NSRange range = [fullFilePath rangeOfString:applicationPath]; // Look for the application path
@@ -106,9 +96,7 @@
 
 + (NSString *)archiveFilePath:(NSString *)filename
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	assert(filename != nil); // Ensure that the archive file name is not nil
 
@@ -122,9 +110,7 @@
 
 + (ReaderDocument *)unarchiveFromFileName:(NSString *)filename password:(NSString *)phrase
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	ReaderDocument *document = nil; // ReaderDocument object
 
@@ -151,9 +137,7 @@
 
 + (ReaderDocument *)withDocumentFilePath:(NSString *)filePath password:(NSString *)phrase
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	ReaderDocument *document = nil; // ReaderDocument object
 
@@ -168,9 +152,7 @@
 
 + (BOOL)isPDF:(NSString *)filePath
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	BOOL state = NO;
 	if (filePath != nil) // Must have a file path
@@ -200,9 +182,7 @@
 
 - (id)initWithFilePath:(NSString *)fullFilePath password:(NSString *)phrase
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	id object = nil; // ReaderDocument object
 
@@ -247,9 +227,7 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	_guid = nil;
 	_fileURL = nil;
@@ -265,18 +243,14 @@
 
 - (NSString *)fileName
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [_fileName lastPathComponent];
 }
 
 - (NSURL *)fileURL
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (_fileURL == nil) // Create and keep the file URL the first time it is requested
 	{
@@ -289,9 +263,7 @@
 
 - (BOOL)archiveWithFileName:(NSString *)filename
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSString *archiveFilePath = [ReaderDocument archiveFilePath:filename];
 	return [NSKeyedArchiver archiveRootObject:self toFile:archiveFilePath];
@@ -299,27 +271,21 @@
 
 - (void)saveReaderDocument
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[self archiveWithFileName:[self fileName]];
 }
 
 - (void)updateProperties
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 }
 
 #pragma mark NSCoding protocol methods
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[encoder encodeObject:_guid forKey:@"FileGUID"];
 	[encoder encodeObject:_fileName forKey:@"FileName"];
@@ -333,9 +299,7 @@
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super init])) // Superclass init
 	{

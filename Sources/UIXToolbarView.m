@@ -24,7 +24,7 @@
 //
 
 #import "UIXToolbarView.h"
-
+#import "CGPDFDocument.h"
 #import <QuartzCore/QuartzCore.h>
 
 @implementation UIXToolbarView
@@ -37,9 +37,7 @@
 
 + (Class)layerClass
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [CAGradientLayer class];
 }
@@ -48,9 +46,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super initWithFrame:frame]))
 	{
@@ -94,9 +90,7 @@
 
 + (Class)layerClass
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [CAGradientLayer class];
 }
@@ -105,9 +99,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super initWithFrame:frame]))
 	{

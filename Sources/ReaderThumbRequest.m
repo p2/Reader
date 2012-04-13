@@ -25,6 +25,7 @@
 
 #import "ReaderThumbRequest.h"
 #import "ReaderThumbView.h"
+#import "CGPDFDocument.h"
 
 @implementation ReaderThumbRequest
 
@@ -45,9 +46,7 @@
 
 + (id)forView:(ReaderThumbView *)view fileURL:(NSURL *)url password:(NSString *)phrase guid:(NSString *)guid page:(NSInteger)page size:(CGSize)size
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [[ReaderThumbRequest alloc] initWithView:view fileURL:url password:phrase guid:guid page:page size:size];
 }
@@ -56,9 +55,7 @@
 
 - (id)initWithView:(ReaderThumbView *)view fileURL:(NSURL *)url password:(NSString *)phrase guid:(NSString *)guid page:(NSInteger)page size:(CGSize)size
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super init])) // Initialize object
 	{
@@ -76,9 +73,7 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	_guid = nil;
 	_fileURL = nil;
 	_password = nil;

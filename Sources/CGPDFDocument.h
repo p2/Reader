@@ -33,3 +33,12 @@
 CGPDFDocumentRef CGPDFDocumentCreateX(CFURLRef theURL, NSString *password);
 
 BOOL CGPDFDocumentNeedsPassword(CFURLRef theURL, NSString *password);
+
+
+#ifndef DXLog
+# ifdef DEBUGX
+#  define DXLog(fmt, ...) NSLog((@"%s (line %d) " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
+# else
+#  define DXLog(...) do { } while (0)
+# endif
+#endif

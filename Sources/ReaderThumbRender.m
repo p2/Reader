@@ -40,9 +40,7 @@
 
 - (id)initWithRequest:(ReaderThumbRequest *)object
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ((self = [super initWithGUID:object.guid]))
 	{
@@ -54,18 +52,14 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	request.thumbView.operation = nil;
 	request = nil;
 }
 
 - (void)cancel
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	[[ReaderThumbCache sharedInstance] removeNullForKey:request.cacheKey];
 	[super cancel];
@@ -73,9 +67,7 @@
 
 - (NSURL *)thumbFileURL
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	NSFileManager *fileManager = [NSFileManager new]; // File manager instance
 	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:request.guid]; // Thumb cache path
@@ -87,9 +79,7 @@
 
 - (void)main
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (self.isCancelled == YES) return;
 	

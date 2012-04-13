@@ -54,18 +54,14 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [self initWithFrame:frame document:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame document:(ReaderDocument *)object
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	assert(object != nil); // Check
 
@@ -221,9 +217,7 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	markButton = nil;
 
@@ -234,9 +228,7 @@
 
 - (void)setBookmarkState:(BOOL)state
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 #if (READER_BOOKMARKS == TRUE) // Option
 
@@ -257,9 +249,7 @@
 
 - (void)updateBookmarkImage
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 #if (READER_BOOKMARKS == TRUE) // Option
 
@@ -277,9 +267,7 @@
 
 - (void)hideToolbar
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (self.hidden == NO)
 	{
@@ -299,9 +287,7 @@
 
 - (void)showToolbar
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (self.hidden == YES)
 	{
@@ -323,45 +309,35 @@
 
 - (void)doneButtonTapped:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[delegate tappedInToolbar:self doneButton:button];
 }
 
 - (void)thumbsButtonTapped:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[delegate tappedInToolbar:self thumbsButton:button];
 }
 
 - (void)printButtonTapped:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[delegate tappedInToolbar:self printButton:button];
 }
 
 - (void)emailButtonTapped:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[delegate tappedInToolbar:self emailButton:button];
 }
 
 - (void)markButtonTapped:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[delegate tappedInToolbar:self markButton:button];
 }

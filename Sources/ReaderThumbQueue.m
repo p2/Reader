@@ -24,6 +24,7 @@
 //
 
 #import "ReaderThumbQueue.h"
+#import "CGPDFDocument.h"
 
 @implementation ReaderThumbQueue
 
@@ -35,9 +36,7 @@
 
 + (ReaderThumbQueue *)sharedInstance
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	static dispatch_once_t predicate = 0;
 	static ReaderThumbQueue *object = nil; // Object
@@ -50,9 +49,7 @@
 
 - (id)init
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super init])) // Initialize
 	{
@@ -70,18 +67,14 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	loadQueue = nil;
 	workQueue = nil;
 }
 
 - (void)addLoadOperation:(NSOperation *)operation
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ([operation isKindOfClass:[ReaderThumbOperation class]])
 	{
@@ -91,9 +84,7 @@
 
 - (void)addWorkOperation:(NSOperation *)operation
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if ([operation isKindOfClass:[ReaderThumbOperation class]])
 	{
@@ -103,9 +94,7 @@
 
 - (void)cancelOperationsWithGUID:(NSString *)guid
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	[loadQueue setSuspended:YES];
 	[workQueue setSuspended:YES];
@@ -131,9 +120,7 @@
 
 - (void)cancelAllOperations
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[loadQueue cancelAllOperations]; [workQueue cancelAllOperations];
 }
@@ -154,9 +141,7 @@
 
 - (id)initWithGUID:(NSString *)guid
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super init]))
 	{
@@ -168,9 +153,7 @@
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	_guid = nil;
 

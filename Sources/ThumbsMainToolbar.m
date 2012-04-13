@@ -25,6 +25,7 @@
 
 #import "ReaderConstants.h"
 #import "ThumbsMainToolbar.h"
+#import "CGPDFDocument.h"
 
 @implementation ThumbsMainToolbar
 
@@ -48,18 +49,14 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [self initWithFrame:frame title:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame title:(NSString *)title
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super initWithFrame:frame]))
 	{
@@ -143,9 +140,7 @@
 
 - (void)showControlTapped:(UISegmentedControl *)control
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[delegate tappedInToolbar:self showControl:control];
 }
@@ -154,9 +149,7 @@
 
 - (void)doneButtonTapped:(UIButton *)button
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[delegate tappedInToolbar:self doneButton:button];
 }

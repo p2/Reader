@@ -52,9 +52,7 @@
 
 + (Class)layerClass
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [CAGradientLayer class];
 }
@@ -63,18 +61,14 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [self initWithFrame:frame document:nil];
 }
 
 - (void)updatePageThumbView:(NSInteger)page
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	NSInteger pages = [document.pageCount integerValue];
 
@@ -113,9 +107,7 @@
 
 - (void)updatePageNumberText:(NSInteger)page
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (page != pageNumberLabel.tag) // Only if page number changed
 	{
@@ -130,9 +122,7 @@
 
 - (id)initWithFrame:(CGRect)frame document:(ReaderDocument *)object
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	assert(object != nil); // Check
 
@@ -212,18 +202,14 @@
 
 - (void)removeFromSuperview
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	[trackTimer invalidate]; [enableTimer invalidate];
 	[super removeFromSuperview];
 }
 
 - (void)dealloc
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	trackTimer = nil;
 	enableTimer = nil;
 	trackControl = nil;
@@ -236,9 +222,7 @@
 
 - (void)layoutSubviews
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	CGRect controlRect = CGRectInset(self.bounds, 4.0f, 0.0f);
 	CGFloat thumbWidth = (THUMB_SMALL_WIDTH + THUMB_SMALL_GAP);
@@ -319,9 +303,7 @@
 
 - (void)updatePagebarViews
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	NSInteger page = [document.pageNumber integerValue]; // #
 	[self updatePageNumberText:page]; // Update page number text
 	[self updatePageThumbView:page]; // Update page thumb view
@@ -329,9 +311,7 @@
 
 - (void)updatePagebar
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	if (self.hidden == NO) // Only if visible
 	{
 		[self updatePagebarViews]; // Update views
@@ -340,9 +320,7 @@
 
 - (void)hidePagebar
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	if (self.hidden == NO) // Only if visible
 	{
@@ -362,9 +340,7 @@
 
 - (void)showPagebar
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (self.hidden == YES) // Only if hidden
 	{
@@ -386,9 +362,7 @@
 
 - (void)trackTimerFired:(NSTimer *)timer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	[trackTimer invalidate]; trackTimer = nil; // Cleanup
 	
 	if (trackControl.tag != [document.pageNumber integerValue]) // Only if different
@@ -399,9 +373,7 @@
 
 - (void)enableTimerFired:(NSTimer *)timer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	[enableTimer invalidate]; enableTimer = nil; // Cleanup
 	trackControl.userInteractionEnabled = YES; // Enable track control interaction
@@ -409,9 +381,7 @@
 
 - (void)restartTrackTimer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (trackTimer != nil) { [trackTimer invalidate]; trackTimer = nil; } // Invalidate and release previous timer
 	trackTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(trackTimerFired:) userInfo:nil repeats:NO];
@@ -419,9 +389,7 @@
 
 - (void)startEnableTimer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (enableTimer != nil) {
 		[enableTimer invalidate];
@@ -433,9 +401,7 @@
 
 - (NSInteger)trackViewPageNumber:(ReaderTrackControl *)trackView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	CGFloat controlWidth = trackView.bounds.size.width; // View width
 	CGFloat stride = (controlWidth / [document.pageCount integerValue]);
@@ -446,9 +412,7 @@
 
 - (void)trackViewTouchDown:(ReaderTrackControl *)trackView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	NSInteger page = [self trackViewPageNumber:trackView]; // Page
 	if (page != [document.pageNumber integerValue]) // Only if different
@@ -463,9 +427,7 @@
 
 - (void)trackViewValueChanged:(ReaderTrackControl *)trackView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	NSInteger page = [self trackViewPageNumber:trackView]; // Page
 	
@@ -481,9 +443,7 @@
 
 - (void)trackViewTouchUp:(ReaderTrackControl *)trackView
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 	
 	[trackTimer invalidate];
 	trackTimer = nil; // Cleanup
@@ -516,9 +476,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super initWithFrame:frame]))
 	{
@@ -535,9 +493,7 @@
 
 - (CGFloat)limitValue:(CGFloat)valueX
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	CGFloat minX = self.bounds.origin.x; // 0.0f;
 	CGFloat maxX = (self.bounds.size.width - 1.0f);
@@ -552,9 +508,7 @@
 
 - (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	CGPoint point = [touch locationInView:self]; // Touch point
 	_value = [self limitValue:point.x]; // Limit control value
@@ -564,9 +518,7 @@
 
 - (BOOL)continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if (self.touchInside == YES) // Only if inside the control
 	{
@@ -583,9 +535,7 @@
 
 - (void)endTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	CGPoint point = [touch locationInView:self]; // Touch point
 	_value = [self limitValue:point.x]; // Limit control value
@@ -609,18 +559,14 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [self initWithFrame:frame small:NO];
 }
 
 - (id)initWithFrame:(CGRect)frame small:(BOOL)small
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super initWithFrame:frame])) // Superclass init
 	{
@@ -655,9 +601,7 @@
 
 + (Class)layerClass
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	return [CAGradientLayer class];
 }
@@ -666,9 +610,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
+	DXLog(@"");
 
 	if ((self = [super initWithFrame:frame]))
 	{
