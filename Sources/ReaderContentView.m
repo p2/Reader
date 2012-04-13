@@ -50,7 +50,7 @@
 
 @synthesize message;
 
-#pragma mark ReaderContentView functions
+#pragma mark - ReaderContentView functions
 
 static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 {
@@ -90,6 +90,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 		self.bouncesZoom = YES;
 		self.delegate = self;
 		theContentView = [[ReaderContentPage alloc] initWithURL:fileURL page:page password:phrase];
+		theContentView.delegate = self;
 		if (theContentView != nil) // Must have a valid and initialized content view
 		{
 			theContainerView = [[UIView alloc] initWithFrame:theContentView.bounds];
@@ -252,14 +253,22 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 	}
 }
 
-#pragma mark UIScrollViewDelegate methods
+#pragma mark - ReaderContentPage delegate methods
+
+- (void)contentPage:(ReaderContentPage *)contentPage didDrawLayer:(CALayer *)aLayer inContext:(CGContextRef)context
+{
+	[message contentView:self didDrawLayer:aLayer ofPage:contentPage inContext:context];
+}
+
+
+#pragma mark - UIScrollViewDelegate methods
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
 	return theContainerView;
 }
 
-#pragma mark UIResponder instance methods
+#pragma mark - UIResponder instance methods
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {

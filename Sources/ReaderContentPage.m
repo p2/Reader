@@ -29,11 +29,13 @@
 
 @implementation ReaderContentPage
 
+@synthesize delegate;
+
 //#pragma mark Properties
 
 //@synthesize ;
 
-#pragma mark ReaderContentPage class methods
+#pragma mark - ReaderContentPage class methods
 
 + (Class)layerClass
 {
@@ -124,7 +126,7 @@
 		
 		CGRect viewRect = CGRectMake(vr_x, vr_y, vr_w, vr_h); // View CGRect from PDFRect
 		
-		documentLink = [ReaderDocumentLink withRect:viewRect dictionary:annotationDictionary];
+		documentLink = [ReaderDocumentLink newWithRect:viewRect dictionary:annotationDictionary];
 	}
 	
 	return documentLink;
@@ -503,7 +505,6 @@
 		CGPDFPageRelease(_PDFPageRef), _PDFPageRef = NULL;
 		CGPDFDocumentRelease(_PDFDocRef), _PDFDocRef = NULL;
 	}
-	
 }
 
 /*
@@ -515,11 +516,11 @@
  }
  */
 
-#pragma mark CATiledLayer delegate methods
+#pragma mark - CATiledLayer delegate methods
 
 - (void)drawLayer:(CATiledLayer *)layer inContext:(CGContextRef)context
 {
-	DXLog(@"");
+	DXLog(@"Drawing layer %@", layer);
 	
 	CGPDFPageRef drawPDFPageRef = NULL;
 	CGPDFDocumentRef drawPDFDocRef = NULL;
@@ -536,13 +537,20 @@
 	
 	if (drawPDFPageRef != NULL) // Go ahead and render the PDF page into the context
 	{
-		CGContextTranslateCTM(context, 0.0f, self.bounds.size.height); CGContextScaleCTM(context, 1.0f, -1.0f);
+		CGContextTranslateCTM(context, 0.0f, self.bounds.size.height);
+		CGContextScaleCTM(context, 1.0f, -1.0f);
 		CGContextConcatCTM(context, CGPDFPageGetDrawingTransform(drawPDFPageRef, kCGPDFCropBox, self.bounds, 0, true));
-		CGContextSetRenderingIntent(context, kCGRenderingIntentDefault); CGContextSetInterpolationQuality(context, kCGInterpolationDefault);
+		CGContextSetRenderingIntent(context, kCGRenderingIntentDefault);
+		CGContextSetInterpolationQuality(context, kCGInterpolationDefault);
 		CGContextDrawPDFPage(context, drawPDFPageRef); // Render the PDF page into the context
 	}
 	
-	CGPDFPageRelease(drawPDFPageRef); CGPDFDocumentRelease(drawPDFDocRef); // Cleanup
+	// Cleanup
+	CGPDFPageRelease(drawPDFPageRef);
+	CGPDFDocumentRelease(drawPDFDocRef);
+	
+	// tell the delegate
+	[delegate contentPage:self didDrawLayer:layer inContext:context];
 }
 
 @end
@@ -562,7 +570,7 @@
 
 #pragma mark ReaderDocumentLink class methods
 
-+ (id)withRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary
++ (id)newWithRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary
 {
 	DXLog(@"");
 	

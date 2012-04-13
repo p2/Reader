@@ -28,6 +28,14 @@
 #import "ReaderThumbCache.h"
 #import "ReaderThumbQueue.h"
 
+
+@interface ReaderViewController ()
+
+@property (nonatomic, strong, readwrite) ReaderDocument *document;
+
+@end
+
+
 @implementation ReaderViewController
 
 #pragma mark Constants
@@ -41,9 +49,9 @@
 
 #pragma mark Properties
 
-@synthesize delegate;
+@synthesize delegate, document;
 
-#pragma mark Support methods
+#pragma mark - Support methods
 
 - (void)updateScrollViewContentSize
 {
@@ -69,7 +77,8 @@
 	[contentViews enumerateKeysAndObjectsUsingBlock: // Enumerate content views
 		^(id key, id object, BOOL *stop)
 		{
-			ReaderContentView *contentView = object; [pageSet addIndex:contentView.tag];
+			ReaderContentView *contentView = object;
+			[pageSet addIndex:contentView.tag];
 		}
 	];
 
@@ -132,17 +141,21 @@
 
 		NSMutableIndexSet *newPageSet = [NSMutableIndexSet new];
 		NSMutableDictionary *unusedViews = [contentViews mutableCopy];
-		CGRect viewRect = CGRectZero; viewRect.size = theScrollView.bounds.size;
+		CGRect viewRect = CGRectZero;
+		viewRect.size = theScrollView.bounds.size;
 
 		for (NSInteger number = minValue; number <= maxValue; number++) {
 			NSNumber *key = [NSNumber numberWithInteger:number]; // # key
 			ReaderContentView *contentView = [contentViews objectForKey:key];
 			if (contentView == nil) // Create a brand new document content view
 			{
-				NSURL *fileURL = document.fileURL; NSString *phrase = document.password; // Document properties
+				NSURL *fileURL = document.fileURL;
+				NSString *phrase = document.password;
 				contentView = [[ReaderContentView alloc] initWithFrame:viewRect fileURL:fileURL page:number password:phrase];
-				[theScrollView addSubview:contentView]; [contentViews setObject:contentView forKey:key];
-				contentView.message = self;  [newPageSet addIndex:number];
+				[theScrollView addSubview:contentView];
+				[contentViews setObject:contentView forKey:key];
+				contentView.message = self;
+				[newPageSet addIndex:number];
 			}
 			else // Reposition the existing content view
 			{
@@ -225,7 +238,7 @@
 	isVisible = YES; // iOS present modal bodge
 }
 
-#pragma mark UIViewController methods
+#pragma mark - UIViewController methods
 
 - (id)initWithReaderDocument:(ReaderDocument *)object
 {
@@ -461,7 +474,7 @@
 	lastHideTime = nil; document = nil;
 }
 
-#pragma mark UIScrollViewDelegate methods
+#pragma mark - UIScrollViewDelegate methods
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
@@ -494,7 +507,7 @@
 	theScrollView.tag = 0; // Clear page number tag
 }
 
-#pragma mark UIGestureRecognizerDelegate methods
+#pragma mark - UIGestureRecognizerDelegate methods
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)recognizer shouldReceiveTouch:(UITouch *)touch
 {
@@ -673,12 +686,13 @@
 		
 		if (CGRectContainsPoint(prevPageRect, point)) // page-- area
 		{
-			[self decrementPageNumber]; return;
+			[self decrementPageNumber];
+			return;
 		}
 	}
 }
 
-#pragma mark ReaderContentViewDelegate methods
+#pragma mark - ReaderContentViewDelegate methods
 
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches
 {
@@ -694,12 +708,21 @@
 			if (CGRectContainsPoint(areaRect, point) == false) return;
 		}
 		
-		[mainToolbar hideToolbar]; [mainPagebar hidePagebar]; // Hide
-		 lastHideTime = [NSDate new];
+		// Hide
+		[mainToolbar hideToolbar];
+		[mainPagebar hidePagebar];
+		lastHideTime = [NSDate new];
 	}
 }
 
-#pragma mark ReaderMainToolbarDelegate methods
+- (void)contentView:(ReaderContentView *)contentView didDrawLayer:(CALayer *)aLayer ofPage:(ReaderContentPage *)contentPage inContext:(CGContextRef)context
+{
+	if ([delegate respondsToSelector:@selector(controller:withContentView:didDrawLayer:ofPage:inContext:)]) {
+		[delegate controller:self withContentView:contentView didDrawLayer:aLayer ofPage:contentPage inContext:context];
+	}
+}
+
+#pragma mark - ReaderMainToolbarDelegate methods
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar doneButton:(UIButton *)button
 {
@@ -842,7 +865,7 @@
 	}
 }
 
-#pragma mark MFMailComposeViewControllerDelegate methods
+#pragma mark - MFMailComposeViewControllerDelegate methods
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
 {
@@ -855,7 +878,7 @@
 	[self dismissModalViewControllerAnimated:YES]; // Dismiss
 }
 
-#pragma mark ThumbsViewControllerDelegate methods
+#pragma mark - ThumbsViewControllerDelegate methods
 
 - (void)dismissThumbsViewController:(ThumbsViewController *)viewController
 {
@@ -872,7 +895,7 @@
 	[self showDocumentPage:page]; // Show the page
 }
 
-#pragma mark ReaderMainPagebarDelegate methods
+#pragma mark - ReaderMainPagebarDelegate methods
 
 - (void)pagebar:(ReaderMainPagebar *)pagebar gotoPage:(NSInteger)page
 {
@@ -881,7 +904,7 @@
 	[self showDocumentPage:page]; // Show the page
 }
 
-#pragma mark UIApplication notification methods
+#pragma mark - UIApplication notification methods
 
 - (void)applicationWill:(NSNotification *)notification
 {

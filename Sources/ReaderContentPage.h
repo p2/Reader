@@ -25,23 +25,32 @@
 
 #import <UIKit/UIKit.h>
 
+@class ReaderContentPage;
+
+@protocol ReaderContentPageDelegate <NSObject>
+
+@required
+- (void)contentPage:(ReaderContentPage *)contentPage didDrawLayer:(CALayer *)aLayer inContext:(CGContextRef)context;
+
+@end
+
+
 @interface ReaderContentPage : UIView
 {
 @private // Instance variables
-
 	NSMutableArray *_links;
-
+	
 	CGPDFDocumentRef _PDFDocRef;
-
 	CGPDFPageRef _PDFPageRef;
-
 	NSInteger _pageAngle;
-
+	
 	CGFloat _pageWidth;
 	CGFloat _pageHeight;
 	CGFloat _pageOffsetX;
 	CGFloat _pageOffsetY;
 }
+
+@property (nonatomic, unsafe_unretained) id<ReaderContentPageDelegate> delegate;
 
 - (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase;
 
@@ -58,18 +67,14 @@
 @interface ReaderDocumentLink : NSObject
 {
 @private // Instance variables
-
 	CGPDFDictionaryRef _dictionary;
-
 	CGRect _rect;
 }
 
 @property (nonatomic, assign, readonly) CGRect rect;
-
 @property (nonatomic, assign, readonly) CGPDFDictionaryRef dictionary;
 
-+ (id)withRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary;
-
++ (id)newWithRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary;
 - (id)initWithRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary;
 
 @end

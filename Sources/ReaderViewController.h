@@ -40,6 +40,7 @@
 @optional // Delegate protocols
 
 - (void)dismissReaderViewController:(ReaderViewController *)viewController;
+- (void)controller:(ReaderViewController *)aController withContentView:(ReaderContentView *)contentView didDrawLayer:(CALayer *)aLayer ofPage:(ReaderContentPage *)contentPage inContext:(CGContextRef)context;
 
 @end
 
@@ -48,8 +49,6 @@
 													ThumbsViewControllerDelegate>
 {
 @private // Instance variables
-	ReaderDocument *document;
-	
 	UIScrollView *theScrollView;
 	ReaderMainToolbar *mainToolbar;
 	ReaderMainPagebar *mainPagebar;
@@ -64,6 +63,7 @@
 }
 
 @property (nonatomic, unsafe_unretained, readwrite) id <ReaderViewControllerDelegate> delegate;
+@property (nonatomic, strong, readonly) ReaderDocument *document;
 
 - (id)initWithReaderDocument:(ReaderDocument *)object;
 

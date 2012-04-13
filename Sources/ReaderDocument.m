@@ -135,7 +135,7 @@
 	return document;
 }
 
-+ (ReaderDocument *)withDocumentFilePath:(NSString *)filePath password:(NSString *)phrase
++ (ReaderDocument *)newWithDocumentFilePath:(NSString *)filePath password:(NSString *)phrase
 {
 	DXLog(@"");
 

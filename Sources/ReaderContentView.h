@@ -25,6 +25,7 @@
 
 #import <UIKit/UIKit.h>
 
+#import "ReaderContentPage.h"
 #import "ReaderThumbView.h"
 
 @class ReaderContentView;
@@ -34,21 +35,18 @@
 @protocol ReaderContentViewDelegate <NSObject>
 
 @required // Delegate protocols
-
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches;
+- (void)contentView:(ReaderContentView *)contentView didDrawLayer:(CALayer *)aLayer ofPage:(ReaderContentPage *)contentPage inContext:(CGContextRef)context;
 
 @end
 
-@interface ReaderContentView : UIScrollView <UIScrollViewDelegate>
+@interface ReaderContentView : UIScrollView <UIScrollViewDelegate, ReaderContentPageDelegate>
 {
 @private // Instance variables
-
 	ReaderContentPage *theContentView;
-
 	ReaderContentThumb *theThumbView;
-
 	UIView *theContainerView;
-
+	
 	CGFloat zoomAmount;
 }
 
@@ -57,7 +55,6 @@
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page password:(NSString *)phrase;
 
 - (void)showPageThumb:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase guid:(NSString *)guid;
-
 - (id)singleTap:(UITapGestureRecognizer *)recognizer;
 
 - (void)zoomIncrement;
