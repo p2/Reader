@@ -29,11 +29,6 @@
 
 @implementation ReaderContentPage
 
-@synthesize delegate;
-
-//#pragma mark Properties
-
-//@synthesize ;
 
 #pragma mark - ReaderContentPage class methods
 
@@ -73,7 +68,6 @@
 	DXLog(@"");
 	
 	ReaderDocumentLink *documentLink = nil; // Document link object
-	
 	CGPDFArrayRef annotationRectArray = NULL; // Annotation co-ordinates array
 	
 	if (CGPDFDictionaryGetArray(annotationDictionary, "Rect", &annotationRectArray))
@@ -400,7 +394,7 @@
 	{
 		if ((self = [super initWithFrame:frame]))
 		{
-			self.autoresizesSubviews = NO;
+			//self.autoresizesSubviews = NO;
 			self.userInteractionEnabled = NO;
 			self.clearsContextBeforeDrawing = NO;
 			self.contentMode = UIViewContentModeRedraw;
@@ -548,9 +542,6 @@
 	// Cleanup
 	CGPDFPageRelease(drawPDFPageRef);
 	CGPDFDocumentRelease(drawPDFDocRef);
-	
-	// tell the delegate
-	[delegate contentPage:self didDrawLayer:layer inContext:context];
 }
 
 @end

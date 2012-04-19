@@ -143,7 +143,8 @@
 		NSMutableDictionary *unusedViews = [contentViews mutableCopy];
 		CGRect viewRect = CGRectZero;
 		viewRect.size = theScrollView.bounds.size;
-
+		
+		BOOL informDelegate = [delegate respondsToSelector:@selector(controller:didAddContentView:page:)];
 		for (NSInteger number = minValue; number <= maxValue; number++) {
 			NSNumber *key = [NSNumber numberWithInteger:number]; // # key
 			ReaderContentView *contentView = [contentViews objectForKey:key];
@@ -152,6 +153,9 @@
 				NSURL *fileURL = document.fileURL;
 				NSString *phrase = document.password;
 				contentView = [[ReaderContentView alloc] initWithFrame:viewRect fileURL:fileURL page:number password:phrase];
+				if (informDelegate) {
+					[delegate controller:self didAddContentView:contentView page:number];
+				}
 				[theScrollView addSubview:contentView];
 				[contentViews setObject:contentView forKey:key];
 				contentView.message = self;
@@ -712,13 +716,6 @@
 		[mainToolbar hideToolbar];
 		[mainPagebar hidePagebar];
 		lastHideTime = [NSDate new];
-	}
-}
-
-- (void)contentView:(ReaderContentView *)contentView didDrawLayer:(CALayer *)aLayer ofPage:(ReaderContentPage *)contentPage inContext:(CGContextRef)context
-{
-	if ([delegate respondsToSelector:@selector(controller:withContentView:didDrawLayer:ofPage:inContext:)]) {
-		[delegate controller:self withContentView:contentView didDrawLayer:aLayer ofPage:contentPage inContext:context];
 	}
 }
 

@@ -31,6 +31,14 @@
 
 #import <QuartzCore/QuartzCore.h>
 
+
+@interface ReaderContentView ()
+
+@property (nonatomic, readwrite, strong) ReaderContentPage *contentPage;
+
+@end
+
+
 @implementation ReaderContentView
 
 #pragma mark Constants
@@ -48,7 +56,7 @@
 
 #pragma mark Properties
 
-@synthesize message;
+@synthesize message, contentPage;
 
 #pragma mark - ReaderContentView functions
 
@@ -64,7 +72,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 - (void)updateMinimumMaximumZoom
 {
 	CGRect targetRect = CGRectInset(self.bounds, CONTENT_INSET, CONTENT_INSET);
-	CGFloat zoomScale = ZoomScaleThatFits(targetRect.size, theContentView.bounds.size);
+	CGFloat zoomScale = ZoomScaleThatFits(targetRect.size, contentPage.bounds.size);
 	self.minimumZoomScale = zoomScale; // Set the minimum and maximum zoom scales
 	
 	self.maximumZoomScale = (zoomScale * ZOOM_LEVELS); // Max number of zoom levels
@@ -89,11 +97,10 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 		self.autoresizesSubviews = NO;
 		self.bouncesZoom = YES;
 		self.delegate = self;
-		theContentView = [[ReaderContentPage alloc] initWithURL:fileURL page:page password:phrase];
-		theContentView.delegate = self;
-		if (theContentView != nil) // Must have a valid and initialized content view
+		self.contentPage = [[ReaderContentPage alloc] initWithURL:fileURL page:page password:phrase];
+		if (contentPage != nil) // Must have a valid and initialized content view
 		{
-			theContainerView = [[UIView alloc] initWithFrame:theContentView.bounds];
+			theContainerView = [[UIView alloc] initWithFrame:contentPage.bounds];
 			theContainerView.autoresizesSubviews = NO;
 			theContainerView.userInteractionEnabled = NO;
 			theContainerView.contentMode = UIViewContentModeRedraw;
@@ -108,13 +115,13 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 			
 #endif // end of READER_SHOW_SHADOWS Option
 			
-			self.contentSize = theContentView.bounds.size; // Content size same as view size
+			self.contentSize = contentPage.bounds.size; // Content size same as view size
 			self.contentOffset = CGPointMake((0.0f - CONTENT_INSET), (0.0f - CONTENT_INSET)); // Offset
 			self.contentInset = UIEdgeInsetsMake(CONTENT_INSET, CONTENT_INSET, CONTENT_INSET, CONTENT_INSET);
-			theThumbView = [[ReaderContentThumb alloc] initWithFrame:theContentView.bounds]; // Page thumb view
+			theThumbView = [[ReaderContentThumb alloc] initWithFrame:contentPage.bounds]; // Page thumb view
 			
 			[theContainerView addSubview:theThumbView]; // Add the thumb view to the container view
-			[theContainerView addSubview:theContentView]; // Add the content view to the container view
+			[theContainerView addSubview:contentPage]; // Add the content view to the container view
 			[self addSubview:theContainerView]; // Add the container view to the scroll view
 			
 			[self updateMinimumMaximumZoom]; // Update the minimum and maximum zoom scales
@@ -134,9 +141,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 	
 	[self removeObserver:self forKeyPath:@"frame"];
 	theContainerView = nil;
-	theContentView = nil;
 	theThumbView = nil;
-	
 }
 
 - (void)showPageThumb:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase guid:(NSString *)guid
@@ -204,7 +209,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 {
 	DXLog(@"");
 	
-	return [theContentView singleTap:recognizer];
+	return [contentPage singleTap:recognizer];
 }
 
 - (void)zoomIncrement
@@ -251,13 +256,6 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 	{
 		self.zoomScale = self.minimumZoomScale;
 	}
-}
-
-#pragma mark - ReaderContentPage delegate methods
-
-- (void)contentPage:(ReaderContentPage *)contentPage didDrawLayer:(CALayer *)aLayer inContext:(CGContextRef)context
-{
-	[message contentView:self didDrawLayer:aLayer ofPage:contentPage inContext:context];
 }
 
 

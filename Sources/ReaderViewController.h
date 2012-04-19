@@ -40,7 +40,7 @@
 @optional // Delegate protocols
 
 - (void)dismissReaderViewController:(ReaderViewController *)viewController;
-- (void)controller:(ReaderViewController *)aController withContentView:(ReaderContentView *)contentView didDrawLayer:(CALayer *)aLayer ofPage:(ReaderContentPage *)contentPage inContext:(CGContextRef)context;
+- (void)controller:(ReaderViewController *)aController didAddContentView:(ReaderContentView *)contentView page:(NSInteger)pageNumber;
 
 @end
 

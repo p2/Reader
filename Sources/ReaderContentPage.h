@@ -25,16 +25,10 @@
 
 #import <UIKit/UIKit.h>
 
-@class ReaderContentPage;
 
-@protocol ReaderContentPageDelegate <NSObject>
-
-@required
-- (void)contentPage:(ReaderContentPage *)contentPage didDrawLayer:(CALayer *)aLayer inContext:(CGContextRef)context;
-
-@end
-
-
+/**
+ *	A class responsible with drawing one page of a PDF document
+ */
 @interface ReaderContentPage : UIView
 {
 @private // Instance variables
@@ -49,8 +43,6 @@
 	CGFloat _pageOffsetX;
 	CGFloat _pageOffsetY;
 }
-
-@property (nonatomic, unsafe_unretained) id<ReaderContentPageDelegate> delegate;
 
 - (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase;
 

@@ -126,9 +126,7 @@ BOOL CGPDFDocumentNeedsPassword(CFURLRef theURL, NSString *password)
 	}
 	else // Log an error diagnostic
 	{
-		#ifdef DEBUG
-			NSLog(@"CGPDFDocumentNeedsPassword: theURL == NULL");
-		#endif
+		DLog(@"CGPDFDocumentNeedsPassword: theURL == NULL");
 	}
 
 	return needPassword;

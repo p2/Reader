@@ -36,14 +36,12 @@
 
 @required // Delegate protocols
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches;
-- (void)contentView:(ReaderContentView *)contentView didDrawLayer:(CALayer *)aLayer ofPage:(ReaderContentPage *)contentPage inContext:(CGContextRef)context;
 
 @end
 
-@interface ReaderContentView : UIScrollView <UIScrollViewDelegate, ReaderContentPageDelegate>
+@interface ReaderContentView : UIScrollView <UIScrollViewDelegate>
 {
 @private // Instance variables
-	ReaderContentPage *theContentView;
 	ReaderContentThumb *theThumbView;
 	UIView *theContainerView;
 	
@@ -51,6 +49,7 @@
 }
 
 @property (nonatomic, unsafe_unretained, readwrite) id <ReaderContentViewDelegate> message;
+@property (nonatomic, readonly, strong) ReaderContentPage *contentPage;
 
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page password:(NSString *)phrase;
 
