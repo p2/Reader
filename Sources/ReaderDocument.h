@@ -27,17 +27,8 @@
 
 @interface ReaderDocument : NSObject <NSCoding>
 {
-@private // Instance variables
-
-	NSString *_guid;
-	NSDate *_fileDate;
-	NSDate *_lastOpen;
-	NSNumber *_fileSize;
-	NSNumber *_pageCount;
-	NSNumber *_pageNumber;
-	NSMutableIndexSet *_bookmarks;
+@private
 	NSString *_fileName;
-	NSString *_password;
 	NSURL *_fileURL;
 }
 

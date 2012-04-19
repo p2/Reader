@@ -77,10 +77,11 @@
 
 		CGFloat titleX = BUTTON_X; CGFloat titleWidth = (viewWidth - (titleX + titleX));
 
+#if !READER_STANDALONE || READER_ENABLE_THUMBS
 		CGFloat leftButtonX = BUTTON_X; // Left button start X position
+#endif
 
-#if (READER_STANDALONE == FALSE) // Option
-
+#if !READER_STANDALONE
 		UIButton *doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
 
 		doneButton.frame = CGRectMake(leftButtonX, BUTTON_Y, DONE_BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -96,11 +97,9 @@
 		[self addSubview:doneButton]; leftButtonX += (DONE_BUTTON_WIDTH + BUTTON_SPACE);
 
 		titleX += (DONE_BUTTON_WIDTH + BUTTON_SPACE); titleWidth -= (DONE_BUTTON_WIDTH + BUTTON_SPACE);
+#endif
 
-#endif // end of READER_STANDALONE Option
-
-#if (READER_ENABLE_THUMBS == TRUE) // Option
-
+#if READER_ENABLE_THUMBS
 		UIButton *thumbsButton = [UIButton buttonWithType:UIButtonTypeCustom];
 
 		thumbsButton.frame = CGRectMake(leftButtonX, BUTTON_Y, THUMBS_BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -113,13 +112,10 @@
 		[self addSubview:thumbsButton]; //leftButtonX += (THUMBS_BUTTON_WIDTH + BUTTON_SPACE);
 
 		titleX += (THUMBS_BUTTON_WIDTH + BUTTON_SPACE); titleWidth -= (THUMBS_BUTTON_WIDTH + BUTTON_SPACE);
-
-#endif // end of READER_ENABLE_THUMBS Option
+#endif
 
 		CGFloat rightButtonX = viewWidth; // Right button start X position
-
-#if (READER_BOOKMARKS == TRUE) // Option
-
+#if READER_BOOKMARKS
 		rightButtonX -= (MARK_BUTTON_WIDTH + BUTTON_SPACE);
 
 		UIButton *flagButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -137,11 +133,9 @@
 
 		markImageN = [UIImage imageNamed:@"Reader-Mark-N.png"]; // N image
 		markImageY = [UIImage imageNamed:@"Reader-Mark-Y.png"]; // Y image
+#endif
 
-#endif // end of READER_BOOKMARKS Option
-
-#if (READER_ENABLE_MAIL == TRUE) // Option
-
+#if READER_ENABLE_MAIL
 		if ([MFMailComposeViewController canSendMail] == YES) // Can email
 		{
 			unsigned long long fileSize = [object.fileSize unsignedLongLongValue];
@@ -162,11 +156,9 @@
 				[self addSubview:emailButton]; titleWidth -= (EMAIL_BUTTON_WIDTH + BUTTON_SPACE);
 			}
 		}
+#endif
 
-#endif // end of READER_ENABLE_MAIL Option
-
-#if (READER_ENABLE_PRINT == TRUE) // Option
-
+#if READER_ENABLE_PRINT
 		if (object.password == nil) // We can only print documents without passwords
 		{
 			Class printInteractionController = NSClassFromString(@"UIPrintInteractionController");
@@ -187,8 +179,7 @@
 				[self addSubview:printButton]; titleWidth -= (PRINT_BUTTON_WIDTH + BUTTON_SPACE);
 			}
 		}
-
-#endif // end of READER_ENABLE_PRINT Option
+#endif
 
 		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
 		{
@@ -230,7 +221,7 @@
 {
 	DXLog(@"");
 
-#if (READER_BOOKMARKS == TRUE) // Option
+#if READER_BOOKMARKS // Option
 
 	if (state != markButton.tag) // Only if different state
 	{
@@ -251,7 +242,7 @@
 {
 	DXLog(@"");
 
-#if (READER_BOOKMARKS == TRUE) // Option
+#if READER_BOOKMARKS // Option
 
 	if (markButton.tag != NSIntegerMin) // Valid tag
 	{

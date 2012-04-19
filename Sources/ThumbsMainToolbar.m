@@ -86,7 +86,7 @@
 
 		titleX += (DONE_BUTTON_WIDTH + BUTTON_SPACE); titleWidth -= (DONE_BUTTON_WIDTH + BUTTON_SPACE);
 
-#if (READER_BOOKMARKS == TRUE) // Option
+#if READER_BOOKMARKS // Option
 
 		CGFloat showControlX = (viewWidth - (SHOW_CONTROL_WIDTH + BUTTON_SPACE));
 

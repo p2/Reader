@@ -37,12 +37,11 @@
 
 @protocol ReaderViewControllerDelegate <NSObject>
 
-@optional // Delegate protocols
-
+@optional
 - (void)dismissReaderViewController:(ReaderViewController *)viewController;
-- (void)controller:(ReaderViewController *)aController didAddContentView:(ReaderContentView *)contentView page:(NSInteger)pageNumber;
 
 @end
+
 
 @interface ReaderViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate, MFMailComposeViewControllerDelegate,
 													ReaderMainToolbarDelegate, ReaderMainPagebarDelegate, ReaderContentViewDelegate,
@@ -66,5 +65,9 @@
 @property (nonatomic, strong, readonly) ReaderDocument *document;
 
 - (id)initWithReaderDocument:(ReaderDocument *)object;
+
+- (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSInteger)pageNumber;
+- (NSData *)documentData;
+
 
 @end

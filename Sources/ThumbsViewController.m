@@ -383,13 +383,11 @@
 		backView.autoresizingMask = UIViewAutoresizingNone;
 		backView.backgroundColor = [UIColor whiteColor];
 
-#if (READER_SHOW_SHADOWS == TRUE) // Option
-
+#if READER_SHOW_SHADOWS
 		backView.layer.shadowOffset = CGSizeMake(0.0f, 1.0f);
 		backView.layer.shadowRadius = 3.0f; backView.layer.shadowOpacity = 1.0f;
 		backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
-
-#endif // end of READER_SHOW_SHADOWS Option
+#endif
 
 		[self insertSubview:backView belowSubview:textLabel];
 
@@ -446,9 +444,9 @@
 	imageView.bounds = viewRect; imageView.center = location; imageView.image = image;
 	bookMark.frame = [self markRectInImageView]; // Position bookmark image
 	maskView.frame = imageView.bounds; backView.bounds = viewRect; backView.center = location;
-#if (READER_SHOW_SHADOWS == TRUE) // Option
+#if READER_SHOW_SHADOWS
 	backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
-#endif // end of READER_SHOW_SHADOWS Option
+#endif
 }
 
 - (void)reuse
@@ -461,9 +459,9 @@
 	imageView.image = nil; imageView.frame = defaultRect;
 	bookMark.hidden = YES; bookMark.frame = [self markRectInImageView];
 	maskView.hidden = YES; maskView.frame = imageView.bounds; backView.frame = defaultRect;
-#if (READER_SHOW_SHADOWS == TRUE) // Option
+#if READER_SHOW_SHADOWS
 	backView.layer.shadowPath = [UIBezierPath bezierPathWithRect:backView.bounds].CGPath;
-#endif // end of READER_SHOW_SHADOWS Option
+#endif
 }
 
 - (void)showBookmark:(BOOL)show

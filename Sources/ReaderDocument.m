@@ -41,7 +41,7 @@
 @synthesize password = _password;
 @dynamic fileName, fileURL;
 
-#pragma mark ReaderDocument class methods
+#pragma mark - ReaderDocument class methods
 
 + (NSString *)GUID
 {
@@ -178,7 +178,7 @@
 	return state;
 }
 
-#pragma mark ReaderDocument instance methods
+#pragma mark - ReaderDocument instance methods
 
 - (id)initWithFilePath:(NSString *)fullFilePath password:(NSString *)phrase
 {
@@ -227,18 +227,10 @@
 
 - (void)dealloc
 {
-	DXLog(@"");
+	DXLog(@"DEALLOC");
 
-	_guid = nil;
 	_fileURL = nil;
-	_password = nil;
 	_fileName = nil;
-	_pageCount = nil;
-	_pageNumber = nil;
-	_bookmarks = nil;
-	_fileSize = nil;
-	_fileDate = nil;
-	_lastOpen = nil;
 }
 
 - (NSString *)fileName
@@ -261,10 +253,11 @@
 	return _fileURL;
 }
 
+
+#pragma mark - Archiving/NSCoding
 - (BOOL)archiveWithFileName:(NSString *)filename
 {
 	DXLog(@"");
-
 	NSString *archiveFilePath = [ReaderDocument archiveFilePath:filename];
 	return [NSKeyedArchiver archiveRootObject:self toFile:archiveFilePath];
 }
@@ -272,7 +265,6 @@
 - (void)saveReaderDocument
 {
 	DXLog(@"");
-
 	[self archiveWithFileName:[self fileName]];
 }
 
@@ -281,7 +273,6 @@
 	DXLog(@"");
 }
 
-#pragma mark NSCoding protocol methods
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {

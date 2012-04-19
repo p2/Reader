@@ -51,12 +51,13 @@
 
 @synthesize delegate, document;
 
-#pragma mark - Support methods
+
+#pragma mark - UI Support methods
 
 - (void)updateScrollViewContentSize
 {
 	DXLog(@"");
-
+	
 	NSInteger count = [document.pageCount integerValue];
 	if (count > PAGING_VIEWS) {
 		count = PAGING_VIEWS; // Limit
@@ -70,7 +71,7 @@
 - (void)updateScrollViewContentViews
 {
 	DXLog(@"");
-
+	
 	[self updateScrollViewContentSize]; // Update the content size
 	NSMutableIndexSet *pageSet = [NSMutableIndexSet indexSet]; // Page set
 	
@@ -104,7 +105,7 @@
 - (void)updateToolbarBookmarkIcon
 {
 	DXLog(@"");
-
+	
 	NSInteger page = [document.pageNumber integerValue];
 	BOOL bookmarked = [document.bookmarks containsIndex:page];
 	[mainToolbar setBookmarkState:bookmarked]; // Update
@@ -113,7 +114,7 @@
 - (void)showDocumentPage:(NSInteger)page
 {
 	DXLog(@"");
-
+	
 	if (page != currentPage) // Only if different
 	{
 		NSInteger minValue; NSInteger maxValue;
@@ -144,7 +145,6 @@
 		CGRect viewRect = CGRectZero;
 		viewRect.size = theScrollView.bounds.size;
 		
-		BOOL informDelegate = [delegate respondsToSelector:@selector(controller:didAddContentView:page:)];
 		for (NSInteger number = minValue; number <= maxValue; number++) {
 			NSNumber *key = [NSNumber numberWithInteger:number]; // # key
 			ReaderContentView *contentView = [contentViews objectForKey:key];
@@ -153,9 +153,7 @@
 				NSURL *fileURL = document.fileURL;
 				NSString *phrase = document.password;
 				contentView = [[ReaderContentView alloc] initWithFrame:viewRect fileURL:fileURL page:number password:phrase];
-				if (informDelegate) {
-					[delegate controller:self didAddContentView:contentView page:number];
-				}
+				[self didAddContentView:contentView forPage:number];
 				[theScrollView addSubview:contentView];
 				[contentViews setObject:contentView forKey:key];
 				contentView.message = self;
@@ -235,19 +233,67 @@
 - (void)showDocument:(id)object
 {
 	DXLog(@"");
-
+	
 	[self updateScrollViewContentSize]; // Set content size
 	[self showDocumentPage:[document.pageNumber integerValue]]; // Show
 	document.lastOpen = [NSDate date]; // Update last opened date
 	isVisible = YES; // iOS present modal bodge
 }
 
+/**
+ *	Called when we add a new view for our document. The default implementation does nothing.
+ */
+- (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSInteger)pageNumber
+{
+}
+
+
+#pragma mark - Turning our Document into NSData
+/**
+ *	@returns An NSData representation of the document, depending on READER_REDRAW_FOR_EXPORT either just read from file or re-rendered into a PDF context
+ */
+- (NSData *)documentData
+{
+# if READER_REDRAW_FOR_EXPORT
+	NSArray *pages = [contentViews allValues];
+	if ([pages count] > 0) {
+		NSMutableData* pdfData = [NSMutableData data];
+		
+		// create the PDF context using the media box of the first page
+		ReaderContentView *firstPage = [pages objectAtIndex:0];
+		CGRect mediaBox = firstPage.contentPage.bounds;
+		UIGraphicsBeginPDFContextToData(pdfData, mediaBox, nil);
+		CGContextRef pdf = UIGraphicsGetCurrentContext();
+		
+		// render all pages
+		NSUInteger numPages = [[document pageCount] unsignedIntegerValue];
+		for (NSUInteger number = 1; number <= numPages; number++) {
+			NSNumber *key = [NSNumber numberWithInteger:number];
+			ReaderContentPage *contentPage = [[contentViews objectForKey:key] contentPage];
+			if (contentPage) {
+				UIGraphicsBeginPDFPageWithInfo(contentPage.bounds, nil);
+				[contentPage.layer renderInContext:pdf];
+			}
+		}
+		
+		// return data
+		UIGraphicsEndPDFContext();
+		return pdfData;
+	}
+	DXLog(@"There are no pages in our document");
+	return nil;
+# else
+	return [NSData dataWithContentsOfURL:document.fileURL options:(NSDataReadingMapped|NSDataReadingUncached) error:nil];
+# endif
+}
+
+
+
 #pragma mark - UIViewController methods
 
 - (id)initWithReaderDocument:(ReaderDocument *)object
 {
 	DXLog(@"");
-
 	id reader = nil; // ReaderViewController object
 
 	if ((object != nil) && ([object isKindOfClass:[ReaderDocument class]]))
@@ -278,10 +324,7 @@
 
 - (void)viewDidLoad
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
+	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	[super viewDidLoad];
 
 	NSAssert(!(document == nil), @"ReaderDocument == nil");
@@ -339,15 +382,13 @@
 	[self.view addGestureRecognizer:doubleTapOne]; 
 	[self.view addGestureRecognizer:doubleTapTwo]; 
 	
-	contentViews = [NSMutableDictionary new]; lastHideTime = [NSDate new];
+	contentViews = [NSMutableDictionary new];
+	lastHideTime = [NSDate new];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
+	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	[super viewWillAppear:animated];
 
 	if (CGSizeEqualToSize(lastAppearSize, CGSizeZero) == false)
@@ -363,43 +404,33 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
+	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	[super viewDidAppear:animated];
-
+	
 	if (CGSizeEqualToSize(theScrollView.contentSize, CGSizeZero)) // First time
 	{
 		[self performSelector:@selector(showDocument:) withObject:nil afterDelay:0.02];
 	}
 
-#if (READER_DISABLE_IDLE == TRUE) // Option
-
+#if READER_DISABLE_IDLE
 	[UIApplication sharedApplication].idleTimerDisabled = YES;
-
-#endif // end of READER_DISABLE_IDLE Option
+#endif
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
+	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	[super viewWillDisappear:animated];
 	lastAppearSize = self.view.bounds.size; // Track view size
-
-#if (READER_DISABLE_IDLE == TRUE) // Option
+	
+#if READER_DISABLE_IDLE
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
-#endif // end of READER_DISABLE_IDLE Option
+#endif
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
+	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	
 	[super viewDidDisappear:animated];
 }
@@ -407,7 +438,6 @@
 - (void)viewDidUnload
 {
 	DXLog(@"");
-	
 	mainToolbar = nil; mainPagebar = nil;
 	theScrollView = nil; contentViews = nil;
 	lastHideTime = nil; lastAppearSize = CGSizeZero; currentPage = 0;
@@ -417,19 +447,14 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-#ifdef DEBUGX
-	NSLog(@"%s (%d)", __FUNCTION__, interfaceOrientation);
-#endif
-
+	DXLog(@"%d", interfaceOrientation);
 	return YES;
 }
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), toInterfaceOrientation);
-#endif
-
+	DXLog(@"%@ (%d)", NSStringFromCGRect(self.view.bounds), toInterfaceOrientation);
+	
 	if (isVisible == NO) return; // iOS present modal bodge
 
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
@@ -440,10 +465,8 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), interfaceOrientation);
-#endif
-
+	DXLog(@"%@ (%d)", NSStringFromCGRect(self.view.bounds), interfaceOrientation);
+	
 	if (isVisible == NO) return; // iOS present modal bodge
 
 	[self updateScrollViewContentViews]; // Update content views
@@ -452,10 +475,7 @@
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d to %d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), fromInterfaceOrientation, self.interfaceOrientation);
-#endif
-
+	DXLog(@"%@ (%d to %d)", NSStringFromCGRect(self.view.bounds), fromInterfaceOrientation, [self interfaceOrientation]);
 	//if (isVisible == NO) return; // iOS present modal bodge
 	//if (fromInterfaceOrientation == self.interfaceOrientation) return;
 }
@@ -463,19 +483,20 @@
 - (void)didReceiveMemoryWarning
 {
 	DXLog(@"");
-
 	[super didReceiveMemoryWarning];
 }
 
 - (void)dealloc
 {
 	DXLog(@"");
-
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-
-	mainToolbar = nil; mainPagebar = nil;
-	theScrollView = nil; contentViews = nil;
-	lastHideTime = nil; document = nil;
+	
+	mainToolbar = nil;
+	mainPagebar = nil;
+	theScrollView = nil;
+	contentViews = nil;
+	lastHideTime = nil;
+	document = nil;
 }
 
 #pragma mark - UIScrollViewDelegate methods
@@ -483,7 +504,6 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
 	DXLog(@"");
-
 	__block NSInteger page = 0;
 
 	CGFloat contentOffsetX = scrollView.contentOffset.x;
@@ -494,7 +514,8 @@
 			ReaderContentView *contentView = object;
 			if (contentView.frame.origin.x == contentOffsetX)
 			{
-				page = contentView.tag; *stop = YES;
+				page = contentView.tag;
+				*stop = YES;
 			}
 		}
 	];
@@ -725,8 +746,7 @@
 {
 	DXLog(@"");
 
-#if (READER_STANDALONE == FALSE) // Option
-
+#if !READER_STANDALONE
 	[document saveReaderDocument]; // Save any ReaderDocument object changes
 	[[ReaderThumbQueue sharedInstance] cancelOperationsWithGUID:document.guid];
 	[[ReaderThumbCache sharedInstance] removeAllObjects]; // Empty the thumb cache
@@ -741,8 +761,7 @@
 	{
 		NSAssert(NO, @"Delegate must respond to -dismissReaderViewController:");
 	}
-
-#endif // end of READER_STANDALONE Option
+#endif
 }
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar thumbsButton:(UIButton *)button
@@ -762,17 +781,15 @@
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar printButton:(UIButton *)button
 {
 	DXLog(@"");
-
-#if (READER_ENABLE_PRINT == TRUE) // Option
-
+	
+#if READER_ENABLE_PRINT
 	Class printInteractionController = NSClassFromString(@"UIPrintInteractionController");
 
 	if ((printInteractionController != nil) && [printInteractionController isPrintingAvailable])
 	{
-		NSURL *fileURL = document.fileURL; // Document file URL
+		NSData *pdfData = [self documentData];
 		printInteraction = [printInteractionController sharedPrintController];
-		if ([printInteractionController canPrintURL:fileURL] == YES) // Check first
-		{
+		if ([printInteractionController canPrintData:pdfData] == YES) {
 			UIPrintInfo *printInfo = [NSClassFromString(@"UIPrintInfo") printInfo];
 			
 			printInfo.duplex = UIPrintInfoDuplexLongEdge;
@@ -780,7 +797,7 @@
 			printInfo.jobName = document.fileName;
 			
 			printInteraction.printInfo = printInfo;
-			printInteraction.printingItem = fileURL;
+			printInteraction.printingItem = pdfData;
 			printInteraction.showsPageRange = YES;
 			
 			if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)
@@ -806,41 +823,47 @@
 				];
 			}
 		}
+		else {
+			NSLog(@"Cannot print this PDF data!");
+		}
 	}
-
-#endif // end of READER_ENABLE_PRINT Option
+#endif
 }
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar emailButton:(UIButton *)button
 {
 	DXLog(@"");
 
-#if (READER_ENABLE_MAIL == TRUE) // Option
-
-	if ([MFMailComposeViewController canSendMail] == NO) return;
-
-	if (printInteraction != nil) [printInteraction dismissAnimated:YES];
-	unsigned long long fileSize = [document.fileSize unsignedLongLongValue];
-
-	if (fileSize < (unsigned long long)15728640) // Check attachment size limit (15MB)
-	{
-		NSURL *fileURL = document.fileURL; NSString *fileName = document.fileName; // Document
-		NSData *attachment = [NSData dataWithContentsOfURL:fileURL options:(NSDataReadingMapped|NSDataReadingUncached) error:nil];
-		if (attachment != nil) // Ensure that we have valid document file attachment data
-		{
-			MFMailComposeViewController *mailComposer = [MFMailComposeViewController new];
-			[mailComposer addAttachmentData:attachment mimeType:@"application/pdf" fileName:fileName];
-			[mailComposer setSubject:fileName]; // Use the document file name for the subject
-			
-			mailComposer.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-			mailComposer.modalPresentationStyle = UIModalPresentationFormSheet;
-			mailComposer.mailComposeDelegate = self; // Set the delegate
-			
-			[self presentModalViewController:mailComposer animated:YES];
-		}
+#if READER_ENABLE_MAIL
+	if ([MFMailComposeViewController canSendMail] == NO) {
+		return;
 	}
-
-#endif // end of READER_ENABLE_MAIL Option
+	if (printInteraction != nil) {
+		[printInteraction dismissAnimated:YES];
+	}
+	
+	// attach the PDF if it's not too big
+	NSData *attachment = [self documentData];
+	if (attachment && [attachment length] < (unsigned long long)15728640) {		// Check attachment size limit (15MB)
+		NSString *fileName = document.fileName;
+		
+		MFMailComposeViewController *mailComposer = [MFMailComposeViewController new];
+		[mailComposer addAttachmentData:attachment mimeType:@"application/pdf" fileName:fileName];
+		[mailComposer setSubject:fileName]; // Use the document file name for the subject
+		
+		mailComposer.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+		mailComposer.modalPresentationStyle = UIModalPresentationFormSheet;
+		mailComposer.mailComposeDelegate = self; // Set the delegate
+		
+		[self presentModalViewController:mailComposer animated:YES];
+	}
+	else if (attachment) {
+		NSLog(@"PDF is too big: %d KB", [attachment length] / 1024);
+	}
+	else {
+		NSLog(@"Did not get data!");
+	}
+#endif
 }
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar markButton:(UIButton *)button
