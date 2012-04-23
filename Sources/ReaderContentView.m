@@ -150,9 +150,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 	
 	CGSize size = (large ? CGSizeMake(PAGE_THUMB_LARGE, PAGE_THUMB_LARGE) : CGSizeMake(PAGE_THUMB_SMALL, PAGE_THUMB_SMALL));
 	ReaderThumbRequest *request = [ReaderThumbRequest forView:theThumbView fileURL:fileURL password:phrase guid:guid page:page size:size];
-	UIImage *image = [[ReaderThumbCache sharedInstance] thumbRequest:request priority:YES]; // Request the page thumb
-	
-	if ([image isKindOfClass:[UIImage class]]) [theThumbView showImage:image]; // Show image from cache
+	[request process];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -206,7 +204,6 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 - (id)singleTap:(UITapGestureRecognizer *)recognizer
 {
 	DXLog(@"");
-	
 	return [contentPage singleTap:recognizer];
 }
 

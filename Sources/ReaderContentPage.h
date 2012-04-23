@@ -31,7 +31,7 @@
  */
 @interface ReaderContentPage : UIView
 {
-@private // Instance variables
+@private
 	NSMutableArray *_links;
 	
 	CGPDFDocumentRef _PDFDocRef;
@@ -58,7 +58,7 @@
 
 @interface ReaderDocumentLink : NSObject
 {
-@private // Instance variables
+@private
 	CGPDFDictionaryRef _dictionary;
 	CGRect _rect;
 }

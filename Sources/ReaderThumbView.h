@@ -25,27 +25,25 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ReaderThumbView : UIView
+
+/**
+ *	A view that shows an image, usually delivered from a ReaderThumbRequest as a PDF thumbnail
+ */
+@interface ReaderThumbView : UIControl
 {
-@private // Instance variables
-
+@private
 	NSUInteger _targetTag;
-
 	NSOperation *__unsafe_unretained _operation;
-
-@protected // Instance variables
-
+	
+@protected
 	UIImageView *imageView;
 }
 
 @property (unsafe_unretained, readwrite) NSOperation *operation;
-
 @property (nonatomic, assign, readwrite) NSUInteger targetTag;
 
 - (void)showImage:(UIImage *)image;
-
 - (void)showTouched:(BOOL)touched;
-
 - (void)reuse;
 
 @end

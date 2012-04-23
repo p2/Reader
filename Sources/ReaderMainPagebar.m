@@ -270,11 +270,7 @@
 			
 			smallThumbView = [[ReaderPagebarThumb alloc] initWithFrame:thumbRect small:YES]; // Create a small thumb view
 			ReaderThumbRequest *thumbRequest = [ReaderThumbRequest forView:smallThumbView fileURL:fileURL password:phrase guid:guid page:page size:size];
-			
-			UIImage *image = [[ReaderThumbCache sharedInstance] thumbRequest:thumbRequest priority:NO]; // Request the thumb
-			if ([image isKindOfClass:[UIImage class]]) {
-				[smallThumbView showImage:image]; // Use thumb image from cache
-			}
+			[thumbRequest processWithoutPriority];
 
 			[trackControl addSubview:smallThumbView]; [miniThumbViews setObject:smallThumbView forKey:key];
 			smallThumbView = nil; // Cleanup

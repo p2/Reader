@@ -37,24 +37,21 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-	DXLog(@"");
-
-	if ((self = [super initWithFrame:frame]))
-	{
-		self.autoresizesSubviews = NO;
+	if ((self = [super initWithFrame:frame])) {
+		//self.autoresizesSubviews = NO;
 		self.userInteractionEnabled = NO;
 		self.contentMode = UIViewContentModeRedraw;
 		self.autoresizingMask = UIViewAutoresizingNone;
-		self.backgroundColor = [UIColor clearColor];
+		self.backgroundColor = [UIColor whiteColor];
 
 		imageView = [[UIImageView alloc] initWithFrame:self.bounds];
 
 		imageView.autoresizesSubviews = NO;
 		imageView.userInteractionEnabled = NO;
 		imageView.contentMode = UIViewContentModeScaleAspectFit;
-		imageView.autoresizingMask = UIViewAutoresizingNone;
+		imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		//imageView.backgroundColor = [UIColor clearColor];
-
+		
 		[self addSubview:imageView];
 	}
 
@@ -63,16 +60,11 @@
 
 - (void)dealloc
 {
-	DXLog(@"");
-
 	imageView = nil;
-
 }
 
 - (void)showImage:(UIImage *)image
 {
-	DXLog(@"");
-
 	imageView.image = image; // Show image
 }
 
@@ -84,23 +76,30 @@
 - (void)removeFromSuperview
 {
 	DXLog(@"");
-
 	_targetTag = 0; // Clear target tag
-
-	[self.operation cancel], self.operation = nil;
-
+	
+	[self.operation cancel];
+	self.operation = nil;
 	[super removeFromSuperview];
 }
 
 - (void)reuse
 {
 	DXLog(@"");
-
 	_targetTag = 0; // Clear target tag
-
-	[self.operation cancel], self.operation = nil;
-
+	
+	[self.operation cancel];
+	self.operation = nil;
 	imageView.image = nil; // Release image
+}
+
+
+
+#pragma mark - Overrides
+- (void)setFrame2:(CGRect)aFrame
+{
+	[super setFrame:aFrame];
+	[imageView setFrame:self.bounds];
 }
 
 @end

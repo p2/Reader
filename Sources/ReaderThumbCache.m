@@ -33,7 +33,7 @@
 
 #pragma mark Constants
 
-#define CACHE_SIZE 2097152
+#define CACHE_SIZE 2 * 1024 * 1024
 
 //#pragma mark Properties
 
@@ -60,7 +60,6 @@
 	dispatch_once(&predicate, // Save a copy of the application caches path the first time it is needed
 	^{
 		NSArray *cachesPaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-
 		theCachesPath = [[cachesPaths objectAtIndex:0] copy]; // Keep a copy for later abusage
 	});
 	
@@ -70,17 +69,16 @@
 + (NSString *)thumbCachePathForGUID:(NSString *)guid
 {
 	DXLog(@"");
-	NSString *cachesPath = [ReaderThumbCache appCachesPath]; // Caches path
+	NSString *cachesPath = [ReaderThumbCache appCachesPath];
 	
-	return [cachesPath stringByAppendingPathComponent:guid]; // Append GUID
+	return [cachesPath stringByAppendingPathComponent:guid];
 }
 
 + (void)createThumbCacheWithGUID:(NSString *)guid
 {
 	DXLog(@"");
-
-	NSFileManager *fileManager = [NSFileManager new]; // File manager instance
-	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid]; // Thumb cache path
+	NSFileManager *fileManager = [NSFileManager new];
+	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid];
 	[fileManager createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:NULL];
 }
 
@@ -89,8 +87,8 @@
 	DXLog(@"");
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0),
 	^{
-		NSFileManager *fileManager = [NSFileManager new]; // File manager instance
-		NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid]; // Thumb cache path
+		NSFileManager *fileManager = [NSFileManager new];
+		NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid];
 		[fileManager removeItemAtPath:cachePath error:NULL]; // Remove thumb cache directory
 	});
 }
@@ -98,9 +96,8 @@
 + (void)touchThumbCacheWithGUID:(NSString *)guid
 {
 	DXLog(@"");
-
-	NSFileManager *fileManager = [NSFileManager new]; // File manager instance
-	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid]; // Thumb cache path
+	NSFileManager *fileManager = [NSFileManager new];
+	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid];
 	NSDictionary *attributes = [NSDictionary dictionaryWithObject:[NSDate date] forKey:NSFileModificationDate];
 	[fileManager setAttributes:attributes ofItemAtPath:cachePath error:NULL]; // New modification date
 }
@@ -111,13 +108,12 @@
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0),
 	^{
-		NSDate *now = [NSDate date]; // Right about now time
-		NSString *cachesPath = [ReaderThumbCache appCachesPath]; // Caches path
-		NSFileManager *fileManager = [NSFileManager new]; // File manager instance
-		NSArray *cachesList = [fileManager contentsOfDirectoryAtPath:cachesPath error:NULL];
+		NSDate *now = [NSDate date];
+		NSString *cachesPath = [ReaderThumbCache appCachesPath];
+		NSFileManager *fileManager = [NSFileManager new];
 		
-		if (cachesList != nil) // Process caches directory contents
-		{
+		NSArray *cachesList = [fileManager contentsOfDirectoryAtPath:cachesPath error:NULL];
+		if (cachesList != nil) {
 			for (NSString *cacheName in cachesList) // Enumerate directory contents
 			{
 				if (cacheName.length == 36) // This is a very hacky cache ident kludge
@@ -130,10 +126,7 @@
 					if (seconds > age) // Older than so remove the thumb cache
 					{
 						[fileManager removeItemAtPath:cachePath error:NULL];
-
-						#ifdef DEBUG
-							NSLog(@"%s purged %@", __FUNCTION__, cacheName);
-						#endif
+						DXLog(@"%s purged %@", cacheName);
 					}
 				}
 			}
@@ -145,10 +138,8 @@
 
 - (id)init
 {
-	DXLog(@"");
-	if ((self = [super init])) // Initialize
-	{
-		thumbCache = [NSCache new]; // Cache
+	if ((self = [super init])) {
+		thumbCache = [NSCache new];
 		[thumbCache setName:@"ReaderThumbCache"];
 		[thumbCache setTotalCostLimit:CACHE_SIZE];
 	}
@@ -158,75 +149,50 @@
 
 - (void)dealloc
 {
-	DXLog(@"");
 	thumbCache = nil;
-
 }
 
 - (id)thumbRequest:(ReaderThumbRequest *)request priority:(BOOL)priority
 {
-	DXLog(@"");
-	
-	@synchronized(thumbCache) // Mutex lock
-	{
-		id object = [thumbCache objectForKey:request.cacheKey];
-		if (object == nil) // Thumb object does not yet exist in the cache
-		{
-			object = [NSNull null]; // Return an NSNull thumb placeholder object
-			[thumbCache setObject:object forKey:request.cacheKey cost:2]; // Cache the placeholder object
-			ReaderThumbFetch *thumbFetch = [[ReaderThumbFetch alloc] initWithRequest:request]; // Create a thumb fetch operation
+	@synchronized(thumbCache) {
+		id cached = [thumbCache objectForKey:request.cacheKey];
+		if (!cached) {
+			ReaderThumbFetch *thumbFetch = [[ReaderThumbFetch alloc] initWithRequest:request];
+			request.thumbView.operation = thumbFetch;				// what is this good for?
 			
 			[thumbFetch setQueuePriority:(priority ? NSOperationQueuePriorityNormal : NSOperationQueuePriorityLow)]; // Queue priority
-			request.thumbView.operation = thumbFetch; [thumbFetch setThreadPriority:(priority ? 0.55 : 0.35)]; // Thread priority
+			[thumbFetch setThreadPriority:(priority ? 0.55 : 0.35)]; // Thread priority
 			
-			[[ReaderThumbQueue sharedInstance] addLoadOperation:thumbFetch];  // Queue the operation
+			[[ReaderThumbQueue sharedInstance] addLoadOperation:thumbFetch];
 		}
-
-		return object; // NSNull or UIImage
+		
+		return cached; // nil or UIImage
 	}
 }
 
 - (void)setObject:(UIImage *)image forKey:(NSString *)key
 {
-	DXLog(@"");
-	
-	@synchronized(thumbCache) // Mutex lock
-	{
-		NSUInteger bytes = (image.size.width * image.size.height * 4.0f);
-		[thumbCache setObject:image forKey:key cost:bytes]; // Cache image
+	if (image && [key length] > 0) {
+		@synchronized(thumbCache) {
+			NSUInteger bytes = (image.size.width * image.size.height * 4.0f);
+			[thumbCache setObject:image forKey:key cost:bytes]; // Cache image
+		}
+	}
+	else {
+		DXLog(@"Nothing to cache, image: %@, key: %@", image, key);
 	}
 }
 
 - (void)removeObjectForKey:(NSString *)key
 {
-	DXLog(@"");
-	
-	@synchronized(thumbCache) // Mutex lock
-	{
+	@synchronized(thumbCache) {
 		[thumbCache removeObjectForKey:key];
-	}
-}
-
-- (void)removeNullForKey:(NSString *)key
-{
-	DXLog(@"");
-	
-	@synchronized(thumbCache) // Mutex lock
-	{
-		id object = [thumbCache objectForKey:key];
-		if ([object isMemberOfClass:[NSNull class]])
-		{
-			[thumbCache removeObjectForKey:key];
-		}
 	}
 }
 
 - (void)removeAllObjects
 {
-	DXLog(@"");
-	
-	@synchronized(thumbCache) // Mutex lock
-	{
+	@synchronized(thumbCache) {
 		[thumbCache removeAllObjects];
 	}
 }

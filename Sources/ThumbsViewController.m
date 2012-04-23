@@ -285,10 +285,7 @@
 	NSString *phrase = document.password; // Document info
 	
 	ReaderThumbRequest *thumbRequest = [ReaderThumbRequest forView:thumbCell fileURL:fileURL password:phrase guid:guid page:page size:size];
-	UIImage *image = [[ReaderThumbCache sharedInstance] thumbRequest:thumbRequest priority:YES]; // Request the thumbnail
-	if ([image isKindOfClass:[UIImage class]]) {
-		[thumbCell showImage:image]; // Show image from cache
-	}
+	[thumbRequest process];
 }
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView refreshThumbCell:(ThumbsPageThumb *)thumbCell forIndex:(NSInteger)index

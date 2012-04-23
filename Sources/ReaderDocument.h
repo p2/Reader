@@ -32,16 +32,18 @@
 	NSURL *_fileURL;
 }
 
-@property (nonatomic, readonly) NSString *guid;
-@property (nonatomic, readonly) NSDate *fileDate;
-@property (nonatomic, readwrite) NSDate *lastOpen;
-@property (nonatomic, readonly) NSNumber *fileSize;
-@property (nonatomic, readonly) NSNumber *pageCount;
-@property (nonatomic, readwrite) NSNumber *pageNumber;
-@property (nonatomic, readonly) NSMutableIndexSet *bookmarks;
-@property (nonatomic, readonly) NSString *fileName;
-@property (nonatomic, readonly) NSString *password;
-@property (nonatomic, readonly) NSURL *fileURL;
+@property (nonatomic, readonly, copy) NSString *guid;
+@property (nonatomic, readonly, strong) NSDate *fileDate;
+@property (nonatomic, readwrite, strong) NSDate *lastOpen;
+@property (nonatomic, readonly, strong) NSNumber *fileSize;
+@property (nonatomic, readonly, strong) NSNumber *pageCount;
+@property (nonatomic, strong) NSNumber *pageNumber;
+@property (nonatomic, readonly, strong) NSMutableIndexSet *bookmarks;
+@property (nonatomic, readonly, copy) NSString *fileName;
+@property (nonatomic, readonly, copy) NSString *password;
+@property (nonatomic, readonly, strong) NSURL *fileURL;
+
++ (NSString *)GUID;
 
 + (ReaderDocument *)newWithDocumentFilePath:(NSString *)filename password:(NSString *)phrase;
 + (ReaderDocument *)unarchiveFromFileName:(NSString *)filename password:(NSString *)phrase;

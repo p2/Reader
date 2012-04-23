@@ -29,31 +29,22 @@
 
 @interface ReaderThumbCache : NSObject
 {
-@private // Instance variables
-
+@private
 	NSCache *thumbCache;
 }
 
 + (ReaderThumbCache *)sharedInstance;
 
 + (void)touchThumbCacheWithGUID:(NSString *)guid;
-
 + (void)createThumbCacheWithGUID:(NSString *)guid;
-
 + (void)removeThumbCacheWithGUID:(NSString *)guid;
-
 + (void)purgeThumbCachesOlderThan:(NSTimeInterval)age;
-
 + (NSString *)thumbCachePathForGUID:(NSString *)guid;
 
 - (id)thumbRequest:(ReaderThumbRequest *)request priority:(BOOL)priority;
 
 - (void)setObject:(UIImage *)image forKey:(NSString *)key;
-
 - (void)removeObjectForKey:(NSString *)key;
-
-- (void)removeNullForKey:(NSString *)key;
-
 - (void)removeAllObjects;
 
 @end

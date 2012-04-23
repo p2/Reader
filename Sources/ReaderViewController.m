@@ -304,7 +304,8 @@
 			[notificationCenter addObserver:self selector:@selector(applicationWill:) name:UIApplicationWillTerminateNotification object:nil];
 			[notificationCenter addObserver:self selector:@selector(applicationWill:) name:UIApplicationWillResignActiveNotification object:nil];
 			
-			[object updateProperties]; document = object; // Retain the supplied ReaderDocument object for our use
+			[object updateProperties];
+			self.document = object;
 			[ReaderThumbCache touchThumbCacheWithGUID:object.guid]; // Touch the document thumb cache directory
 			reader = self; // Return an initialized ReaderViewController object
 		}
@@ -496,7 +497,6 @@
 	theScrollView = nil;
 	contentViews = nil;
 	lastHideTime = nil;
-	document = nil;
 }
 
 #pragma mark - UIScrollViewDelegate methods

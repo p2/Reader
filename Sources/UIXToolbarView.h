@@ -26,9 +26,6 @@
 #import <UIKit/UIKit.h>
 
 @interface UIXToolbarView : UIView
-{
-@private // Instance variables
-}
 
 @end
 
@@ -39,8 +36,5 @@
 //
 
 @interface UIXToolbarShadow : UIView
-{
-@private // Instance variables
-}
 
 @end

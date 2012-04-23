@@ -27,44 +27,28 @@
 
 @class ReaderThumbView;
 
+
+/**
+ *	Handles requests for thumbnail sized images of PDF pages
+ */
 @interface ReaderThumbRequest : NSObject
-{
-@private // Instance variables
 
-	NSURL *_fileURL;
-
-	NSString *_guid;
-
-	NSString *_password;
-
-	NSString *_cacheKey;
-
-	NSString *_thumbName;
-
-	ReaderThumbView *_thumbView;
-
-	NSUInteger _targetTag;
-
-	NSInteger _thumbPage;
-
-	CGSize _thumbSize;
-
-	CGFloat _scale;
-}
-
-@property (nonatomic, readonly) NSURL *fileURL;
-@property (nonatomic, readonly) NSString *guid;
-@property (nonatomic, readonly) NSString *password;
-@property (nonatomic, readonly) NSString *cacheKey;
-@property (nonatomic, readonly) NSString *thumbName;
-@property (nonatomic, readonly) ReaderThumbView *thumbView;
-@property (nonatomic, assign, readonly) NSUInteger targetTag;
-@property (nonatomic, assign, readonly) NSInteger thumbPage;
-@property (nonatomic, assign, readonly) CGSize thumbSize;
-@property (nonatomic, assign, readonly) CGFloat scale;
+@property (nonatomic, readonly, strong) NSURL *fileURL;
+@property (nonatomic, readonly, copy) NSString *guid;
+@property (nonatomic, readonly, copy) NSString *password;
+@property (nonatomic, readonly, copy) NSString *cacheKey;
+@property (nonatomic, readonly, copy) NSString *thumbName;
+@property (nonatomic, readonly, unsafe_unretained) ReaderThumbView *thumbView;				///< The view that shows the thumbnail
+@property (nonatomic, readonly) NSUInteger targetTag;
+@property (nonatomic, readonly) NSInteger thumbPage;
+@property (nonatomic, readonly) CGSize thumbSize;
+@property (nonatomic, readonly) CGFloat scale;
 
 + (id)forView:(ReaderThumbView *)view fileURL:(NSURL *)url password:(NSString *)phrase guid:(NSString *)guid page:(NSInteger)page size:(CGSize)size;
-
 - (id)initWithView:(ReaderThumbView *)view fileURL:(NSURL *)url password:(NSString *)phrase guid:(NSString *)guid page:(NSInteger)page size:(CGSize)size;
+
+- (void)process;
+- (void)processWithoutPriority;
+
 
 @end

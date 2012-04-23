@@ -27,8 +27,5 @@
 #import <QuartzCore/QuartzCore.h>
 
 @interface ReaderContentTile : CATiledLayer
-{
-@private // Instance variables
-}
 
 @end

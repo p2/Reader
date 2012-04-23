@@ -225,14 +225,6 @@
 	return object;
 }
 
-- (void)dealloc
-{
-	DXLog(@"DEALLOC");
-
-	_fileURL = nil;
-	_fileName = nil;
-}
-
 - (NSString *)fileName
 {
 	DXLog(@"");

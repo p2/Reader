@@ -25,7 +25,25 @@
 
 #import "ReaderThumbRequest.h"
 #import "ReaderThumbView.h"
+#import "ReaderThumbCache.h"
 #import "CGPDFDocument.h"
+
+
+@interface ReaderThumbRequest ()
+
+@property (nonatomic, readwrite, strong) NSURL *fileURL;
+@property (nonatomic, readwrite, copy) NSString *guid;
+@property (nonatomic, readwrite, copy) NSString *password;
+@property (nonatomic, readwrite, copy) NSString *cacheKey;
+@property (nonatomic, readwrite, copy) NSString *thumbName;
+@property (nonatomic, readwrite, unsafe_unretained) ReaderThumbView *thumbView;
+@property (nonatomic, readwrite) NSUInteger targetTag;
+@property (nonatomic, readwrite) NSInteger thumbPage;
+@property (nonatomic, readwrite) CGSize thumbSize;
+@property (nonatomic, readwrite) CGFloat scale;
+
+@end
+
 
 @implementation ReaderThumbRequest
 
@@ -42,44 +60,58 @@
 @synthesize cacheKey = _cacheKey;
 @synthesize scale = _scale;
 
-#pragma mark ReaderThumbRequest class methods
 
 + (id)forView:(ReaderThumbView *)view fileURL:(NSURL *)url password:(NSString *)phrase guid:(NSString *)guid page:(NSInteger)page size:(CGSize)size
 {
-	DXLog(@"");
-
 	return [[ReaderThumbRequest alloc] initWithView:view fileURL:url password:phrase guid:guid page:page size:size];
 }
 
-#pragma mark ReaderThumbRequest instance methods
 
+/**
+ *	Instantiates a new object with the given information. If "guid" is nil, creates a string based on the file URL and uses this as identifier.
+ */
 - (id)initWithView:(ReaderThumbView *)view fileURL:(NSURL *)url password:(NSString *)phrase guid:(NSString *)guid page:(NSInteger)page size:(CGSize)size
 {
-	DXLog(@"");
-
-	if ((self = [super init])) // Initialize object
-	{
-		NSInteger w = size.width; NSInteger h = size.height;
-		_thumbView = view; _thumbPage = page; _thumbSize = size;
-		_fileURL = [url copy]; _password = [phrase copy]; _guid = [guid copy];
-		_thumbName = [[NSString alloc] initWithFormat:@"%07d-%04dx%04d", page, w, h];
-		_cacheKey = [[NSString alloc] initWithFormat:@"%@+%@", _thumbName, _guid];
-		_targetTag = [_cacheKey hash]; _thumbView.targetTag = _targetTag;
-		_scale = [[UIScreen mainScreen] scale]; // Thumb screen scale
+	if ((self = [super init])) {
+		NSInteger w = size.width;
+		NSInteger h = size.height;
+		_thumbPage = page;
+		_thumbSize = size;
+		self.fileURL = url;
+		self.password = phrase;
+		self.guid = guid ? guid : [[url relativeString] stringByTrimmingCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
+		self.thumbName = [NSString stringWithFormat:@"%07d-%04dx%04d", page, w, h];
+		self.cacheKey = [NSString stringWithFormat:@"%@+%@", _thumbName, _guid];
+		_targetTag = [_cacheKey hash];
+		self.thumbView = view;
+		_thumbView.targetTag = _targetTag;
+		_scale = [[UIScreen mainScreen] scale];
 	}
-
+	
 	return self;
 }
 
-- (void)dealloc
+
+
+#pragma mark - Actions
+/**
+ *	Uses the request to fetch the cached thumbnail, creating it on a background thread if necessary, and shows it in the given view
+ */
+- (void)process
 {
-	DXLog(@"");
-	_guid = nil;
-	_fileURL = nil;
-	_password = nil;
-	_thumbView = nil;
-	_thumbName = nil;
-	_cacheKey = nil;
+	UIImage *thumb = [[ReaderThumbCache sharedInstance] thumbRequest:self priority:YES];
+	if (_thumbView && thumb) {
+		[_thumbView showImage:thumb];
+	}
 }
+
+- (void)processWithoutPriority
+{
+	UIImage *thumb = [[ReaderThumbCache sharedInstance] thumbRequest:self priority:NO];
+	if (_thumbView && thumb) {
+		[_thumbView showImage:thumb];
+	}
+}
+
 
 @end

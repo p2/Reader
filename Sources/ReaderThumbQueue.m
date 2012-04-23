@@ -36,23 +36,18 @@
 
 + (ReaderThumbQueue *)sharedInstance
 {
-	DXLog(@"");
-
 	static dispatch_once_t predicate = 0;
-	static ReaderThumbQueue *object = nil; // Object
+	static ReaderThumbQueue *object = nil;
 	dispatch_once(&predicate, ^{ object = [self new]; });
 	
-	return object; // ReaderThumbQueue singleton
+	return object;
 }
 
 #pragma mark ReaderThumbQueue instance methods
 
 - (id)init
 {
-	DXLog(@"");
-
-	if ((self = [super init])) // Initialize
-	{
+	if ((self = [super init])) {
 		loadQueue = [NSOperationQueue new];
 		[loadQueue setName:@"ReaderThumbLoadQueue"];
 		[loadQueue setMaxConcurrentOperationCount:1];
@@ -61,13 +56,11 @@
 		[workQueue setName:@"ReaderThumbWorkQueue"];
 		[workQueue setMaxConcurrentOperationCount:1];
 	}
-
 	return self;
 }
 
 - (void)dealloc
 {
-	DXLog(@"");
 	loadQueue = nil;
 	workQueue = nil;
 }
@@ -75,54 +68,46 @@
 - (void)addLoadOperation:(NSOperation *)operation
 {
 	DXLog(@"");
-	
-	if ([operation isKindOfClass:[ReaderThumbOperation class]])
-	{
-		[loadQueue addOperation:operation]; // Add to load queue
+	if ([operation isKindOfClass:[ReaderThumbOperation class]]) {
+		[loadQueue addOperation:operation];
 	}
 }
 
 - (void)addWorkOperation:(NSOperation *)operation
 {
 	DXLog(@"");
-	
-	if ([operation isKindOfClass:[ReaderThumbOperation class]])
-	{
-		[workQueue addOperation:operation]; // Add to work queue
+	if ([operation isKindOfClass:[ReaderThumbOperation class]]) {
+		[workQueue addOperation:operation];
 	}
 }
 
 - (void)cancelOperationsWithGUID:(NSString *)guid
 {
 	DXLog(@"");
-	
 	[loadQueue setSuspended:YES];
 	[workQueue setSuspended:YES];
 	
-	for (ReaderThumbOperation *operation in loadQueue.operations)
-	{
-		if ([operation isKindOfClass:[ReaderThumbOperation class]])
-		{
+	for (ReaderThumbOperation *operation in loadQueue.operations) {
+		if ([operation isKindOfClass:[ReaderThumbOperation class]]) {
 			if ([operation.guid isEqualToString:guid]) [operation cancel];
 		}
 	}
-
-	for (ReaderThumbOperation *operation in workQueue.operations)
-	{
-		if ([operation isKindOfClass:[ReaderThumbOperation class]])
-		{
+	
+	for (ReaderThumbOperation *operation in workQueue.operations) {
+		if ([operation isKindOfClass:[ReaderThumbOperation class]]) {
 			if ([operation.guid isEqualToString:guid]) [operation cancel];
 		}
 	}
-
-	[workQueue setSuspended:NO]; [loadQueue setSuspended:NO];
+	
+	[workQueue setSuspended:NO];
+	[loadQueue setSuspended:NO];
 }
 
 - (void)cancelAllOperations
 {
 	DXLog(@"");
-
-	[loadQueue cancelAllOperations]; [workQueue cancelAllOperations];
+	[loadQueue cancelAllOperations];
+	[workQueue cancelAllOperations];
 }
 
 @end
@@ -133,30 +118,26 @@
 //	ReaderThumbOperation class implementation
 //
 
+@interface ReaderThumbOperation ()
+
+@property (nonatomic, readwrite, copy) NSString *guid;
+
+@end
+
+
 @implementation ReaderThumbOperation
 
-@synthesize guid = _guid;
+@synthesize guid;
 
 #pragma mark ReaderThumbOperation instance methods
 
-- (id)initWithGUID:(NSString *)guid
+- (id)initWithGUID:(NSString *)aGuid
 {
-	DXLog(@"");
-
-	if ((self = [super init]))
-	{
-		_guid = guid;
+	if ((self = [super init])) {
+		self.guid = aGuid;
 	}
-
 	return self;
 }
 
-- (void)dealloc
-{
-	DXLog(@"");
-
-	_guid = nil;
-
-}
 
 @end

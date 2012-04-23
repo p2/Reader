@@ -34,14 +34,14 @@
 
 @protocol ReaderContentViewDelegate <NSObject>
 
-@required // Delegate protocols
+@required
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches;
 
 @end
 
 @interface ReaderContentView : UIScrollView <UIScrollViewDelegate>
 {
-@private // Instance variables
+@private
 	ReaderContentThumb *theThumbView;
 	UIView *theContainerView;
 	
@@ -69,8 +69,5 @@
 //
 
 @interface ReaderContentThumb : ReaderThumbView
-{
-@private // Instance variables
-}
 
 @end

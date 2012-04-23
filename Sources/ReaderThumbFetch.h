@@ -31,8 +31,7 @@
 
 @interface ReaderThumbFetch : ReaderThumbOperation
 {
-@private // Instance variables
-
+@private
 	ReaderThumbRequest *request;
 }
 

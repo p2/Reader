@@ -220,16 +220,14 @@
 
 	NSString *filePath = [pdfs lastObject]; assert(filePath != nil); // Path to last PDF file
 
-	ReaderDocument *document = [ReaderDocument withDocumentFilePath:filePath password:phrase];
+	ReaderDocument *document = [ReaderDocument newWithDocumentFilePath:filePath password:phrase];
 
 	if (document != nil) // Must have a valid ReaderDocument object in order to proceed with things
 	{
 		ReaderViewController *readerViewController = [[ReaderViewController alloc] initWithReaderDocument:document];
-
 		readerViewController.delegate = self; // Set the ReaderViewController delegate to self
 
 #if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
-
 		[self.navigationController pushViewController:readerViewController animated:YES];
 
 #else // present in a modal view controller

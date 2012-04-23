@@ -34,26 +34,20 @@
 
 @protocol ReaderMainPagebarDelegate <NSObject>
 
-@required // Delegate protocols
-
+@required
 - (void)pagebar:(ReaderMainPagebar *)pagebar gotoPage:(NSInteger)page;
 
 @end
 
 @interface ReaderMainPagebar : UIView
 {
-@private // Instance variables
-
+@private
 	ReaderDocument *document;
-
 	ReaderTrackControl *trackControl;
 
 	NSMutableDictionary *miniThumbViews;
-
 	ReaderPagebarThumb *pageThumbView;
-
 	UILabel *pageNumberLabel;
-
 	UIView *pageNumberView;
 
 	NSTimer *enableTimer;
@@ -65,7 +59,6 @@
 - (id)initWithFrame:(CGRect)frame document:(ReaderDocument *)object;
 
 - (void)updatePagebar;
-
 - (void)hidePagebar;
 - (void)showPagebar;
 
@@ -79,8 +72,7 @@
 
 @interface ReaderTrackControl : UIControl
 {
-@private // Instance variables
-
+@private
 	CGFloat _value;
 }
 
@@ -95,9 +87,6 @@
 //
 
 @interface ReaderPagebarThumb : ReaderThumbView
-{
-@private // Instance variables
-}
 
 - (id)initWithFrame:(CGRect)frame small:(BOOL)small;
 
@@ -110,8 +99,5 @@
 //
 
 @interface ReaderPagebarShadow : UIView
-{
-@private // Instance variables
-}
 
 @end

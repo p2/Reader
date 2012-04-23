@@ -31,8 +31,7 @@
 
 @interface ReaderThumbRender : ReaderThumbOperation
 {
-@private // Instance variables
-
+@private
 	ReaderThumbRequest *request;
 }
 
