@@ -31,61 +31,24 @@
 
 #define DEMO_VIEW_CONTROLLER_PUSH FALSE
 
-//#pragma mark Properties
-
-//@synthesize ;
 
 #pragma mark UIViewController methods
 
-/*
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
-	{
-		// Custom initialization
-	}
-
-	return self;
-}
-*/
-
-/*
-- (void)loadView
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	// Implement loadView to create a view hierarchy programmatically, without using a nib.
-}
-*/
 
 - (void)viewDidLoad
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
 	[super viewDidLoad];
-
+	
 	self.view.backgroundColor = [UIColor clearColor]; // Transparent
-
+	
 	NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-
 	NSString *name = [infoDictionary objectForKey:@"CFBundleName"];
-
 	NSString *version = [infoDictionary objectForKey:@"CFBundleVersion"];
 
 	self.title = [NSString stringWithFormat:@"%@ v%@", name, version];
 
 	CGSize viewSize = self.view.bounds.size;
-
 	CGRect labelRect = CGRectMake(0.0f, 0.0f, 80.0f, 32.0f);
-
 	UILabel *tapLabel = [[UILabel alloc] initWithFrame:labelRect];
 
 	tapLabel.text = @"Tap";
@@ -106,94 +69,28 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
 	[super viewWillAppear:animated];
 
 #if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
-
 	[self.navigationController setNavigationBarHidden:NO animated:animated];
-
 #endif // DEMO_VIEW_CONTROLLER_PUSH
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
-	[super viewDidAppear:animated];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
 	[super viewWillDisappear:animated];
 
 #if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
-
 	[self.navigationController setNavigationBarHidden:YES animated:animated];
-
 #endif // DEMO_VIEW_CONTROLLER_PUSH
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
-	[super viewDidDisappear:animated];
-}
-
-- (void)viewDidUnload
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	[super viewDidUnload];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-#ifdef DEBUGX
-	NSLog(@"%s (%d)", __FUNCTION__, interfaceOrientation);
-#endif
-
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) // See README
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {		// See README
 		return UIInterfaceOrientationIsPortrait(interfaceOrientation);
-	else
-		return YES;
-}
-
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), toInterfaceOrientation);
-#endif
-}
-
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), interfaceOrientation);
-#endif
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d to %d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), fromInterfaceOrientation, self.interfaceOrientation);
-#endif
-
-	//if (fromInterfaceOrientation == self.interfaceOrientation) return;
+	}
+	return YES;
 }
 
 - (void)didReceiveMemoryWarning
@@ -210,18 +107,12 @@
 
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
 	NSString *phrase = nil; // Document password (for unlocking most encrypted PDF files)
-
 	NSArray *pdfs = [[NSBundle mainBundle] pathsForResourcesOfType:@"pdf" inDirectory:nil];
-
-	NSString *filePath = [pdfs lastObject]; assert(filePath != nil); // Path to last PDF file
-
+	NSString *filePath = [pdfs lastObject];
+	assert(filePath != nil);
+	
 	ReaderDocument *document = [ReaderDocument newWithDocumentFilePath:filePath password:phrase];
-
 	if (document != nil) // Must have a valid ReaderDocument object in order to proceed with things
 	{
 		ReaderViewController *readerViewController = [[ReaderViewController alloc] initWithReaderDocument:document];
@@ -229,17 +120,12 @@
 
 #if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
 		[self.navigationController pushViewController:readerViewController animated:YES];
-
-#else // present in a modal view controller
-
+#else
 		readerViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
 		readerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 
 		[self presentModalViewController:readerViewController animated:YES];
-
-#endif // DEMO_VIEW_CONTROLLER_PUSH
-
-		 // Release the ReaderViewController
+#endif
 	}
 }
 
@@ -247,19 +133,13 @@
 
 - (void)dismissReaderViewController:(ReaderViewController *)viewController
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
 #if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
-
 	[self.navigationController popViewControllerAnimated:YES];
-
-#else // dismiss the modal view controller
-
+#else
 	[self dismissModalViewControllerAnimated:YES];
-
-#endif // DEMO_VIEW_CONTROLLER_PUSH
+#endif
+	
+	viewController.delegate = nil;
 }
 
 @end

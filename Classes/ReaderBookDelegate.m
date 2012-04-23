@@ -44,35 +44,25 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
 	mainWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-
 //	[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
-
 	mainWindow.backgroundColor = [UIColor scrollViewTexturedBackgroundColor]; // Window background color
-
+	
 	NSString *phrase = nil; // Document password (for unlocking most encrypted PDF files)
-
 	NSArray *pdfs = [[NSBundle mainBundle] pathsForResourcesOfType:@"pdf" inDirectory:nil];
-
 	NSString *filePath = [pdfs lastObject]; assert(filePath != nil); // Path to last PDF file
-
+	
 	ReaderDocument *document = [ReaderDocument newWithDocumentFilePath:filePath password:phrase];
-
+	
 	if (document != nil) // Must have a valid ReaderDocument object in order to proceed
 	{
 		readerViewController = [[ReaderViewController alloc] initWithReaderDocument:document];
-
-		readerViewController.delegate = self; // Set the ReaderViewController delegate to self
-
-		mainWindow.rootViewController = readerViewController; // Set the root view controller
+		readerViewController.delegate = self;
+		mainWindow.rootViewController = readerViewController;
 	}
-
+	
 	[mainWindow makeKeyAndVisible];
-
+	
 	return YES;
 }
 

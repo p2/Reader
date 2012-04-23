@@ -27,6 +27,22 @@
 #import "CGPDFDocument.h"
 #import <fcntl.h>
 
+@interface ReaderDocument ()
+
+@property (nonatomic, readwrite, copy) NSString *guid;
+@property (nonatomic, readwrite, strong) NSDate *fileDate;
+@property (nonatomic, readwrite, copy) NSString *fileName;
+@property (nonatomic, readwrite, strong) NSURL *fileURL;
+
+@property (nonatomic, readwrite, strong) NSNumber *fileSize;
+@property (nonatomic, readwrite, strong) NSNumber *pageCount;
+
+@property (nonatomic, readwrite, strong) NSMutableIndexSet *bookmarks;
+@property (nonatomic, readwrite, copy) NSString *password;
+
+@end
+
+
 @implementation ReaderDocument
 
 #pragma mark Properties
@@ -39,44 +55,45 @@
 @synthesize bookmarks = _bookmarks;
 @synthesize lastOpen = _lastOpen;
 @synthesize password = _password;
-@dynamic fileName, fileURL;
+@synthesize fileURL = _fileURL;
+@synthesize fileName = _fileName;
 
 #pragma mark - ReaderDocument class methods
 
 + (NSString *)GUID
 {
-	DXLog(@"");
-	
 	CFUUIDRef theUUID;
 	CFStringRef theString;
 	theUUID = CFUUIDCreate(NULL);
 	theString = CFUUIDCreateString(NULL, theUUID);
 	NSString *unique = [NSString stringWithString:(__bridge id)theString];
-	CFRelease(theString); CFRelease(theUUID); // Cleanup
+	
+	CFRelease(theString);
+	CFRelease(theUUID);
 	
 	return unique;
 }
 
 + (NSString *)documentsPath
 {
-	DXLog(@"");
 	NSArray *documentsPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	
-	return [documentsPaths objectAtIndex:0]; // Path to the application's "~/Documents" directory
+	if ([documentsPaths count] > 0) {
+		return [documentsPaths objectAtIndex:0]; // Path to the application's "~/Documents" directory
+	}
+	return nil;
 }
 
 + (NSString *)applicationPath
 {
-	DXLog(@"");
 	NSArray *documentsPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	
-	return [[documentsPaths objectAtIndex:0] stringByDeletingLastPathComponent]; // Strip "Documents" component
+	if ([documentsPaths count] > 0) {
+		return [[documentsPaths objectAtIndex:0] stringByDeletingLastPathComponent]; // Strip "Documents" component
+	}
+	return nil;
 }
 
 + (NSString *)applicationSupportPath
 {
-	DXLog(@"");
-
 	NSFileManager *fileManager = [NSFileManager new]; // File manager instance
 
 	NSURL *pathURL = [fileManager URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:NULL];
@@ -96,26 +113,20 @@
 
 + (NSString *)archiveFilePath:(NSString *)filename
 {
-	DXLog(@"");
-
 	assert(filename != nil); // Ensure that the archive file name is not nil
-
+	
 	//NSString *archivePath = [ReaderDocument documentsPath]; // Application's "~/Documents" path
-
 	NSString *archivePath = [ReaderDocument applicationSupportPath]; // Application's "~/Library/Application Support" path
-
 	NSString *archiveName = [[filename stringByDeletingPathExtension] stringByAppendingPathExtension:@"plist"];
+	
 	return [archivePath stringByAppendingPathComponent:archiveName]; // "{archivePath}/'filename'.plist"
 }
 
 + (ReaderDocument *)unarchiveFromFileName:(NSString *)filename password:(NSString *)phrase
 {
-	DXLog(@"");
-
 	ReaderDocument *document = nil; // ReaderDocument object
-
-	NSString *withName = [filename lastPathComponent]; // File name only
-
+	
+	NSString *withName = [filename lastPathComponent];					// File name only
 	NSString *archiveFilePath = [ReaderDocument archiveFilePath:withName];
 	@try // Unarchive an archived ReaderDocument object from its property list
 	{
@@ -131,22 +142,17 @@
 			NSLog(@"%s Caught %@: %@", __FUNCTION__, [exception name], [exception reason]);
 		#endif
 	}
-
+	
 	return document;
 }
 
 + (ReaderDocument *)newWithDocumentFilePath:(NSString *)filePath password:(NSString *)phrase
 {
-	DXLog(@"");
-
-	ReaderDocument *document = nil; // ReaderDocument object
-
-	document = [ReaderDocument unarchiveFromFileName:filePath password:phrase];
-	if (document == nil) // Unarchive failed so we create a new ReaderDocument object
-	{
+	ReaderDocument *document = [ReaderDocument unarchiveFromFileName:filePath password:phrase];
+	if (!document) {						// Unarchive failed so we create a new ReaderDocument object
 		document = [[ReaderDocument alloc] initWithFilePath:filePath password:phrase];
 	}
-
+	
 	return document;
 }
 
@@ -186,39 +192,34 @@
 
 	id object = nil; // ReaderDocument object
 
-	if ([ReaderDocument isPDF:fullFilePath] == YES) // File must exist
-	{
-		if ((self = [super init])) // Initialize the superclass object first
-		{
-			_guid = [ReaderDocument GUID]; // Create a document GUID
-			_password = [phrase copy]; // Keep a copy of any document password
-			_bookmarks = [NSMutableIndexSet new]; // Bookmarked pages index set
-			_pageNumber = [NSNumber numberWithInteger:1]; // Start page 1
-			_fileName = [ReaderDocument relativeFilePath:fullFilePath];
+	if ([ReaderDocument isPDF:fullFilePath] == YES) {						// File must exist
+		if ((self = [super init])) {
+			self.guid = [ReaderDocument GUID];								// Create a document GUID
+			self.password = phrase;
+			self.bookmarks = [NSMutableIndexSet new];						// Bookmarked pages index set
+			self.pageNumber = [NSNumber numberWithInteger:1];				// Start page 1
+			self.fileName = [ReaderDocument relativeFilePath:fullFilePath];
 			
-			CFURLRef docURLRef = (__bridge CFURLRef)[self fileURL]; // CFURLRef from NSURL
+			CFURLRef docURLRef = (__bridge CFURLRef)[self fileURL];			// CFURLRef from NSURL
 			CGPDFDocumentRef thePDFDocRef = CGPDFDocumentCreateX(docURLRef, _password);
-			if (thePDFDocRef != NULL) // Get the number of pages in a document
-			{
+			if (thePDFDocRef != NULL) {										// Get the number of pages in a document
 				NSInteger pageCount = CGPDFDocumentGetNumberOfPages(thePDFDocRef);
 				_pageCount = [NSNumber numberWithInteger:pageCount];
 				CGPDFDocumentRelease(thePDFDocRef); // Cleanup
 			}
-			else // Cupertino, we have a problem with the document
-			{
+			else {															// Cupertino, we have a problem with the document
 				NSAssert(NO, @"CGPDFDocumentRef == NULL");
 			}
-
-			_lastOpen = [NSDate dateWithTimeIntervalSinceReferenceDate:0.0]; // Last opened
-
-			NSFileManager *fileManager = [NSFileManager new]; // File manager
+			
+			self.lastOpen = [NSDate dateWithTimeIntervalSinceReferenceDate:0.0];
+			
+			NSFileManager *fileManager = [NSFileManager new];
 			NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:fullFilePath error:NULL];
-			_fileDate = [fileAttributes objectForKey:NSFileModificationDate]; // File date
-			_fileSize = [fileAttributes objectForKey:NSFileSize]; // File size (bytes)
-
-			 [self saveReaderDocument]; // Save ReaderDocument object
-
-			object = self; // Return initialized ReaderDocument object
+			self.fileDate = [fileAttributes objectForKey:NSFileModificationDate]; // File date
+			self.fileSize = [fileAttributes objectForKey:NSFileSize];		// File size (bytes)
+			
+			[self saveReaderDocument];
+			object = self;
 		}
 	}
 
@@ -227,19 +228,14 @@
 
 - (NSString *)fileName
 {
-	DXLog(@"");
-
 	return [_fileName lastPathComponent];
 }
 
 - (NSURL *)fileURL
 {
-	DXLog(@"");
-
-	if (_fileURL == nil) // Create and keep the file URL the first time it is requested
-	{
+	if (!_fileURL) {
 		NSString *fullFilePath = [[ReaderDocument applicationPath] stringByAppendingPathComponent:_fileName];
-		_fileURL = [[NSURL alloc] initFileURLWithPath:fullFilePath isDirectory:NO]; // File URL from full file path
+		self.fileURL = [[NSURL alloc] initFileURLWithPath:fullFilePath isDirectory:NO]; // File URL from full file path
 	}
 
 	return _fileURL;
@@ -269,7 +265,7 @@
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
 	DXLog(@"");
-
+	
 	[encoder encodeObject:_guid forKey:@"FileGUID"];
 	[encoder encodeObject:_fileName forKey:@"FileName"];
 	[encoder encodeObject:_fileDate forKey:@"FileDate"];
@@ -283,21 +279,25 @@
 - (id)initWithCoder:(NSCoder *)decoder
 {
 	DXLog(@"");
-
-	if ((self = [super init])) // Superclass init
-	{
-		_guid = [decoder decodeObjectForKey:@"FileGUID"];
-		_fileName = [decoder decodeObjectForKey:@"FileName"];
-		_fileDate = [decoder decodeObjectForKey:@"FileDate"];
-		_pageCount = [decoder decodeObjectForKey:@"PageCount"];
-		_pageNumber = [decoder decodeObjectForKey:@"PageNumber"];
-		_bookmarks = [[decoder decodeObjectForKey:@"Bookmarks"] mutableCopy];
-		_fileSize = [decoder decodeObjectForKey:@"FileSize"];
-		_lastOpen = [decoder decodeObjectForKey:@"LastOpen"];
-		if (_bookmarks == nil) _bookmarks = [NSMutableIndexSet new];
-		if (_guid == nil) _guid = [ReaderDocument GUID];
+	
+	if ((self = [super init])) {
+		self.guid = [decoder decodeObjectForKey:@"FileGUID"];
+		self.fileName = [decoder decodeObjectForKey:@"FileName"];
+		self.fileDate = [decoder decodeObjectForKey:@"FileDate"];
+		self.pageCount = [decoder decodeObjectForKey:@"PageCount"];
+		self.pageNumber = [decoder decodeObjectForKey:@"PageNumber"];
+		self.bookmarks = [[decoder decodeObjectForKey:@"Bookmarks"] mutableCopy];
+		self.fileSize = [decoder decodeObjectForKey:@"FileSize"];
+		self.lastOpen = [decoder decodeObjectForKey:@"LastOpen"];
+		
+		if (!_bookmarks) {
+			self.bookmarks = [NSMutableIndexSet new];
+		}
+		if (!_guid) {
+			self.guid = [ReaderDocument GUID];
+		}
 	}
-
+	
 	return self;
 }
 

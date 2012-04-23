@@ -42,14 +42,13 @@
 @interface ReaderContentView : UIScrollView <UIScrollViewDelegate>
 {
 @private
-	ReaderContentThumb *theThumbView;
-	UIView *theContainerView;
-	
 	CGFloat zoomAmount;
 }
 
 @property (nonatomic, unsafe_unretained, readwrite) id <ReaderContentViewDelegate> message;
 @property (nonatomic, readonly, strong) ReaderContentPage *contentPage;
+@property (nonatomic, readonly, strong) ReaderContentThumb *thumbView;
+@property (nonatomic, readonly, strong) UIView *containerView;
 
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page password:(NSString *)phrase;
 

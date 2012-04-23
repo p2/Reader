@@ -35,6 +35,8 @@
 @interface ReaderContentView ()
 
 @property (nonatomic, readwrite, strong) ReaderContentPage *contentPage;
+@property (nonatomic, readwrite, strong) ReaderContentThumb *thumbView;
+@property (nonatomic, readwrite, strong) UIView *containerView;
 
 @end
 
@@ -56,7 +58,7 @@
 
 #pragma mark Properties
 
-@synthesize message, contentPage;
+@synthesize message, contentPage, thumbView, containerView;
 
 #pragma mark - ReaderContentView functions
 
@@ -100,27 +102,28 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 		self.contentPage = [[ReaderContentPage alloc] initWithURL:fileURL page:page password:phrase];
 		if (contentPage != nil) // Must have a valid and initialized content view
 		{
-			theContainerView = [[UIView alloc] initWithFrame:contentPage.bounds];
-			theContainerView.autoresizesSubviews = NO;
-			theContainerView.userInteractionEnabled = NO;
-			theContainerView.contentMode = UIViewContentModeRedraw;
-			theContainerView.autoresizingMask = UIViewAutoresizingNone;
-			theContainerView.backgroundColor = [UIColor whiteColor];
+			self.containerView = [[UIView alloc] initWithFrame:contentPage.bounds];
+			containerView.autoresizesSubviews = NO;
+			containerView.userInteractionEnabled = NO;
+			containerView.contentMode = UIViewContentModeRedraw;
+			containerView.autoresizingMask = UIViewAutoresizingNone;
+			containerView.backgroundColor = [UIColor whiteColor];
 			
 #if READER_SHOW_SHADOWS
-			theContainerView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
-			theContainerView.layer.shadowRadius = 4.0f; theContainerView.layer.shadowOpacity = 1.0f;
-			theContainerView.layer.shadowPath = [UIBezierPath bezierPathWithRect:theContainerView.bounds].CGPath;
+			containerView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+			containerView.layer.shadowRadius = 4.0f;
+			containerView.layer.shadowOpacity = 1.0f;
+			containerView.layer.shadowPath = [UIBezierPath bezierPathWithRect:containerView.bounds].CGPath;
 #endif
 			
 			self.contentSize = contentPage.bounds.size; // Content size same as view size
 			self.contentOffset = CGPointMake((0.0f - CONTENT_INSET), (0.0f - CONTENT_INSET)); // Offset
 			self.contentInset = UIEdgeInsetsMake(CONTENT_INSET, CONTENT_INSET, CONTENT_INSET, CONTENT_INSET);
-			theThumbView = [[ReaderContentThumb alloc] initWithFrame:contentPage.bounds]; // Page thumb view
+			self.thumbView = [[ReaderContentThumb alloc] initWithFrame:contentPage.bounds]; // Page thumb view
 			
-			[theContainerView addSubview:theThumbView]; // Add the thumb view to the container view
-			[theContainerView addSubview:contentPage]; // Add the content view to the container view
-			[self addSubview:theContainerView]; // Add the container view to the scroll view
+			[containerView addSubview:thumbView]; // Add the thumb view to the container view
+			[containerView addSubview:contentPage]; // Add the content view to the container view
+			[self addSubview:containerView]; // Add the container view to the scroll view
 			
 			[self updateMinimumMaximumZoom]; // Update the minimum and maximum zoom scales
 			self.zoomScale = self.minimumZoomScale; // Set zoom to fit page content
@@ -135,47 +138,33 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)dealloc
 {
-	DXLog(@"");
-	
 	[self removeObserver:self forKeyPath:@"frame"];
-	theContainerView = nil;
-	theThumbView = nil;
 }
 
 - (void)showPageThumb:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase guid:(NSString *)guid
 {
-	DXLog(@"");
-	
 	BOOL large = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad); // Page thumb size
 	
 	CGSize size = (large ? CGSizeMake(PAGE_THUMB_LARGE, PAGE_THUMB_LARGE) : CGSizeMake(PAGE_THUMB_SMALL, PAGE_THUMB_SMALL));
-	ReaderThumbRequest *request = [ReaderThumbRequest forView:theThumbView fileURL:fileURL password:phrase guid:guid page:page size:size];
+	ReaderThumbRequest *request = [ReaderThumbRequest forView:thumbView fileURL:fileURL password:phrase guid:guid page:page size:size];
 	[request process];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	DXLog(@"");
-	
-	if ((object == self) && [keyPath isEqualToString:@"frame"])
-	{
+	if ((object == self) && [keyPath isEqualToString:@"frame"]) {
 		CGFloat oldMinimumZoomScale = self.minimumZoomScale;
 		[self updateMinimumMaximumZoom]; // Update zoom scale limits
 		
-		if (self.zoomScale == oldMinimumZoomScale) // Old minimum
-		{
+		if (self.zoomScale == oldMinimumZoomScale) {	// Old minimum
 			self.zoomScale = self.minimumZoomScale;
 		}
-		else // Check against minimum zoom scale
-		{
-			if (self.zoomScale < self.minimumZoomScale)
-			{
+		else {											// Check against minimum zoom scale
+			if (self.zoomScale < self.minimumZoomScale) {
 				self.zoomScale = self.minimumZoomScale;
 			}
-			else // Check against maximum zoom scale
-			{
-				if (self.zoomScale > self.maximumZoomScale)
-				{
+			else {										// Check against maximum zoom scale
+				if (self.zoomScale > self.maximumZoomScale) {
 					self.zoomScale = self.maximumZoomScale;
 				}
 			}
@@ -185,11 +174,10 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)layoutSubviews
 {
-	DXLog(@"");
-	
 	[super layoutSubviews];
+	
 	CGSize boundsSize = self.bounds.size;
-	CGRect viewFrame = theContainerView.frame;
+	CGRect viewFrame = containerView.frame;
 	if (viewFrame.size.width < boundsSize.width)
 		viewFrame.origin.x = (((boundsSize.width - viewFrame.size.width) / 2.0f) + self.contentOffset.x);
 	else
@@ -198,26 +186,21 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 		viewFrame.origin.y = (((boundsSize.height - viewFrame.size.height) / 2.0f) + self.contentOffset.y);
 	else
 		viewFrame.origin.y = 0.0f;
-	theContainerView.frame = viewFrame;
+	containerView.frame = viewFrame;
 }
 
 - (id)singleTap:(UITapGestureRecognizer *)recognizer
 {
-	DXLog(@"");
 	return [contentPage singleTap:recognizer];
 }
 
 - (void)zoomIncrement
 {
-	DXLog(@"");
-	
 	CGFloat zoomScale = self.zoomScale;
-	if (zoomScale < self.maximumZoomScale)
-	{
+	if (zoomScale < self.maximumZoomScale) {
 		zoomScale += zoomAmount; // += value
 		
-		if (zoomScale > self.maximumZoomScale)
-		{
+		if (zoomScale > self.maximumZoomScale) {
 			zoomScale = self.maximumZoomScale;
 		}
 		
@@ -227,15 +210,11 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)zoomDecrement
 {
-	DXLog(@"");
-	
 	CGFloat zoomScale = self.zoomScale;
-	if (zoomScale > self.minimumZoomScale)
-	{
+	if (zoomScale > self.minimumZoomScale) {
 		zoomScale -= zoomAmount; // -= value
 		
-		if (zoomScale < self.minimumZoomScale)
-		{
+		if (zoomScale < self.minimumZoomScale) {
 			zoomScale = self.minimumZoomScale;
 		}
 		
@@ -245,10 +224,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (void)zoomReset
 {
-	DXLog(@"");
-	
-	if (self.zoomScale > self.minimumZoomScale)
-	{
+	if (self.zoomScale > self.minimumZoomScale) {
 		self.zoomScale = self.minimumZoomScale;
 	}
 }
@@ -258,32 +234,17 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
-	return theContainerView;
+	return containerView;
 }
 
 #pragma mark - UIResponder instance methods
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-	[super touchesBegan:touches withEvent:event]; // Message superclass
-	
-	[message contentView:self touchesBegan:touches]; // Message delegate
+	[super touchesBegan:touches withEvent:event];
+	[message contentView:self touchesBegan:touches];
 }
 
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
-{
-	[super touchesCancelled:touches withEvent:event]; // Message superclass
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-	[super touchesEnded:touches withEvent:event]; // Message superclass
-}
-
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
-	[super touchesMoved:touches withEvent:event]; // Message superclass
-}
 
 @end
 
@@ -303,10 +264,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (id)initWithFrame:(CGRect)frame
 {
-	DXLog(@"");
-	
-	if ((self = [super initWithFrame:frame])) // Superclass init
-	{
+	if ((self = [super initWithFrame:frame])) {
 		imageView.contentMode = UIViewContentModeScaleAspectFill;
 		imageView.clipsToBounds = YES; // Needed for aspect fill
 	}

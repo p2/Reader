@@ -48,21 +48,22 @@
 													ThumbsViewControllerDelegate>
 {
 @private // Instance variables
-	UIScrollView *theScrollView;
-	ReaderMainToolbar *mainToolbar;
-	ReaderMainPagebar *mainPagebar;
-	NSMutableDictionary *contentViews;
-	
 	UIPrintInteractionController *printInteraction;
 	
 	NSInteger currentPage;
 	CGSize lastAppearSize;
-	NSDate *lastHideTime;
 	BOOL isVisible;
 }
 
 @property (nonatomic, unsafe_unretained, readwrite) id <ReaderViewControllerDelegate> delegate;
 @property (nonatomic, strong, readonly) ReaderDocument *document;
+
+@property (nonatomic, strong) UIScrollView *theScrollView;
+@property (nonatomic, strong) ReaderMainToolbar *mainToolbar;
+@property (nonatomic, strong) ReaderMainPagebar *mainPagebar;
+@property (nonatomic, strong) NSMutableDictionary *contentViews;
+
+@property (nonatomic, readonly, strong) NSDate *lastHideTime;
 
 - (id)initWithReaderDocument:(ReaderDocument *)object;
 

@@ -27,15 +27,23 @@
 #import "ReaderContentTile.h"
 #import "CGPDFDocument.h"
 
+
+@interface ReaderContentPage ()
+
+@property (nonatomic, readwrite, strong) NSMutableArray *links;
+
+@end
+
+
 @implementation ReaderContentPage
+
+@synthesize links = _links;
 
 
 #pragma mark - ReaderContentPage class methods
 
 + (Class)layerClass
 {
-	DXLog(@"");
-	
 	return [ReaderContentTile class];
 }
 
@@ -115,8 +123,10 @@
 			}
 		}
 		
-		NSInteger vr_x = ll_x; NSInteger vr_w = (ur_x - ll_x); // Integer X and width
-		NSInteger vr_y = ll_y; NSInteger vr_h = (ur_y - ll_y); // Integer Y and height
+		NSInteger vr_x = ll_x;
+		NSInteger vr_w = (ur_x - ll_x);
+		NSInteger vr_y = ll_y;
+		NSInteger vr_h = (ur_y - ll_y);
 		
 		CGRect viewRect = CGRectMake(vr_x, vr_y, vr_w, vr_h); // View CGRect from PDFRect
 		
@@ -130,29 +140,28 @@
 {
 	DXLog(@"");
 	
-	_links = [NSMutableArray new]; // Links list array
+	self.links = [NSMutableArray new]; // Links list array
 	
-	CGPDFArrayRef pageAnnotations = NULL; // Page annotations array
-	
+	CGPDFArrayRef pageAnnotations = NULL;
 	CGPDFDictionaryRef pageDictionary = CGPDFPageGetDictionary(_PDFPageRef);
 	if (CGPDFDictionaryGetArray(pageDictionary, "Annots", &pageAnnotations) == true)
 	{
-		NSInteger count = CGPDFArrayGetCount(pageAnnotations); // Number of annotations
+		NSInteger count = CGPDFArrayGetCount(pageAnnotations);							// Number of annotations
 		
-		for (NSInteger index = 0; index < count; index++) // Iterate through all annotations
+		for (NSInteger index = 0; index < count; index++)								// Iterate through all annotations
 		{
-			CGPDFDictionaryRef annotationDictionary = NULL; // PDF annotation dictionary
-			
+			CGPDFDictionaryRef annotationDictionary = NULL;
 			if (CGPDFArrayGetDictionary(pageAnnotations, index, &annotationDictionary) == true)
 			{
-				const char *annotationSubtype = NULL; // PDF annotation subtype string
-				
+				const char *annotationSubtype = NULL;
 				if (CGPDFDictionaryGetName(annotationDictionary, "Subtype", &annotationSubtype) == true)
 				{
-					if (strcmp(annotationSubtype, "Link") == 0) // Found annotation subtype of 'Link'
+					if (strcmp(annotationSubtype, "Link") == 0)							// Found annotation subtype of 'Link'
 					{
 						ReaderDocumentLink *documentLink = [self linkFromAnnotation:annotationDictionary];
-						if (documentLink != nil) [_links insertObject:documentLink atIndex:0]; // Add link
+						if (documentLink != nil) {
+							[_links insertObject:documentLink atIndex:0];				// Add link
+						}
 					}
 				}
 			}
@@ -493,7 +502,6 @@
 {
 	DXLog(@"");
 	
-	_links = nil;
 	@synchronized(self) // Block any other threads
 	{
 		CGPDFPageRelease(_PDFPageRef), _PDFPageRef = NULL;
@@ -501,14 +509,7 @@
 	}
 }
 
-/*
- - (void)layoutSubviews
- {
- #ifdef DEBUGX
- NSLog(@"%s", __FUNCTION__);
- #endif
- }
- */
+
 
 #pragma mark - CATiledLayer delegate methods
 

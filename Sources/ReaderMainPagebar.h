@@ -40,21 +40,15 @@
 @end
 
 @interface ReaderMainPagebar : UIView
-{
-@private
-	ReaderDocument *document;
-	ReaderTrackControl *trackControl;
 
-	NSMutableDictionary *miniThumbViews;
-	ReaderPagebarThumb *pageThumbView;
-	UILabel *pageNumberLabel;
-	UIView *pageNumberView;
+@property (nonatomic, unsafe_unretained) id <ReaderMainPagebarDelegate> delegate;
 
-	NSTimer *enableTimer;
-	NSTimer *trackTimer;
-}
-
-@property (nonatomic, unsafe_unretained, readwrite) id <ReaderMainPagebarDelegate> delegate;
+@property (nonatomic, readonly, strong) ReaderDocument *document;
+@property (nonatomic, readonly, strong) ReaderTrackControl *trackControl;
+@property (nonatomic, readonly, strong) ReaderPagebarThumb *pageThumbView;
+@property (nonatomic, readonly, strong) NSMutableDictionary *miniThumbViews;
+@property (nonatomic, readonly, strong) UILabel *pageNumberLabel;
+@property (nonatomic, readonly, strong) UIView *pageNumberView;
 
 - (id)initWithFrame:(CGRect)frame document:(ReaderDocument *)object;
 

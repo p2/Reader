@@ -26,22 +26,19 @@
 #import "CGPDFDocument.h"
 
 @interface ReaderDocument : NSObject <NSCoding>
-{
-@private
-	NSString *_fileName;
-	NSURL *_fileURL;
-}
 
 @property (nonatomic, readonly, copy) NSString *guid;
 @property (nonatomic, readonly, strong) NSDate *fileDate;
-@property (nonatomic, readwrite, strong) NSDate *lastOpen;
+@property (nonatomic, readonly, copy) NSString *fileName;
+@property (nonatomic, readonly, strong) NSURL *fileURL;
+
+@property (nonatomic, strong) NSDate *lastOpen;
 @property (nonatomic, readonly, strong) NSNumber *fileSize;
 @property (nonatomic, readonly, strong) NSNumber *pageCount;
 @property (nonatomic, strong) NSNumber *pageNumber;
+
 @property (nonatomic, readonly, strong) NSMutableIndexSet *bookmarks;
-@property (nonatomic, readonly, copy) NSString *fileName;
 @property (nonatomic, readonly, copy) NSString *password;
-@property (nonatomic, readonly, strong) NSURL *fileURL;
 
 + (NSString *)GUID;
 

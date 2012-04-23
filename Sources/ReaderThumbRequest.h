@@ -38,7 +38,7 @@
 @property (nonatomic, readonly, copy) NSString *password;
 @property (nonatomic, readonly, copy) NSString *cacheKey;
 @property (nonatomic, readonly, copy) NSString *thumbName;
-@property (nonatomic, readonly, unsafe_unretained) ReaderThumbView *thumbView;				///< The view that shows the thumbnail
+@property (nonatomic, readonly, strong) ReaderThumbView *thumbView;				///< The view that shows the thumbnail
 @property (nonatomic, readonly) NSUInteger targetTag;
 @property (nonatomic, readonly) NSInteger thumbPage;
 @property (nonatomic, readonly) CGSize thumbSize;

@@ -31,7 +31,8 @@
 
 @interface ReaderViewController ()
 
-@property (nonatomic, strong, readwrite) ReaderDocument *document;
+@property (nonatomic, readwrite, strong) ReaderDocument *document;
+@property (nonatomic, readwrite, strong) NSDate *lastHideTime;
 
 @end
 
@@ -50,6 +51,8 @@
 #pragma mark Properties
 
 @synthesize delegate, document;
+@synthesize theScrollView, mainToolbar, mainPagebar, contentViews;
+@synthesize lastHideTime;
 
 
 #pragma mark - UI Support methods
@@ -333,11 +336,11 @@
 	assert(self.splitViewController == nil); // Not supported (sorry)
 
 	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
-
-	CGRect viewRect = self.view.bounds; // View controller's view bounds
-
-	theScrollView = [[UIScrollView alloc] initWithFrame:viewRect]; // All
-
+	
+	// setup the scroll view
+	CGRect viewRect = self.view.bounds;
+	self.theScrollView = [[UIScrollView alloc] initWithFrame:viewRect];
+	
 	theScrollView.scrollsToTop = NO;
 	theScrollView.pagingEnabled = YES;
 	theScrollView.delaysContentTouches = NO;
@@ -351,19 +354,21 @@
 	theScrollView.delegate = self;
 
 	[self.view addSubview:theScrollView];
-
+	
+	// setup the toolbal at top
 	CGRect toolbarRect = viewRect;
 	toolbarRect.size.height = TOOLBAR_HEIGHT;
-
-	mainToolbar = [[ReaderMainToolbar alloc] initWithFrame:toolbarRect document:document]; // At top
+	
+	self.mainToolbar = [[ReaderMainToolbar alloc] initWithFrame:toolbarRect document:document];
 	mainToolbar.delegate = self;
 	[self.view addSubview:mainToolbar];
 	
+	// add the thumbnail bar at the bottom if we have more than one page
 	if ([document.pageCount integerValue] > 1) {
 		CGRect pagebarRect = viewRect;
 		pagebarRect.size.height = PAGEBAR_HEIGHT;
 		pagebarRect.origin.y = (viewRect.size.height - PAGEBAR_HEIGHT);
-		mainPagebar = [[ReaderMainPagebar alloc] initWithFrame:pagebarRect document:document]; // At bottom
+		self.mainPagebar = [[ReaderMainPagebar alloc] initWithFrame:pagebarRect document:document];
 		mainPagebar.delegate = self;
 		[self.view addSubview:mainPagebar];
 	}
@@ -383,8 +388,8 @@
 	[self.view addGestureRecognizer:doubleTapOne]; 
 	[self.view addGestureRecognizer:doubleTapTwo]; 
 	
-	contentViews = [NSMutableDictionary new];
-	lastHideTime = [NSDate new];
+	self.contentViews = [NSMutableDictionary new];
+	self.lastHideTime = [NSDate new];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -439,9 +444,14 @@
 - (void)viewDidUnload
 {
 	DXLog(@"");
-	mainToolbar = nil; mainPagebar = nil;
-	theScrollView = nil; contentViews = nil;
-	lastHideTime = nil; lastAppearSize = CGSizeZero; currentPage = 0;
+	self.mainToolbar = nil;
+	self.mainPagebar = nil;
+	self.theScrollView = nil;
+	self.contentViews = nil;
+	self.lastHideTime = nil;
+	
+	lastAppearSize = CGSizeZero;
+	currentPage = 0;
 	
 	[super viewDidUnload];
 }
@@ -489,14 +499,7 @@
 
 - (void)dealloc
 {
-	DXLog(@"");
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
-	mainToolbar = nil;
-	mainPagebar = nil;
-	theScrollView = nil;
-	contentViews = nil;
-	lastHideTime = nil;
 }
 
 #pragma mark - UIScrollViewDelegate methods
@@ -736,7 +739,7 @@
 		// Hide
 		[mainToolbar hideToolbar];
 		[mainPagebar hidePagebar];
-		lastHideTime = [NSDate new];
+		self.lastHideTime = [NSDate new];
 	}
 }
 
@@ -771,7 +774,8 @@
 	if (printInteraction != nil) [printInteraction dismissAnimated:NO]; // Dismiss
 	
 	ThumbsViewController *thumbsViewController = [[ThumbsViewController alloc] initWithReaderDocument:document];
-	thumbsViewController.delegate = self; thumbsViewController.title = self.title;
+	thumbsViewController.delegate = self;
+	thumbsViewController.title = self.title;
 	thumbsViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
 	thumbsViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 	

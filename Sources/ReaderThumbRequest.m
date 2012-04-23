@@ -36,7 +36,7 @@
 @property (nonatomic, readwrite, copy) NSString *password;
 @property (nonatomic, readwrite, copy) NSString *cacheKey;
 @property (nonatomic, readwrite, copy) NSString *thumbName;
-@property (nonatomic, readwrite, unsafe_unretained) ReaderThumbView *thumbView;
+@property (nonatomic, readwrite, strong) ReaderThumbView *thumbView;
 @property (nonatomic, readwrite) NSUInteger targetTag;
 @property (nonatomic, readwrite) NSInteger thumbPage;
 @property (nonatomic, readwrite) CGSize thumbSize;
@@ -82,8 +82,9 @@
 		self.guid = guid ? guid : [[url relativeString] stringByTrimmingCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
 		self.thumbName = [NSString stringWithFormat:@"%07d-%04dx%04d", page, w, h];
 		self.cacheKey = [NSString stringWithFormat:@"%@+%@", _thumbName, _guid];
-		_targetTag = [_cacheKey hash];
+		
 		self.thumbView = view;
+		_targetTag = [_cacheKey hash];
 		_thumbView.targetTag = _targetTag;
 		_scale = [[UIScreen mainScreen] scale];
 	}
@@ -100,7 +101,7 @@
 - (void)process
 {
 	UIImage *thumb = [[ReaderThumbCache sharedInstance] thumbRequest:self priority:YES];
-	if (_thumbView && thumb) {
+	if (_thumbView.superview && thumb) {
 		[_thumbView showImage:thumb];
 	}
 }
@@ -108,7 +109,7 @@
 - (void)processWithoutPriority
 {
 	UIImage *thumb = [[ReaderThumbCache sharedInstance] thumbRequest:self priority:NO];
-	if (_thumbView && thumb) {
+	if (_thumbView.superview && thumb) {
 		[_thumbView showImage:thumb];
 	}
 }

@@ -31,16 +31,12 @@
  */
 @interface ReaderThumbView : UIControl
 {
-@private
-	NSUInteger _targetTag;
-	NSOperation *__unsafe_unretained _operation;
-	
 @protected
 	UIImageView *imageView;
 }
 
-@property (unsafe_unretained, readwrite) NSOperation *operation;
-@property (nonatomic, assign, readwrite) NSUInteger targetTag;
+@property (readwrite, strong) NSOperation *operation;
+@property (nonatomic, assign) NSUInteger targetTag;
 
 - (void)showImage:(UIImage *)image;
 - (void)showTouched:(BOOL)touched;

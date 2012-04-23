@@ -32,8 +32,6 @@
 @interface ReaderContentPage : UIView
 {
 @private
-	NSMutableArray *_links;
-	
 	CGPDFDocumentRef _PDFDocRef;
 	CGPDFPageRef _PDFPageRef;
 	NSInteger _pageAngle;
@@ -43,6 +41,8 @@
 	CGFloat _pageOffsetX;
 	CGFloat _pageOffsetY;
 }
+
+@property (nonatomic, readonly, strong) NSMutableArray *links;
 
 - (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase;
 
