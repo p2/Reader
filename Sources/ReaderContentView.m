@@ -84,10 +84,20 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page password:(NSString *)phrase
 {
-	DXLog(@"");
-	
-	if ((self = [super initWithFrame:frame]))
-	{
+	return [self initWithFrame:frame fileURL:fileURL page:page contentPageClass:nil password:phrase];
+}
+
+/**
+ *	The designated initializer
+ *	@param frame The frame to be used
+ *	@param fileURL The URL to the PDF file
+ *	@param page The page of the PDF we want to show
+ *	@param aClass The class to use for the contentPage, must be a subclass of "ReaderContentPage", which is automatically chosen if it is nil
+ *	@param phrase The password to use for the PDF, if any
+ */
+- (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page contentPageClass:(Class)aClass password:(NSString *)phrase
+{
+	if ((self = [super initWithFrame:frame])) {
 		self.scrollsToTop = NO;
 		self.delaysContentTouches = NO;
 		self.showsVerticalScrollIndicator = NO;
@@ -99,9 +109,11 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 		self.autoresizesSubviews = NO;
 		self.bouncesZoom = YES;
 		self.delegate = self;
-		self.contentPage = [[ReaderContentPage alloc] initWithURL:fileURL page:page password:phrase];
-		if (contentPage != nil) // Must have a valid and initialized content view
-		{
+		
+		// create the content page
+		aClass = [aClass isSubclassOfClass:[ReaderContentPage class]] ? aClass : [ReaderContentPage class];
+		self.contentPage = [[aClass alloc] initWithURL:fileURL page:page password:phrase];
+		if (contentPage != nil) {																// Must have a valid and initialized content view
 			self.containerView = [[UIView alloc] initWithFrame:contentPage.bounds];
 			containerView.autoresizesSubviews = NO;
 			containerView.userInteractionEnabled = NO;
@@ -116,17 +128,19 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 			containerView.layer.shadowPath = [UIBezierPath bezierPathWithRect:containerView.bounds].CGPath;
 #endif
 			
-			self.contentSize = contentPage.bounds.size; // Content size same as view size
-			self.contentOffset = CGPointMake((0.0f - CONTENT_INSET), (0.0f - CONTENT_INSET)); // Offset
+			self.contentSize = contentPage.bounds.size;											// Content size same as view size
+			self.contentOffset = CGPointMake((0.0f - CONTENT_INSET), (0.0f - CONTENT_INSET));	// Offset
 			self.contentInset = UIEdgeInsetsMake(CONTENT_INSET, CONTENT_INSET, CONTENT_INSET, CONTENT_INSET);
-			self.thumbView = [[ReaderContentThumb alloc] initWithFrame:contentPage.bounds]; // Page thumb view
 			
-			[containerView addSubview:thumbView]; // Add the thumb view to the container view
-			[containerView addSubview:contentPage]; // Add the content view to the container view
-			[self addSubview:containerView]; // Add the container view to the scroll view
+			// add the thumbnail view
+			self.thumbView = [[ReaderContentThumb alloc] initWithFrame:contentPage.bounds];
 			
-			[self updateMinimumMaximumZoom]; // Update the minimum and maximum zoom scales
-			self.zoomScale = self.minimumZoomScale; // Set zoom to fit page content
+			[containerView addSubview:thumbView];
+			[containerView addSubview:contentPage];
+			[self addSubview:containerView];
+			
+			[self updateMinimumMaximumZoom];				// Update the minimum and maximum zoom scales
+			self.zoomScale = self.minimumZoomScale;			// Set zoom to fit page content
 		}
 		
 		[self addObserver:self forKeyPath:@"frame" options:0 context:NULL];

@@ -155,7 +155,7 @@
 			{
 				NSURL *fileURL = document.fileURL;
 				NSString *phrase = document.password;
-				contentView = [[ReaderContentView alloc] initWithFrame:viewRect fileURL:fileURL page:number password:phrase];
+				contentView = [[ReaderContentView alloc] initWithFrame:viewRect fileURL:fileURL page:number contentPageClass:[self classForViewPages] password:phrase];
 				[self didAddContentView:contentView forPage:number];
 				[theScrollView addSubview:contentView];
 				[contentViews setObject:contentView forKey:key];
@@ -251,7 +251,7 @@
 }
 
 
-#pragma mark - Turning our Document into NSData
+#pragma mark - Document Handling
 /**
  *	@returns An NSData representation of the document, depending on READER_REDRAW_FOR_EXPORT either just read from file or re-rendered into a PDF context
  */
@@ -288,6 +288,15 @@
 # else
 	return [NSData dataWithContentsOfURL:document.fileURL options:(NSDataReadingMapped|NSDataReadingUncached) error:nil];
 # endif
+}
+
+
+/**
+ *	We can return a subclass of ReaderContentPage if we want
+ */
+- (Class)classForViewPages
+{
+	return nil;				// if we return nil, the default class (ReaderContentPage) will be used by ReaderContentView
 }
 
 

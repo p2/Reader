@@ -515,29 +515,27 @@
 
 - (void)drawLayer:(CATiledLayer *)layer inContext:(CGContextRef)context
 {
-	DXLog(@"Drawing layer %@", layer);
+	DXLog(@"Drawing bounding box %@", NSStringFromCGRect(CGContextGetClipBoundingBox(context)));
 	
+	// Block any other threads
 	CGPDFPageRef drawPDFPageRef = NULL;
 	CGPDFDocumentRef drawPDFDocRef = NULL;
-	@synchronized(self) // Block any other threads
-	{
+	@synchronized(self) {
 		drawPDFDocRef = CGPDFDocumentRetain(_PDFDocRef);
 		drawPDFPageRef = CGPDFPageRetain(_PDFPageRef);
 	}
 	
-	//NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(CGContextGetClipBoundingBox(context)));
-	CGContextSetRGBFillColor(context, 1.0f, 1.0f, 1.0f, 1.0f); // White
+	CGContextSetRGBFillColor(context, 1.0f, 1.0f, 1.0f, 1.0f);			// White
+	CGContextFillRect(context, CGContextGetClipBoundingBox(context));
 	
-	CGContextFillRect(context, CGContextGetClipBoundingBox(context)); // Fill
-	
-	if (drawPDFPageRef != NULL) // Go ahead and render the PDF page into the context
-	{
+	// Go ahead and render the PDF page into the context
+	if (drawPDFPageRef != NULL) {
 		CGContextTranslateCTM(context, 0.0f, self.bounds.size.height);
 		CGContextScaleCTM(context, 1.0f, -1.0f);
 		CGContextConcatCTM(context, CGPDFPageGetDrawingTransform(drawPDFPageRef, kCGPDFCropBox, self.bounds, 0, true));
 		CGContextSetRenderingIntent(context, kCGRenderingIntentDefault);
 		CGContextSetInterpolationQuality(context, kCGInterpolationDefault);
-		CGContextDrawPDFPage(context, drawPDFPageRef); // Render the PDF page into the context
+		CGContextDrawPDFPage(context, drawPDFPageRef);
 	}
 	
 	// Cleanup

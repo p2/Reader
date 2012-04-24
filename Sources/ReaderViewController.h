@@ -70,5 +70,7 @@
 - (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSInteger)pageNumber;
 - (NSData *)documentData;
 
+- (Class)classForViewPages;
+
 
 @end
