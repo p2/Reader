@@ -318,6 +318,8 @@
 			
 			[object updateProperties];
 			self.document = object;
+			self.title = [document.fileName stringByDeletingPathExtension];
+			
 			[ReaderThumbCache touchThumbCacheWithGUID:object.guid]; // Touch the document thumb cache directory
 			reader = self; // Return an initialized ReaderViewController object
 		}
@@ -370,6 +372,7 @@
 	
 	self.mainToolbar = [[ReaderMainToolbar alloc] initWithFrame:toolbarRect document:document];
 	mainToolbar.delegate = self;
+	mainToolbar.title = self.title;
 	[self.view addSubview:mainToolbar];
 	
 	// add the thumbnail bar at the bottom if we have more than one page
@@ -463,6 +466,12 @@
 	currentPage = 0;
 	
 	[super viewDidUnload];
+}
+
+- (void)setTitle:(NSString *)title
+{
+	[super setTitle:title];
+	mainToolbar.title = title;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -845,13 +854,11 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar emailButton:(UIButton *)button
 {
-	DXLog(@"");
-
 #if READER_ENABLE_MAIL
-	if ([MFMailComposeViewController canSendMail] == NO) {
+	if (![MFMailComposeViewController canSendMail]) {
 		return;
 	}
-	if (printInteraction != nil) {
+	if (printInteraction) {
 		[printInteraction dismissAnimated:YES];
 	}
 	
@@ -862,10 +869,10 @@
 		
 		MFMailComposeViewController *mailComposer = [MFMailComposeViewController new];
 		[mailComposer addAttachmentData:attachment mimeType:@"application/pdf" fileName:fileName];
-		[mailComposer setSubject:fileName]; // Use the document file name for the subject
+		[mailComposer setSubject:self.title];
 		
 		mailComposer.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-		mailComposer.modalPresentationStyle = UIModalPresentationFormSheet;
+		mailComposer.modalPresentationStyle = UIModalPresentationPageSheet;
 		mailComposer.mailComposeDelegate = self; // Set the delegate
 		
 		[self presentModalViewController:mailComposer animated:YES];
