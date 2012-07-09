@@ -1,6 +1,6 @@
 //
 //	ReaderMainPagebar.m
-//	Reader v2.5.4
+//	Reader v2.5.6
 //
 //	Created by Julius Oklamcak on 2011-09-01.
 //	Copyright © 2011-2012 Julius Oklamcak. All rights reserved.
@@ -144,9 +144,10 @@
 		self.backgroundColor = [UIColor clearColor];
 		
 		CAGradientLayer *layer = (CAGradientLayer *)self.layer;
-		layer.colors = [NSArray arrayWithObjects:(__bridge id)[[UIColor colorWithWhite:0.82f alpha:0.8f] CGColor], (__bridge id)[[UIColor colorWithWhite:0.32f alpha:0.8f] CGColor], nil];
-		
-		// Add the shadow to the view
+		UIColor *liteColor = [UIColor colorWithWhite:0.82f alpha:0.8f];
+		UIColor *darkColor = [UIColor colorWithWhite:0.32f alpha:0.8f];
+		layer.colors = [NSArray arrayWithObjects:(id)liteColor.CGColor, (id)darkColor.CGColor, nil];
+
 		CGRect shadowRect = self.bounds; shadowRect.size.height = 4.0f; shadowRect.origin.y -= shadowRect.size.height;
 		ReaderPagebarShadow *shadowView = [[ReaderPagebarShadow alloc] initWithFrame:shadowRect];
 		[self addSubview:shadowView];
@@ -572,7 +573,9 @@
 		self.backgroundColor = [UIColor clearColor];
 
 		CAGradientLayer *layer = (CAGradientLayer *)self.layer;
-		layer.colors = [NSArray arrayWithObjects:(__bridge id)[[UIColor colorWithWhite:0.42f alpha:1.0f] CGColor], (__bridge id)[[UIColor colorWithWhite:0.42f alpha:0.0f] CGColor], nil];
+		UIColor *blackColor = [UIColor colorWithWhite:0.42f alpha:1.0f];
+		UIColor *clearColor = [UIColor colorWithWhite:0.42f alpha:0.0f];
+		layer.colors = [NSArray arrayWithObjects:(id)clearColor.CGColor, (id)blackColor.CGColor, nil];
 	}
 
 	return self;

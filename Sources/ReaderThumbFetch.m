@@ -1,6 +1,6 @@
 //
 //	ReaderThumbFetch.m
-//	Reader v2.5.4
+//	Reader v2.5.6
 //
 //	Created by Julius Oklamcak on 2011-09-01.
 //	Copyright © 2011-2012 Julius Oklamcak. All rights reserved.
@@ -70,8 +70,6 @@
 		return;
 	}
 	
-	[[NSThread currentThread] setName:@"ReaderThumbFetch"];		// is this needed?
-	
 	NSURL *thumbURL = [self thumbFileURL];
 	CGImageRef imageRef = NULL;
 	CGImageSourceRef loadRef = CGImageSourceCreateWithURL((__bridge CFURLRef)thumbURL, NULL);
@@ -85,7 +83,13 @@
 			UIImage *image = [UIImage imageWithCGImage:imageRef scale:request.scale orientation:0];
 			CGImageRelease(imageRef); // Release the CGImage reference from the above thumb load code
 			
-			[[ReaderThumbCache sharedInstance] setObject:image forKey:request.cacheKey]; // Update cache
+			// Decode and draw the image on this background thread
+			UIGraphicsBeginImageContextWithOptions(image.size, YES, request.scale);
+			[image drawAtPoint:CGPointZero];
+			UIImage *decoded = UIGraphicsGetImageFromCurrentImageContext();
+			UIGraphicsEndImageContext();
+			
+			[[ReaderThumbCache sharedInstance] setObject:decoded forKey:request.cacheKey]; // Update cache
 			
 			// Show the image in the target thumb view on the main thread
 			if (!self.isCancelled) {
@@ -95,7 +99,7 @@
 				// Queue image show on main thread
 				dispatch_async(dispatch_get_main_queue(), ^{
 					if (thumbView.targetTag == targetTag) {
-						[thumbView showImage:image];
+						[thumbView showImage:decoded];
 					}
 				});
 			}

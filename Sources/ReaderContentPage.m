@@ -1,6 +1,6 @@
 //
 //	ReaderContentPage.m
-//	Reader v2.5.5
+//	Reader v2.5.6
 //
 //	Created by Julius Oklamcak on 2011-07-01.
 //	Copyright © 2011-2012 Julius Oklamcak. All rights reserved.
