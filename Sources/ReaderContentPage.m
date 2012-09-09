@@ -525,12 +525,16 @@
 	
 	// Go ahead and render the PDF page into the context
 	if (drawPDFPageRef != NULL) {
+		CGContextSaveGState(context);
+		
 		CGContextTranslateCTM(context, 0.0f, self.bounds.size.height);
 		CGContextScaleCTM(context, 1.0f, -1.0f);
 		CGContextConcatCTM(context, CGPDFPageGetDrawingTransform(drawPDFPageRef, kCGPDFCropBox, self.bounds, 0, true));
 		CGContextSetRenderingIntent(context, kCGRenderingIntentDefault);
 		CGContextSetInterpolationQuality(context, kCGInterpolationDefault);
 		CGContextDrawPDFPage(context, drawPDFPageRef);
+		
+		CGContextRestoreGState(context);
 	}
 	
 	// Cleanup
