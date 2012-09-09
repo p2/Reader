@@ -40,12 +40,126 @@
 @synthesize links = _links;
 
 
+- (void)dealloc
+{
+	DXLog(@"");
+	
+	@synchronized(self) {		// Block any other threads
+		CGPDFPageRelease(_PDFPageRef), _PDFPageRef = NULL;
+		CGPDFDocumentRelease(_PDFDocRef), _PDFDocRef = NULL;
+	}
+}
+
+
+#pragma mark - Initialization
+- (id)initWithFrame:(CGRect)frame
+{
+	if ((self = [super initWithFrame:frame])) {
+		//self.autoresizesSubviews = NO;
+		self.userInteractionEnabled = NO;
+		self.clearsContextBeforeDrawing = NO;
+		self.contentMode = UIViewContentModeRedraw;
+		self.autoresizingMask = UIViewAutoresizingNone;
+		self.backgroundColor = [UIColor clearColor];
+	}
+	
+	return self;
+}
+
+- (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase
+{
+	CGRect viewRect = CGRectZero;
+	
+	if (fileURL) {
+		_PDFDocRef = CGPDFDocumentCreateX((__bridge CFURLRef)fileURL, phrase);
+		if (_PDFDocRef) {
+			
+			// check page bounds
+			if (page < 1) {
+				page = 1;
+			}
+			
+			NSInteger numPages = CGPDFDocumentGetNumberOfPages(_PDFDocRef);
+			if (page > numPages) {
+				page = numPages;
+			}
+			
+			// Get page
+			_PDFPageRef = CGPDFDocumentGetPage(_PDFDocRef, page);
+			if (_PDFPageRef) {
+				CGPDFPageRetain(_PDFPageRef);
+				
+				CGRect cropBoxRect = CGPDFPageGetBoxRect(_PDFPageRef, kCGPDFCropBox);
+				CGRect mediaBoxRect = CGPDFPageGetBoxRect(_PDFPageRef, kCGPDFMediaBox);
+				CGRect effectiveRect = CGRectIntersection(cropBoxRect, mediaBoxRect);
+				_pageAngle = CGPDFPageGetRotationAngle(_PDFPageRef);
+				
+				// Page rotation angle (in degrees)
+				switch (_pageAngle) {
+					default:
+					case 0:
+					case 180:
+					{
+						_pageWidth = effectiveRect.size.width;
+						_pageHeight = effectiveRect.size.height;
+						_pageOffsetX = effectiveRect.origin.x;
+						_pageOffsetY = effectiveRect.origin.y;
+						break;
+					}
+						
+					case 90:
+					case 270:
+					{
+						_pageWidth = effectiveRect.size.height;
+						_pageHeight = effectiveRect.size.width;
+						_pageOffsetX = effectiveRect.origin.y;
+						_pageOffsetY = effectiveRect.origin.x;
+						break;
+					}
+				}
+				
+				NSInteger page_w = _pageWidth;
+				NSInteger page_h = _pageHeight;
+				
+				if (page_w % 2) {
+					page_w--;
+				}
+				if (page_h % 2) {
+					page_h--;
+				}
+				
+				viewRect.size = CGSizeMake(page_w, page_h);
+			}
+			else {
+				CGPDFDocumentRelease(_PDFDocRef), _PDFDocRef = NULL;
+				NSAssert(NO, @"CGPDFPageRef == NULL");
+			}
+		}
+		else  {
+			NSAssert(NO, @"CGPDFDocumentRef == NULL");
+		}
+	}
+	else {
+		NSAssert(NO, @"fileURL == nil");
+	}
+	
+	// now we initialize
+	if ((self = [self initWithFrame:viewRect])) {
+		_page = page;
+		
+		[self buildAnnotationLinksList];		// links
+	}
+	return self;
+}
+
+
 #pragma mark - ReaderContentPage class methods
 
 + (Class)layerClass
 {
 	return [ReaderContentTile class];
 }
+
 
 #pragma mark ReaderContentPage PDF link methods
 
@@ -390,125 +504,6 @@
 	
 	return result;
 }
-
-#pragma mark ReaderContentPage instance methods
-
-- (id)initWithFrame:(CGRect)frame
-{
-	DXLog(@"");
-	
-	id view = nil; // UIView
-	
-	if (CGRectIsEmpty(frame) == false)
-	{
-		if ((self = [super initWithFrame:frame]))
-		{
-			//self.autoresizesSubviews = NO;
-			self.userInteractionEnabled = NO;
-			self.clearsContextBeforeDrawing = NO;
-			self.contentMode = UIViewContentModeRedraw;
-			self.autoresizingMask = UIViewAutoresizingNone;
-			self.backgroundColor = [UIColor clearColor];
-			view = self; // Return self
-		}
-	}
-	else // Handle invalid frame size
-	{
-	}
-	
-	return view;
-}
-
-- (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase
-{
-	DXLog(@"");
-	
-	CGRect viewRect = CGRectZero; // View rect
-	
-	if (fileURL != nil) // Check for non-nil file URL
-	{
-		_PDFDocRef = CGPDFDocumentCreateX((__bridge CFURLRef)fileURL, phrase);
-		if (_PDFDocRef != NULL) // Check for non-NULL CGPDFDocumentRef
-		{
-			if (page < 1) page = 1; // Check the lower page bounds
-			
-			NSInteger pages = CGPDFDocumentGetNumberOfPages(_PDFDocRef);
-			if (page > pages) page = pages; // Check the upper page bounds
-			
-			_PDFPageRef = CGPDFDocumentGetPage(_PDFDocRef, page); // Get page
-			
-			if (_PDFPageRef != NULL) // Check for non-NULL CGPDFPageRef
-			{
-				CGPDFPageRetain(_PDFPageRef); // Retain the PDF page
-				
-				CGRect cropBoxRect = CGPDFPageGetBoxRect(_PDFPageRef, kCGPDFCropBox);
-				CGRect mediaBoxRect = CGPDFPageGetBoxRect(_PDFPageRef, kCGPDFMediaBox);
-				CGRect effectiveRect = CGRectIntersection(cropBoxRect, mediaBoxRect);
-				_pageAngle = CGPDFPageGetRotationAngle(_PDFPageRef); // Angle
-				
-				switch (_pageAngle) // Page rotation angle (in degrees)
-				{
-					default: // Default case
-					case 0: case 180: // 0 and 180 degrees
-					{
-						_pageWidth = effectiveRect.size.width;
-						_pageHeight = effectiveRect.size.height;
-						_pageOffsetX = effectiveRect.origin.x;
-						_pageOffsetY = effectiveRect.origin.y;
-						break;
-					}
-						
-					case 90: case 270: // 90 and 270 degrees
-					{
-						_pageWidth = effectiveRect.size.height;
-						_pageHeight = effectiveRect.size.width;
-						_pageOffsetX = effectiveRect.origin.y;
-						_pageOffsetY = effectiveRect.origin.x;
-						break;
-					}
-				}
-				
-				NSInteger page_w = _pageWidth; // Integer width
-				NSInteger page_h = _pageHeight; // Integer height
-				
-				if (page_w % 2) page_w--; if (page_h % 2) page_h--; // Even
-				
-				viewRect.size = CGSizeMake(page_w, page_h); // View size
-			}
-			else // Error out with a diagnostic
-			{
-				CGPDFDocumentRelease(_PDFDocRef), _PDFDocRef = NULL;
-				NSAssert(NO, @"CGPDFPageRef == NULL");
-			}
-		}
-		else // Error out with a diagnostic
-		{
-			NSAssert(NO, @"CGPDFDocumentRef == NULL");
-		}
-	}
-	else // Error out with a diagnostic
-	{
-		NSAssert(NO, @"fileURL == nil");
-	}
-	
-	id view = [self initWithFrame:viewRect]; // UIView setup
-	
-	if (view != nil) [self buildAnnotationLinksList]; // Links
-	
-	return view;
-}
-
-- (void)dealloc
-{
-	DXLog(@"");
-	
-	@synchronized(self) // Block any other threads
-	{
-		CGPDFPageRelease(_PDFPageRef), _PDFPageRef = NULL;
-		CGPDFDocumentRelease(_PDFDocRef), _PDFDocRef = NULL;
-	}
-}
-
 
 
 #pragma mark - CATiledLayer delegate methods

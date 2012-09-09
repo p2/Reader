@@ -29,7 +29,7 @@
 /**
  *	A class responsible with drawing one page of a PDF document
  */
-@interface ReaderContentPage : UIView
+@interface ReaderContentPage : UIControl
 {
 @private
 	CGPDFDocumentRef _PDFDocRef;
@@ -42,6 +42,7 @@
 	CGFloat _pageOffsetY;
 }
 
+@property (nonatomic, readonly, assign) NSUInteger page;
 @property (nonatomic, readonly, strong) NSMutableArray *links;
 
 - (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase;

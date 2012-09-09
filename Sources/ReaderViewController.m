@@ -118,29 +118,31 @@
 {
 	DXLog(@"");
 	
-	if (page != currentPage) // Only if different
-	{
+	if (page != currentPage) {
 		NSInteger minValue; NSInteger maxValue;
 		NSInteger maxPage = [document.pageCount integerValue];
 		NSInteger minPage = 1;
 
-		if ((page < minPage) || (page > maxPage)) return;
+		if ((page < minPage) || (page > maxPage)) {
+			return;
+		}
 
-		if (maxPage <= PAGING_VIEWS) // Few pages
-		{
+		if (maxPage <= PAGING_VIEWS) {		// Few pages
 			minValue = minPage;
 			maxValue = maxPage;
 		}
-		else // Handle more pages
-		{
+		else {								// Handle more pages
 			minValue = (page - 1);
 			maxValue = (page + 1);
 
-			if (minValue < minPage)
-				{minValue++; maxValue++;}
-			else
-				if (maxValue > maxPage)
-					{minValue--; maxValue--;}
+			if (minValue < minPage) {
+				minValue++;
+				maxValue++;
+			}
+			else if (maxValue > maxPage) {
+				minValue--;
+				maxValue--;
+			}
 		}
 
 		NSMutableIndexSet *newPageSet = [NSMutableIndexSet new];
@@ -151,8 +153,9 @@
 		for (NSInteger number = minValue; number <= maxValue; number++) {
 			NSNumber *key = [NSNumber numberWithInteger:number]; // # key
 			ReaderContentView *contentView = [contentViews objectForKey:key];
-			if (contentView == nil) // Create a brand new document content view
-			{
+			
+			// Create a brand new document content view
+			if (contentView == nil) {
 				NSURL *fileURL = document.fileURL;
 				NSString *phrase = document.password;
 				contentView = [[ReaderContentView alloc] initWithFrame:viewRect fileURL:fileURL page:number contentPageClass:[self classForViewPages] password:phrase];
@@ -162,8 +165,9 @@
 				contentView.message = self;
 				[newPageSet addIndex:number];
 			}
-			else // Reposition the existing content view
-			{
+			
+			// Reposition the existing content view
+			else {
 				contentView.frame = viewRect; [contentView zoomReset];
 				[unusedViews removeObjectForKey:key];
 			}
