@@ -49,6 +49,8 @@
 
 - (id)singleTap:(UITapGestureRecognizer *)recognizer;
 
+- (CGRect)pageRect;
+
 @end
 
 #pragma mark -

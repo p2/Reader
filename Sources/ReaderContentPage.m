@@ -153,6 +153,14 @@
 }
 
 
+#pragma mark - Properties
+
+- (CGRect)pageRect
+{
+	return CGRectMake(_pageOffsetX, _pageOffsetY, _pageWidth, _pageHeight);
+}
+
+
 #pragma mark - ReaderContentPage class methods
 
 + (Class)layerClass
@@ -508,6 +516,9 @@
 
 #pragma mark - CATiledLayer delegate methods
 
+/**
+ *  The PDF is drawn with constant aspect ratio, centered in the view's bounds with the wider edges aligning with the bounds edges.
+ */
 - (void)drawLayer:(CATiledLayer *)layer inContext:(CGContextRef)context
 {
 	DXLog(@"Drawing bounding box %@", NSStringFromCGRect(CGContextGetClipBoundingBox(context)));
@@ -529,7 +540,7 @@
 		
 		CGContextTranslateCTM(context, 0.0f, self.bounds.size.height);
 		CGContextScaleCTM(context, 1.0f, -1.0f);
-		CGContextConcatCTM(context, CGPDFPageGetDrawingTransform(drawPDFPageRef, kCGPDFCropBox, self.bounds, 0, true));
+		CGContextConcatCTM(context, CGPDFPageGetDrawingTransform(drawPDFPageRef, kCGPDFCropBox, self.bounds, 0, true));		// draw centered with constant aspect ratio
 		CGContextSetRenderingIntent(context, kCGRenderingIntentDefault);
 		CGContextSetInterpolationQuality(context, kCGInterpolationDefault);
 		CGContextDrawPDFPage(context, drawPDFPageRef);
