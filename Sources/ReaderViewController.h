@@ -70,6 +70,9 @@
 - (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSInteger)pageNumber;
 - (NSData *)documentData;
 
+- (void)handleSingleTap:(UITapGestureRecognizer *)recognizer;
+- (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer;
+
 - (Class)classForViewPages;
 
 
