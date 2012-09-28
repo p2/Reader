@@ -115,7 +115,7 @@
 {
 	DXLog(@"");
 	
-	if (page != currentPage) {
+	if (page != _currentPage) {
 		NSInteger minValue; NSInteger maxValue;
 		NSInteger maxPage = [document.pageCount integerValue];
 		NSInteger minPage = 1;
@@ -229,7 +229,7 @@
 		// update and track current page
 		[mainPagebar updatePagebar];
 		[self updateToolbarBookmarkIcon];
-		currentPage = page;
+		_currentPage = page;
 	}
 }
 
@@ -462,7 +462,7 @@
 	self.lastHideTime = nil;
 	
 	lastAppearSize = CGSizeZero;
-	currentPage = 0;
+	_currentPage = 0;
 	
 	[super viewDidUnload];
 }

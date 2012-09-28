@@ -50,7 +50,6 @@
 @private // Instance variables
 	UIPrintInteractionController *printInteraction;
 	
-	NSInteger currentPage;
 	CGSize lastAppearSize;
 	BOOL isVisible;
 }
@@ -63,6 +62,7 @@
 @property (nonatomic, strong) ReaderMainPagebar *mainPagebar;
 @property (nonatomic, strong) NSMutableDictionary *contentViews;
 
+@property (nonatomic, readonly, assign) NSUInteger currentPage;
 @property (nonatomic, readonly, strong) NSDate *lastHideTime;
 
 - (id)initWithReaderDocument:(ReaderDocument *)object;
