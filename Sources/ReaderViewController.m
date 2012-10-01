@@ -86,13 +86,17 @@
 	];
 
 	__block CGRect viewRect = CGRectZero; viewRect.size = theScrollView.bounds.size;
-	__block CGPoint contentOffset = CGPointZero; NSInteger page = [document.pageNumber integerValue];
+	__block CGPoint contentOffset = CGPointZero;
+	NSUInteger page = [document.pageNumber unsignedIntegerValue];
 
 	[pageSet enumerateIndexesUsingBlock:
 		^(NSUInteger number, BOOL *stop) {
 			NSNumber *key = [NSNumber numberWithInteger:number];
 			ReaderContentView *contentView = [contentViews objectForKey:key];
-			contentView.frame = viewRect; if (page == number) contentOffset = viewRect.origin;
+			contentView.frame = viewRect;
+			if (page == number) {
+				contentOffset = viewRect.origin;
+			}
 			viewRect.origin.x += viewRect.size.width; // Next view frame position
 		}
 	];
@@ -111,14 +115,15 @@
 	[mainToolbar setBookmarkState:bookmarked]; // Update
 }
 
-- (void)showDocumentPage:(NSInteger)page
+- (void)showDocumentPage:(NSUInteger)page
 {
 	DXLog(@"");
 	
 	if (page != _currentPage) {
-		NSInteger minValue; NSInteger maxValue;
-		NSInteger maxPage = [document.pageCount integerValue];
-		NSInteger minPage = 1;
+		NSUInteger minValue;
+		NSUInteger maxValue;
+		NSUInteger maxPage = [document.pageCount unsignedIntegerValue];
+		NSUInteger minPage = 1;
 
 		if ((page < minPage) || (page > maxPage)) {
 			return;
@@ -147,7 +152,7 @@
 		CGRect viewRect = CGRectZero;
 		viewRect.size = theScrollView.bounds.size;
 		
-		for (NSInteger number = minValue; number <= maxValue; number++) {
+		for (NSUInteger number = minValue; number <= maxValue; number++) {
 			NSNumber *key = [NSNumber numberWithInteger:number];
 			ReaderContentView *contentView = [contentViews objectForKey:key];
 			
@@ -201,7 +206,7 @@
 		if (!CGPointEqualToPoint(theScrollView.contentOffset, contentOffset) == false) {
 			theScrollView.contentOffset = contentOffset;
 		}
-		if ([document.pageNumber integerValue] != page) {
+		if ([document.pageNumber unsignedIntegerValue] != page) {
 			document.pageNumber = [NSNumber numberWithInteger:page];
 		}
 
@@ -246,7 +251,7 @@
 /**
  *	Called when we add a new view for our document. The default implementation does nothing.
  */
-- (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSInteger)pageNumber
+- (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSUInteger)pageNumber
 {
 }
 

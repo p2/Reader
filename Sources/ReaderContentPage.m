@@ -118,8 +118,8 @@
 					}
 				}
 				
-				NSInteger page_w = _pageWidth;
-				NSInteger page_h = _pageHeight;
+				NSInteger page_w = (NSInteger)_pageWidth;
+				NSInteger page_h = (NSInteger)_pageHeight;
 				
 				if (page_w % 2) {
 					page_w--;
@@ -245,10 +245,10 @@
 			}
 		}
 		
-		NSInteger vr_x = ll_x;
-		NSInteger vr_w = (ur_x - ll_x);
-		NSInteger vr_y = ll_y;
-		NSInteger vr_h = (ur_y - ll_y);
+		CGFloat vr_x = roundf(ll_x);
+		CGFloat vr_w = roundf(ur_x - ll_x);
+		CGFloat vr_y = roundf(ll_y);
+		CGFloat vr_h = roundf(ur_y - ll_y);
 		
 		CGRect viewRect = CGRectMake(vr_x, vr_y, vr_w, vr_h); // View CGRect from PDFRect
 		

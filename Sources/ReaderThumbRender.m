@@ -121,11 +121,15 @@
 				scale = ((thumb_h < thumb_w) ? scale_h : scale_w); // Landscape
 			}
 			
-			NSInteger target_w = (page_w * scale);
-			NSInteger target_h = (page_h * scale);
+			NSInteger target_w = (NSInteger)(page_w * scale);
+			NSInteger target_h = (NSInteger)(page_h * scale);
 			
-			if (target_w % 2) target_w--;
-			if (target_h % 2) target_h--; // Even
+			if (target_w % 2) {
+				target_w--;
+			}
+			if (target_h % 2) {
+				target_h--; // Even
+			}
 			
 			target_w *= request.scale;
 			target_h *= request.scale;

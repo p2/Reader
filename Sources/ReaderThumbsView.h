@@ -63,9 +63,9 @@
 
 - (void)setThumbSize:(CGSize)thumbSize;
 
-- (void)reloadThumbsCenterOnIndex:(NSInteger)index;
+- (void)reloadThumbsCenterOnIndex:(NSUInteger)index;
 - (void)reloadThumbsContentOffset:(CGPoint)newContentOffset;
-- (void)refreshThumbWithIndex:(NSInteger)index;
+- (void)refreshThumbWithIndex:(NSUInteger)index;
 - (void)refreshVisibleThumbs;
 
 - (CGPoint)insetContentOffset;

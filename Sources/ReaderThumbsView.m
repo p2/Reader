@@ -137,8 +137,8 @@
 	CGFloat minY = self.contentOffset.y; // Content offset
 	CGFloat maxY = (minY + self.bounds.size.height - 1.0f);
 	
-	NSInteger startRow = (minY / _thumbSize.height); // Start row
-	NSInteger finalRow = (maxY / _thumbSize.height); // Final row
+	NSInteger startRow = (NSInteger)(minY / _thumbSize.height); // Start row
+	NSInteger finalRow = (NSInteger)(maxY / _thumbSize.height); // Final row
 	
 	NSInteger startIndex = (startRow * _thumbsX); // Start index
 	NSInteger finalIndex = (finalRow * _thumbsX); // Final index
@@ -177,8 +177,8 @@
 #endif
 	
 	CGRect thumbRect; thumbRect.size = _thumbSize;
-	NSInteger thumbY = ((index / _thumbsX) * _thumbSize.height); // X, Y
-	NSInteger thumbX = (((index % _thumbsX) * _thumbSize.width) + _thumbX);
+	NSInteger thumbY = (NSInteger)((index / _thumbsX) * _thumbSize.height); // X, Y
+	NSInteger thumbX = (NSInteger)(((index % _thumbsX) * _thumbSize.width) + _thumbX);
 	thumbRect.origin.x = thumbX; thumbRect.origin.y = thumbY;
 	
 	return thumbRect;
@@ -197,16 +197,20 @@
 		CGFloat bw = self.bounds.size.width;
 		//CGFloat bh = self.bounds.size.height;
 
-		_thumbsX = (bw / _thumbSize.width);
-		if (_thumbsX < 1) _thumbsX = 1;
+		_thumbsX = (NSInteger)(bw / _thumbSize.width);
+		if (_thumbsX < 1) {
+			_thumbsX = 1;
+		}
 		_thumbsY = (thumbCount / _thumbsX);
-		if ((_thumbsX * _thumbsY) < thumbCount) _thumbsY++;
+		if ((_thumbsX * _thumbsY) < (NSInteger)thumbCount) {
+			_thumbsY++;
+		}
 		
 		CGFloat tw = (_thumbsX * _thumbSize.width);
 		CGFloat th = (_thumbsY * _thumbSize.height);
 		
 		if (tw < bw)
-			_thumbX = ((bw - tw) / 2.0f);
+			_thumbX = (NSInteger)((bw - tw) / 2.0f);
 		else
 			_thumbX = 0; // Reset
 
@@ -287,7 +291,7 @@
 	}
 }
 
-- (void)reloadThumbsCenterOnIndex:(NSInteger)index
+- (void)reloadThumbsCenterOnIndex:(NSUInteger)index
 {
 #ifdef DEBUGX
 	NSLog(@"%s %d", __FUNCTION__, index);
@@ -312,16 +316,23 @@
 	
 	if (thumbCount > 0) // Have some thumbs
 	{
-		NSInteger boundsHeight = self.bounds.size.height;
-		NSInteger maxY = (self.contentSize.height - boundsHeight);
+		CGFloat boundsHeight = self.bounds.size.height;
+		NSInteger maxY = (NSInteger)(self.contentSize.height - boundsHeight);
 		NSInteger minY = 0; maxY--; if (maxY < minY) maxY = minY; // Limits
 		
-		if (index < 0) index = 0; else if (index > thumbCount) index = (thumbCount - 1);
+		if (index > thumbCount) {
+			index = (thumbCount - 1);
+		}
 		
-		NSInteger thumbY = ((index / _thumbsX) * _thumbSize.height); // Thumb Y
-		NSInteger offsetY = (thumbY - (boundsHeight / 2) + (_thumbSize.height / 2));
+		NSInteger thumbY = (NSInteger)((index / _thumbsX) * _thumbSize.height); // Thumb Y
+		NSInteger offsetY = (NSInteger)(thumbY - (boundsHeight / 2) + (_thumbSize.height / 2));
 		
-		if (offsetY < minY) offsetY = minY; else if (offsetY > maxY) offsetY = maxY;
+		if (offsetY < minY) {
+			offsetY = minY;
+		}
+		else if (offsetY > maxY) {
+			offsetY = maxY;
+		}
 		
 		newContentOffset.y = offsetY; // Calculated content offset Y position
 	}
@@ -359,10 +370,10 @@
 	_thumbCount = thumbCount;
 	if (thumbCount > 0) // Have some thumbs
 	{
-		NSInteger boundsHeight = self.bounds.size.height;
-		NSInteger maxY = (self.contentSize.height - boundsHeight);
+		CGFloat boundsHeight = self.bounds.size.height;
+		NSInteger maxY = (NSInteger)(self.contentSize.height - boundsHeight);
 		NSInteger minY = 0; maxY--; if (maxY < minY) maxY = minY; // Limits
-		NSInteger offsetY = newContentOffset.y; // Requested content offset Y
+		NSInteger offsetY = (NSInteger)newContentOffset.y; // Requested content offset Y
 		
 		if (offsetY < minY) offsetY = minY; else if (offsetY > maxY) offsetY = maxY;
 		
@@ -383,7 +394,7 @@
 	[self flashScrollIndicators];
 }
 
-- (void)refreshThumbWithIndex:(NSInteger)index
+- (void)refreshThumbWithIndex:(NSUInteger)index
 {
 #ifdef DEBUGX
 	NSLog(@"%s %d", __FUNCTION__, index);
@@ -391,7 +402,7 @@
 	
 	for (ReaderThumbView *tvCell in thumbCellsVisible) // Enumerate visible cells
 	{
-		if (tvCell.tag == index) // Found a visible thumb cell with the index value
+		if ((NSUInteger)tvCell.tag == index) // Found a visible thumb cell with the index value
 		{
 			if ([delegate respondsToSelector:@selector(thumbsView:refreshThumbCell:forIndex:)])
 			{

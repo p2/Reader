@@ -86,7 +86,8 @@
 		CGFloat controlWidth = trackControl.bounds.size.width;
 		CGFloat useableWidth = (controlWidth - THUMB_LARGE_WIDTH);
 		CGFloat stride = (useableWidth / (pages - 1)); // Page stride
-		NSInteger X = (stride * (page - 1)); CGFloat pageThumbX = X;
+		NSInteger X = (NSInteger)(stride * (page - 1));
+		CGFloat pageThumbX = X;
 		
 		CGRect pageThumbRect = pageThumbView.frame; // Current frame
 		if (pageThumbX != pageThumbRect.origin.x) // Only if different
@@ -221,8 +222,8 @@
 {
 	CGRect controlRect = CGRectInset(self.bounds, 4.0f, 0.0f);
 	CGFloat thumbWidth = (THUMB_SMALL_WIDTH + THUMB_SMALL_GAP);
-	NSInteger thumbs = (controlRect.size.width / thumbWidth);
-	NSInteger pages = [document.pageCount integerValue];
+	NSUInteger thumbs = (NSUInteger)(controlRect.size.width / thumbWidth);
+	NSUInteger pages = [document.pageCount unsignedIntegerValue];
 	if (thumbs > pages) {
 		thumbs = pages;
 	}
@@ -230,13 +231,14 @@
 	CGFloat controlWidth = ((thumbs * thumbWidth) - THUMB_SMALL_GAP);
 	controlRect.size.width = controlWidth;
 	CGFloat widthDelta = (self.bounds.size.width - controlWidth);
-	NSInteger X = (widthDelta / 2.0f); controlRect.origin.x = X;
+	NSInteger X = (NSInteger)(widthDelta / 2.0f);
+	controlRect.origin.x = X;
 	trackControl.frame = controlRect;
 	
 	// create the page thumb view when needed
 	if (pageThumbView == nil) {
 		CGFloat heightDelta = (controlRect.size.height - THUMB_LARGE_HEIGHT);
-		NSInteger thumbY = (heightDelta / 2.0f);
+		NSInteger thumbY = (NSInteger)(heightDelta / 2.0f);
 		NSInteger thumbX = 0;
 		CGRect thumbRect = CGRectMake(thumbX, thumbY, THUMB_LARGE_WIDTH, THUMB_LARGE_HEIGHT);
 		
@@ -250,15 +252,19 @@
 	NSInteger strideThumbs = (thumbs - 1); if (strideThumbs < 1) strideThumbs = 1;
 	CGFloat stride = ((CGFloat)pages / (CGFloat)strideThumbs); // Page stride
 	CGFloat heightDelta = (controlRect.size.height - THUMB_SMALL_HEIGHT);
-	NSInteger thumbY = (heightDelta / 2.0f); NSInteger thumbX = 0; // Initial X, Y
+	NSInteger thumbY = (NSInteger)(heightDelta / 2.0f);
+	NSInteger thumbX = 0; // Initial X, Y
 	
 	CGRect thumbRect = CGRectMake(thumbX, thumbY, THUMB_SMALL_WIDTH, THUMB_SMALL_HEIGHT);
 	
 	NSMutableDictionary *thumbsToHide = [miniThumbViews mutableCopy];
-	for (NSInteger thumb = 0; thumb < thumbs; thumb++) // Iterate through needed thumbs
+	for (NSUInteger thumb = 0; thumb < thumbs; thumb++) // Iterate through needed thumbs
 	{
-		NSInteger page = ((stride * thumb) + 1); if (page > pages) page = pages; // Page
-		NSNumber *key = [NSNumber numberWithInteger:page]; // Page number key for thumb view
+		NSUInteger page = (NSUInteger)((stride * thumb) + 1);
+		if (page > pages) {
+			page = pages; // Page
+		}
+		NSNumber *key = [NSNumber numberWithUnsignedInteger:page]; // Page number key for thumb view
 		
 		ReaderPagebarThumb *smallThumbView = [miniThumbViews objectForKey:key]; // Thumb view
 		if (smallThumbView == nil) // We need to create a new small thumb view for the page number
@@ -387,7 +393,7 @@
 {
 	CGFloat controlWidth = trackView.bounds.size.width;
 	CGFloat stride = (controlWidth / [document.pageCount integerValue]);
-	NSInteger page = (trackView.value / stride);				// Integer page number
+	NSInteger page = (NSInteger)(trackView.value / stride);				// Integer page number
 	
 	return (page + 1); // + 1
 }

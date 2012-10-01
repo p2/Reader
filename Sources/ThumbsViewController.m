@@ -432,8 +432,8 @@
 {
 	DXLog(@"");
 
-	NSInteger x = (self.bounds.size.width / 2.0f);
-	NSInteger y = (self.bounds.size.height / 2.0f);
+	CGFloat x = roundf(self.bounds.size.width / 2.0f);
+	CGFloat y = roundf(self.bounds.size.height / 2.0f);
 	
 	CGPoint location = CGPointMake(x, y); // Center point
 	CGRect viewRect = CGRectZero; viewRect.size = image.size;

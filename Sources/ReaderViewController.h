@@ -67,7 +67,7 @@
 
 - (id)initWithReaderDocument:(ReaderDocument *)object;
 
-- (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSInteger)pageNumber;
+- (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSUInteger)pageNumber;
 - (NSData *)documentData;
 
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer;

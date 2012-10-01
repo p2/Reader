@@ -174,7 +174,7 @@
 {
 	if (image && [key length] > 0) {
 		@synchronized(thumbCache) {
-			NSUInteger bytes = (image.size.width * image.size.height * 4.0f);
+			NSUInteger bytes = (NSUInteger)(image.size.width * image.size.height * 4.0f);
 			[thumbCache setObject:image forKey:key cost:bytes]; // Cache image
 		}
 	}

@@ -73,14 +73,12 @@
 - (id)initWithView:(ReaderThumbView *)view fileURL:(NSURL *)url password:(NSString *)phrase guid:(NSString *)guid page:(NSInteger)page size:(CGSize)size
 {
 	if ((self = [super init])) {
-		NSInteger w = size.width;
-		NSInteger h = size.height;
 		_thumbPage = page;
 		_thumbSize = size;
 		self.fileURL = url;
 		self.password = phrase;
 		self.guid = guid ? guid : [[url relativeString] stringByTrimmingCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
-		self.thumbName = [NSString stringWithFormat:@"%07d-%04dx%04d", page, w, h];
+		self.thumbName = [NSString stringWithFormat:@"%07d-%04.0fx%04.0f", page, size.width, size.height];
 		self.cacheKey = [NSString stringWithFormat:@"%@+%@", _thumbName, _guid];
 		
 		self.thumbView = view;
