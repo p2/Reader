@@ -126,7 +126,7 @@
 					if (seconds > age) // Older than so remove the thumb cache
 					{
 						[fileManager removeItemAtPath:cachePath error:NULL];
-						DXLog(@"%s purged %@", cacheName);
+						DXLog(@"purged %@", cacheName);
 					}
 				}
 			}

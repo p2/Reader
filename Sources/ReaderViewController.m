@@ -33,6 +33,7 @@
 
 @property (nonatomic, readwrite, strong) ReaderDocument *document;
 @property (nonatomic, readwrite, strong) NSDate *lastHideTime;
+@property (nonatomic, readwrite, assign) ReaderContentView *currentPageView;
 
 @end
 
@@ -217,8 +218,8 @@
 		// Preview visible page first
 		if ([newPageSet containsIndex:page]) {
 			NSNumber *key = [NSNumber numberWithInteger:page];
-			ReaderContentView *targetView = [contentViews objectForKey:key];
-			[targetView showPageThumb:fileURL page:page password:phrase guid:guid];
+			self.currentPageView = [contentViews objectForKey:key];
+			[_currentPageView showPageThumb:fileURL page:page password:phrase guid:guid];
 			[newPageSet removeIndex:page];
 		}
 		
@@ -333,18 +334,8 @@
 	return reader;
 }
 
-/*
-- (void)loadView
-{
-	DXLog(@"");
-
-	// Implement loadView to create a view hierarchy programmatically, without using a nib.
-}
-*/
-
 - (void)viewDidLoad
 {
-	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	[super viewDidLoad];
 
 	NSAssert(!(document == nil), @"ReaderDocument == nil");
@@ -450,13 +441,6 @@
 #endif
 }
 
-- (void)viewDidDisappear:(BOOL)animated
-{
-	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
-	
-	[super viewDidDisappear:animated];
-}
-
 - (void)viewDidUnload
 {
 	DXLog(@"");
@@ -467,6 +451,7 @@
 	self.lastHideTime = nil;
 	
 	lastAppearSize = CGSizeZero;
+	self.currentPageView = nil;
 	_currentPage = 0;
 	
 	[super viewDidUnload];
@@ -478,9 +463,13 @@
 	mainToolbar.title = title;
 }
 
+- (NSUInteger)supportedInterfaceOrientations
+{
+	return 30;		// UIInterfaceOrientationMaskAll
+}
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-	DXLog(@"%d", interfaceOrientation);
 	return YES;
 }
 
@@ -518,16 +507,12 @@
 	//if (fromInterfaceOrientation == self.interfaceOrientation) return;
 }
 
-- (void)didReceiveMemoryWarning
-{
-	DXLog(@"");
-	[super didReceiveMemoryWarning];
-}
-
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
+
 
 #pragma mark - UIScrollViewDelegate methods
 
@@ -561,6 +546,8 @@
 	theScrollView.tag = 0; // Clear page number tag
 }
 
+
+
 #pragma mark - UIGestureRecognizerDelegate methods
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)recognizer shouldReceiveTouch:(UITouch *)touch
@@ -568,6 +555,8 @@
 	DXLog(@"");
 	return [touch.view isKindOfClass:[UIScrollView class]];
 }
+
+
 
 #pragma mark UIGestureRecognizer action methods
 
@@ -733,6 +722,8 @@
 	}
 }
 
+
+
 #pragma mark - ReaderContentViewDelegate methods
 
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches
@@ -757,6 +748,8 @@
 		self.lastHideTime = [NSDate new];
 	}
 }
+
+
 
 #pragma mark - ReaderMainToolbarDelegate methods
 
@@ -905,6 +898,8 @@
 	}
 }
 
+
+
 #pragma mark - MFMailComposeViewControllerDelegate methods
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
@@ -915,6 +910,8 @@
 	
 	[self dismissModalViewControllerAnimated:YES];
 }
+
+
 
 #pragma mark - ThumbsViewControllerDelegate methods
 
@@ -932,6 +929,8 @@
 	[self showDocumentPage:page];
 }
 
+
+
 #pragma mark - ReaderMainPagebarDelegate methods
 
 - (void)pagebar:(ReaderMainPagebar *)pagebar gotoPage:(NSInteger)page
@@ -939,6 +938,8 @@
 	DXLog(@"");
 	[self showDocumentPage:page];
 }
+
+
 
 #pragma mark - UIApplication notification methods
 

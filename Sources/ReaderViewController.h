@@ -47,7 +47,7 @@
 													ReaderMainToolbarDelegate, ReaderMainPagebarDelegate, ReaderContentViewDelegate,
 													ThumbsViewControllerDelegate>
 {
-@private // Instance variables
+@private
 	UIPrintInteractionController *printInteraction;
 	
 	CGSize lastAppearSize;
@@ -62,6 +62,7 @@
 @property (nonatomic, strong) ReaderMainPagebar *mainPagebar;
 @property (nonatomic, strong) NSMutableDictionary *contentViews;
 
+@property (nonatomic, readonly, assign) ReaderContentView *currentPageView;
 @property (nonatomic, readonly, assign) NSUInteger currentPage;
 @property (nonatomic, readonly, strong) NSDate *lastHideTime;
 
