@@ -442,7 +442,7 @@
 #endif
 }
 
-- (void)viewDidUnload
+/*- (void)viewDidUnload
 {
 	DXLog(@"");
 	self.mainToolbar = nil;
@@ -456,7 +456,7 @@
 	_currentPage = 0;
 	
 	[super viewDidUnload];
-}
+}*/
 
 - (void)setTitle:(NSString *)title
 {
@@ -469,10 +469,10 @@
 	return 30;		// UIInterfaceOrientationMaskAll
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+/*- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
 	return YES;
-}
+}*/
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
@@ -783,7 +783,8 @@
 	thumbsViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
 	thumbsViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 	
-	[self presentModalViewController:thumbsViewController animated:NO];
+	[self presentViewController:thumbsViewController animated:NO completion:NULL];
+	//[self presentModalViewController:thumbsViewController animated:NO];
 }
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar printButton:(UIButton *)button
@@ -858,7 +859,8 @@
 		mailComposer.modalPresentationStyle = UIModalPresentationPageSheet;
 		mailComposer.mailComposeDelegate = self; // Set the delegate
 		
-		[self presentModalViewController:mailComposer animated:YES];
+		[self presentViewController:mailComposer animated:YES completion:NULL];
+		//[self presentModalViewController:mailComposer animated:YES];
 	}
 	else if (attachment) {
 		NSLog(@"PDF is too big: %d KB", [attachment length] / 1024);
@@ -902,7 +904,8 @@
 		DXLog(@"%@", error);
 	}
 	
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:NULL];
+	//[self dismissModalViewControllerAnimated:YES];
 }
 
 
@@ -914,7 +917,8 @@
 	DXLog(@"");
 
 	[self updateToolbarBookmarkIcon];
-	[self dismissModalViewControllerAnimated:NO];
+	[self dismissViewControllerAnimated:YES completion:NULL];
+	//[self dismissModalViewControllerAnimated:NO];
 }
 
 - (void)thumbsViewController:(ThumbsViewController *)viewController gotoPage:(NSInteger)page
