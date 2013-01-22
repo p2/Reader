@@ -40,10 +40,6 @@
 @end
 
 @interface ReaderContentView : UIScrollView <UIScrollViewDelegate>
-{
-@private
-	CGFloat zoomAmount;
-}
 
 @property (nonatomic, unsafe_unretained, readwrite) id <ReaderContentViewDelegate> message;
 @property (nonatomic, readonly, strong) ReaderContentPage *contentPage;
@@ -56,9 +52,9 @@
 - (void)showPageThumb:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase guid:(NSString *)guid;
 - (id)singleTap:(UITapGestureRecognizer *)recognizer;
 
-- (void)zoomIncrement;
-- (void)zoomDecrement;
-- (void)zoomReset;
+- (BOOL)zoomIncrementAnimated:(BOOL)animated;
+- (BOOL)zoomDecrementAnimated:(BOOL)animated;
+- (void)zoomResetAnimated:(BOOL)animated;
 
 @end
 

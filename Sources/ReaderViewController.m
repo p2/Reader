@@ -171,7 +171,8 @@
 			
 			// Reposition the existing content view
 			else {
-				contentView.frame = viewRect; [contentView zoomReset];
+				contentView.frame = viewRect;
+				[contentView zoomResetAnimated:NO];
 				[unusedViews removeObjectForKey:key];
 			}
 			
@@ -600,8 +601,6 @@
 
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer
 {
-	DXLog(@"");
-
 	if (recognizer.state == UIGestureRecognizerStateRecognized) {
 		CGRect viewRect = recognizer.view.bounds;
 		CGPoint point = [recognizer locationInView:recognizer.view];
@@ -648,14 +647,15 @@
 			else {
 				if ([lastHideTime timeIntervalSinceNow] < -0.75) {			// Delay since hide
 					if ((mainToolbar.hidden == YES) || (mainPagebar.hidden == YES)) {
-						[mainToolbar showToolbar]; [mainPagebar showPagebar]; // Show
+						[mainToolbar showToolbar];
+						[mainPagebar showPagebar];
 					}
 				}
 			}
-
+			
 			return;
 		}
-
+		
 		CGRect nextPageRect = viewRect;
 		nextPageRect.size.width = TAP_AREA_SIZE;
 		nextPageRect.origin.x = (viewRect.size.width - TAP_AREA_SIZE);
@@ -677,8 +677,6 @@
 
 - (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer
 {
-	DXLog(@"");
-
 	if (recognizer.state == UIGestureRecognizerStateRecognized) {
 		CGRect viewRect = recognizer.view.bounds;
 		CGPoint point = [recognizer locationInView:recognizer.view];
@@ -689,14 +687,12 @@
 			NSNumber *key = [NSNumber numberWithInteger:page];				// Page number key
 			ReaderContentView *targetView = [contentViews objectForKey:key];
 			
-			switch (recognizer.numberOfTouchesRequired) {
-				case 1: {		// One finger double tap: zoom ++
-					[targetView zoomIncrement]; break;
-				}
-
-				case 2: {		// Two finger double tap: zoom --
-					[targetView zoomDecrement]; break;
-				}
+			// double tap toggles between zooming in and zooming out
+			if (targetView.zoomScale > targetView.minimumZoomScale) {
+				[targetView zoomResetAnimated:YES];
+			}
+			else {
+				[targetView zoomIncrementAnimated:YES];
 			}
 			return;
 		}
@@ -728,8 +724,6 @@
 
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches
 {
-	DXLog(@"");
-	
 	if ((mainToolbar.hidden == NO) || (mainPagebar.hidden == NO)) {
 		
 		// Single touches only

@@ -67,6 +67,7 @@
 @property (nonatomic, readonly, strong) NSDate *lastHideTime;
 
 - (id)initWithReaderDocument:(ReaderDocument *)object;
+- (void)showDocument:(id)object;
 
 - (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSUInteger)pageNumber;
 - (NSData *)documentData;

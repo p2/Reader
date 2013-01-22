@@ -45,7 +45,7 @@
 
 #pragma mark Constants
 
-#define ZOOM_LEVELS 4
+#define ZOOM_LEVELS 3
 
 #if READER_SHOW_SHADOWS
 #define CONTENT_INSET 4.0f
@@ -75,11 +75,8 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 {
 	CGRect targetRect = CGRectInset(self.bounds, CONTENT_INSET, CONTENT_INSET);
 	CGFloat zoomScale = ZoomScaleThatFits(targetRect.size, contentPage.bounds.size);
-	self.minimumZoomScale = zoomScale; // Set the minimum and maximum zoom scales
-	
-	self.maximumZoomScale = (zoomScale * ZOOM_LEVELS); // Max number of zoom levels
-	
-	zoomAmount = ((self.maximumZoomScale - self.minimumZoomScale) / ZOOM_LEVELS);
+	self.minimumZoomScale = zoomScale;
+	self.maximumZoomScale = zoomScale * MAX(2, ZOOM_LEVELS);
 }
 
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page password:(NSString *)phrase
@@ -191,39 +188,45 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 	return [contentPage singleTap:recognizer];
 }
 
-- (void)zoomIncrement
+- (BOOL)zoomIncrementAnimated:(BOOL)animated
 {
-	CGFloat zoomScale = self.zoomScale;
-	if (zoomScale < self.maximumZoomScale) {
-		zoomScale += zoomAmount; // += value
-		
-		if (zoomScale > self.maximumZoomScale) {
-			zoomScale = self.maximumZoomScale;
+	if (ZOOM_LEVELS > 0) {
+		CGFloat zoomScale = self.zoomScale;
+		if (zoomScale < self.maximumZoomScale) {
+			zoomScale += ((self.maximumZoomScale - self.minimumZoomScale) / ZOOM_LEVELS);
+			
+			if (zoomScale > self.maximumZoomScale) {
+				zoomScale = self.maximumZoomScale;
+			}
+			
+			[self setZoomScale:zoomScale animated:animated];
+			return YES;
 		}
-		
-		[self setZoomScale:zoomScale animated:YES];
 	}
+	return NO;
 }
 
-- (void)zoomDecrement
+- (BOOL)zoomDecrementAnimated:(BOOL)animated
 {
-	CGFloat zoomScale = self.zoomScale;
-	if (zoomScale > self.minimumZoomScale) {
-		zoomScale -= zoomAmount; // -= value
-		
-		if (zoomScale < self.minimumZoomScale) {
-			zoomScale = self.minimumZoomScale;
+	if (ZOOM_LEVELS > 0) {
+		CGFloat zoomScale = self.zoomScale;
+		if (zoomScale > self.minimumZoomScale) {
+			zoomScale -= ((self.maximumZoomScale - self.minimumZoomScale) / ZOOM_LEVELS);
+			
+			if (zoomScale < self.minimumZoomScale) {
+				zoomScale = self.minimumZoomScale;
+			}
+			
+			[self setZoomScale:zoomScale animated:animated];
+			return YES;
 		}
-		
-		[self setZoomScale:zoomScale animated:YES];
 	}
+	return NO;
 }
 
-- (void)zoomReset
+- (void)zoomResetAnimated:(BOOL)animated
 {
-	if (self.zoomScale > self.minimumZoomScale) {
-		self.zoomScale = self.minimumZoomScale;
-	}
+	[self setZoomScale:self.minimumZoomScale animated:animated];
 }
 
 
