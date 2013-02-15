@@ -74,6 +74,7 @@
 
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer;
 - (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer;
+- (void)handleLongPress:(UILongPressGestureRecognizer *)recognizer;
 
 - (Class)classForViewPages;
 
