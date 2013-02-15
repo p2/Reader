@@ -393,9 +393,12 @@
 	
 	[singleTapOne requireGestureRecognizerToFail:doubleTapOne]; // Single tap requires double tap to fail
 	
-	[self.view addGestureRecognizer:singleTapOne]; 
-	[self.view addGestureRecognizer:doubleTapOne]; 
-	[self.view addGestureRecognizer:doubleTapTwo]; 
+	UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+	
+	[self.view addGestureRecognizer:singleTapOne];
+	[self.view addGestureRecognizer:doubleTapOne];
+	[self.view addGestureRecognizer:doubleTapTwo];
+	[self.view addGestureRecognizer:longPress];
 	
 	self.contentViews = [NSMutableDictionary new];
 	self.lastHideTime = [NSDate new];
@@ -716,6 +719,10 @@
 			return;
 		}
 	}
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)recognizer
+{
 }
 
 
