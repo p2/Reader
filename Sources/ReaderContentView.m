@@ -126,7 +126,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 #endif
 			
 			self.contentSize = contentPage.bounds.size;											// Content size same as view size
-			self.contentOffset = CGPointMake((0.0f - CONTENT_INSET), (0.0f - CONTENT_INSET));	// Offset
+			self.contentOffset = CGPointMake((0.0f - CONTENT_INSET), (0.0f - CONTENT_INSET));
 			self.contentInset = UIEdgeInsetsMake(CONTENT_INSET, CONTENT_INSET, CONTENT_INSET, CONTENT_INSET);
 			
 			// add the thumbnail view
@@ -165,7 +165,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 {
 	if ((object == self) && [keyPath isEqualToString:@"frame"]) {
 		CGFloat oldMinimumZoomScale = self.minimumZoomScale;
-		[self updateMinimumMaximumZoom]; // Update zoom scale limits
+		[self updateMinimumMaximumZoom];				// Update zoom scale limits
 		
 		if (self.zoomScale == oldMinimumZoomScale) {	// Old minimum
 			self.zoomScale = self.minimumZoomScale;
@@ -230,15 +230,30 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 }
 
 
-#pragma mark - UIScrollViewDelegate methods
 
+#pragma mark - UIScrollViewDelegate methods
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
 	return containerView;
 }
 
-#pragma mark - UIResponder instance methods
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
+{
+	if ([message respondsToSelector:@selector(contentViewDidZoom:)]) {
+		[message contentViewDidZoom:self];
+	}
+}
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+	if ([message respondsToSelector:@selector(contentViewDidPan:)]) {
+		[message contentViewDidPan:self];
+	}
+}
+
+
+
+#pragma mark - UIResponder instance methods
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
 	[super touchesBegan:touches withEvent:event];

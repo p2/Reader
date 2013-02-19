@@ -60,8 +60,6 @@
 
 - (void)updateScrollViewContentSize
 {
-	DXLog(@"");
-	
 	NSInteger count = [document.pageCount integerValue];
 	if (count > PAGING_VIEWS) {
 		count = PAGING_VIEWS; // Limit
@@ -74,8 +72,6 @@
 
 - (void)updateScrollViewContentViews
 {
-	DXLog(@"");
-	
 	[self updateScrollViewContentSize]; // Update the content size
 	NSMutableIndexSet *pageSet = [NSMutableIndexSet indexSet];
 	
@@ -109,8 +105,6 @@
 
 - (void)updateToolbarBookmarkIcon
 {
-	DXLog(@"");
-	
 	NSInteger page = [document.pageNumber integerValue];
 	BOOL bookmarked = [document.bookmarks containsIndex:page];
 	[mainToolbar setBookmarkState:bookmarked]; // Update
@@ -118,8 +112,6 @@
 
 - (void)showDocumentPage:(NSUInteger)page
 {
-	DXLog(@"");
-	
 	if (page != _currentPage) {
 		NSUInteger minValue;
 		NSUInteger maxValue;
@@ -242,8 +234,6 @@
 
 - (void)showDocument:(id)object
 {
-	DXLog(@"");
-	
 	[self updateScrollViewContentSize]; // Set content size
 	[self showDocumentPage:[document.pageNumber integerValue]];
 	document.lastOpen = [NSDate date];
@@ -314,7 +304,6 @@
  */
 - (id)initWithReaderDocument:(ReaderDocument *)object
 {
-	DXLog(@"");
 	id reader = nil;
 
 	if ([object isKindOfClass:[ReaderDocument class]]) {
@@ -406,7 +395,6 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	[super viewWillAppear:animated];
 	
 	// Update content views if sizes changed
@@ -421,7 +409,6 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	[super viewDidAppear:animated];
 	
 	// First time
@@ -436,7 +423,6 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-	DXLog(@"%@", NSStringFromCGRect(self.view.bounds));
 	[super viewWillDisappear:animated];
 	lastAppearSize = self.view.bounds.size; // Track view size
 	
@@ -447,7 +433,6 @@
 
 /*- (void)viewDidUnload
 {
-	DXLog(@"");
 	self.mainToolbar = nil;
 	self.mainPagebar = nil;
 	self.theScrollView = nil;
@@ -479,8 +464,6 @@
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-	DXLog(@"%@ (%d)", NSStringFromCGRect(self.view.bounds), toInterfaceOrientation);
-	
 	if (isVisible == NO) {
 		return; // iOS present modal bodge
 	}
@@ -494,21 +477,12 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
 {
-	DXLog(@"%@ (%d)", NSStringFromCGRect(self.view.bounds), interfaceOrientation);
-	
 	if (isVisible == NO) {
 		return; // iOS present modal bodge
 	}
 	
 	[self updateScrollViewContentViews];
 	lastAppearSize = CGSizeZero; // Reset view size tracking
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-	DXLog(@"%@ (%d to %d)", NSStringFromCGRect(self.view.bounds), fromInterfaceOrientation, [self interfaceOrientation]);
-	//if (isVisible == NO) return; // iOS present modal bodge
-	//if (fromInterfaceOrientation == self.interfaceOrientation) return;
 }
 
 - (void)dealloc
@@ -519,10 +493,8 @@
 
 
 #pragma mark - UIScrollViewDelegate methods
-
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-	DXLog(@"");
 	__block NSInteger page = 0;
 
 	CGFloat contentOffsetX = scrollView.contentOffset.x;
@@ -544,8 +516,6 @@
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
-	DXLog(@"");
-
 	[self showDocumentPage:theScrollView.tag];
 	theScrollView.tag = 0; // Clear page number tag
 }
@@ -553,21 +523,16 @@
 
 
 #pragma mark - UIGestureRecognizerDelegate methods
-
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)recognizer shouldReceiveTouch:(UITouch *)touch
 {
-	DXLog(@"");
 	return [touch.view isKindOfClass:[UIScrollView class]];
 }
 
 
 
 #pragma mark UIGestureRecognizer action methods
-
 - (void)decrementPageNumber
 {
-	DXLog(@"");
-	
 	// Scroll view did end
 	if (theScrollView.tag == 0) {
 		NSInteger page = [document.pageNumber integerValue];
@@ -585,8 +550,6 @@
 
 - (void)incrementPageNumber
 {
-	DXLog(@"");
-	
 	// Scroll view did end
 	if (theScrollView.tag == 0) {
 		NSInteger page = [document.pageNumber integerValue];
@@ -728,7 +691,6 @@
 
 
 #pragma mark - ReaderContentViewDelegate methods
-
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches
 {
 	if ((mainToolbar.hidden == NO) || (mainPagebar.hidden == NO)) {
@@ -753,11 +715,8 @@
 
 
 #pragma mark - ReaderMainToolbarDelegate methods
-
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar doneButton:(UIButton *)button
 {
-	DXLog(@"");
-
 #if !READER_STANDALONE
 	[document saveReaderDocument];		// Save any ReaderDocument object changes
 	[[ReaderThumbQueue sharedInstance] cancelOperationsWithGUID:document.guid];
@@ -778,8 +737,6 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar thumbsButton:(UIButton *)button
 {
-	DXLog(@"");
-
 	if (printInteraction != nil) {
 		[printInteraction dismissAnimated:NO]; // Dismiss
 	}
@@ -796,8 +753,6 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar printButton:(UIButton *)button
 {
-	DXLog(@"");
-	
 #if READER_ENABLE_PRINT
 	Class printInteractionController = NSClassFromString(@"UIPrintInteractionController");
 
@@ -880,8 +835,6 @@
 
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar markButton:(UIButton *)button
 {
-	DXLog(@"");
-
 	if (printInteraction != nil) {
 		[printInteraction dismissAnimated:YES];
 	}
@@ -904,7 +857,6 @@
 
 
 #pragma mark - MFMailComposeViewControllerDelegate methods
-
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
 {
 	if ((result == MFMailComposeResultFailed) && (error != NULL)) {
@@ -918,11 +870,8 @@
 
 
 #pragma mark - ThumbsViewControllerDelegate methods
-
 - (void)dismissThumbsViewController:(ThumbsViewController *)viewController
 {
-	DXLog(@"");
-
 	[self updateToolbarBookmarkIcon];
 	[self dismissViewControllerAnimated:YES completion:NULL];
 	//[self dismissModalViewControllerAnimated:NO];
@@ -930,33 +879,28 @@
 
 - (void)thumbsViewController:(ThumbsViewController *)viewController gotoPage:(NSInteger)page
 {
-	DXLog(@"");
 	[self showDocumentPage:page];
 }
 
 
 
 #pragma mark - ReaderMainPagebarDelegate methods
-
 - (void)pagebar:(ReaderMainPagebar *)pagebar gotoPage:(NSInteger)page
 {
-	DXLog(@"");
 	[self showDocumentPage:page];
 }
 
 
 
 #pragma mark - UIApplication notification methods
-
 - (void)applicationWill:(NSNotification *)notification
 {
-	DXLog(@"");
-	
 	// Save any ReaderDocument object changes
 	[document saveReaderDocument];
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && printInteraction != nil) {
 		[printInteraction dismissAnimated:NO];
 	}
 }
+
 
 @end

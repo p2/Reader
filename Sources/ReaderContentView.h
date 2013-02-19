@@ -37,6 +37,10 @@
 @required
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches;
 
+@optional
+- (void)contentViewDidZoom:(ReaderContentView *)contentView;
+- (void)contentViewDidPan:(ReaderContentView *)contentView;
+
 @end
 
 @interface ReaderContentView : UIScrollView <UIScrollViewDelegate>
