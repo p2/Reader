@@ -32,6 +32,7 @@
 #import "ReaderMainPagebar.h"
 #import "ThumbsViewController.h"
 
+
 @class ReaderViewController;
 @class ReaderMainToolbar;
 
@@ -70,7 +71,7 @@
 - (void)showDocument:(id)object;
 
 - (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSUInteger)pageNumber;
-- (NSData *)documentData;
+- (NSData *)documentDataFor:(ReaderContentTargetType)dataType;
 
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer;
 - (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer;

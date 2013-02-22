@@ -252,7 +252,7 @@
 /**
  *	@return An NSData representation of the document, depending on READER_REDRAW_FOR_EXPORT either just read from file or re-rendered into a PDF context
  */
-- (NSData *)documentData
+- (NSData *)documentDataFor:(ReaderContentTargetType)dataType
 {
 # if READER_REDRAW_FOR_EXPORT
 	NSArray *pages = [contentViews allValues];
@@ -271,6 +271,7 @@
 			NSNumber *key = [NSNumber numberWithInteger:number];
 			ReaderContentPage *contentPage = [[contentViews objectForKey:key] contentPage];
 			if (contentPage) {
+				contentPage.currentRenderTarget = dataType;
 				UIGraphicsBeginPDFPageWithInfo(contentPage.bounds, nil);
 				[contentPage.layer renderInContext:pdf];
 			}
@@ -757,7 +758,7 @@
 	Class printInteractionController = NSClassFromString(@"UIPrintInteractionController");
 
 	if ((printInteractionController != nil) && [printInteractionController isPrintingAvailable]) {
-		NSData *pdfData = [self documentData];
+		NSData *pdfData = [self documentDataFor:ReaderContentTargetTypePrint];
 		printInteraction = [printInteractionController sharedPrintController];
 		if ([printInteractionController canPrintData:pdfData] == YES) {
 			UIPrintInfo *printInfo = [NSClassFromString(@"UIPrintInfo") printInfo];
@@ -809,7 +810,7 @@
 	}
 	
 	// attach the PDF if it's not too big
-	NSData *attachment = [self documentData];
+	NSData *attachment = [self documentDataFor:ReaderContentTargetTypeEmail];
 	if (attachment && [attachment length] < (unsigned long long)15728640) {		// Check attachment size limit (15MB)
 		NSString *fileName = document.fileName;
 		

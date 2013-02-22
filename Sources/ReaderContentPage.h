@@ -27,6 +27,17 @@
 
 
 /**
+ *  More info about the rendering context.
+ */
+typedef enum {
+	ReaderContentTargetTypeScreen = 0,
+	ReaderContentTargetTypeEmail,
+	ReaderContentTargetTypePrint
+} ReaderContentTargetType;
+
+
+
+/**
  *	A class responsible with drawing one page of a PDF document
  */
 @interface ReaderContentPage : UIControl
@@ -44,6 +55,7 @@
 
 @property (nonatomic, readonly, assign) NSUInteger page;
 @property (nonatomic, readonly, strong) NSMutableArray *links;
+@property (nonatomic, assign) ReaderContentTargetType currentRenderTarget;
 
 - (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase;
 
@@ -51,14 +63,16 @@
 
 - (CGRect)pageRect;
 
+
 @end
+
 
 #pragma mark -
 
-//
-//	ReaderDocumentLink class interface
-//
 
+/**
+ *  ReaderDocumentLink class interface.
+ */
 @interface ReaderDocumentLink : NSObject
 {
 @private
@@ -71,5 +85,6 @@
 
 + (id)newWithRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary;
 - (id)initWithRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary;
+
 
 @end

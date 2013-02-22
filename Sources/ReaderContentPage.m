@@ -42,11 +42,11 @@
 
 - (void)dealloc
 {
-	DXLog(@"");
-	
 	@synchronized(self) {		// Block any other threads
-		CGPDFPageRelease(_PDFPageRef), _PDFPageRef = NULL;
-		CGPDFDocumentRelease(_PDFDocRef), _PDFDocRef = NULL;
+		CGPDFPageRelease(_PDFPageRef),
+		_PDFPageRef = NULL;
+		CGPDFDocumentRelease(_PDFDocRef),
+		_PDFDocRef = NULL;
 	}
 }
 
@@ -154,7 +154,6 @@
 
 
 #pragma mark - Properties
-
 - (CGRect)pageRect
 {
 	return CGRectMake(_pageOffsetX, _pageOffsetY, _pageWidth, _pageHeight);
@@ -162,7 +161,6 @@
 
 
 #pragma mark - ReaderContentPage class methods
-
 + (Class)layerClass
 {
 	return [ReaderContentTile class];
@@ -170,16 +168,14 @@
 
 
 #pragma mark ReaderContentPage PDF link methods
-
+/**
+ *  Add highlight views over all links.
+ */
 - (void)highlightPageLinks
 {
-	DXLog(@"");
-	
-	if (_links.count > 0) // Add highlight views over all links
-	{
+	if (_links.count > 0) {
 		UIColor *hilite = [UIColor colorWithRed:0.0f green:0.0f blue:1.0f alpha:0.15f];
-		for (ReaderDocumentLink *link in _links) // Enumerate the links array
-		{
+		for (ReaderDocumentLink *link in _links) {
 			UIView *highlight = [[UIView alloc] initWithFrame:link.rect];
 			highlight.autoresizesSubviews = NO;
 			highlight.userInteractionEnabled = NO;
@@ -195,15 +191,14 @@
 
 - (ReaderDocumentLink *)linkFromAnnotation:(CGPDFDictionaryRef)annotationDictionary
 {
-	DXLog(@"");
+	ReaderDocumentLink *documentLink = nil;
+	CGPDFArrayRef annotationRectArray = NULL;
 	
-	ReaderDocumentLink *documentLink = nil; // Document link object
-	CGPDFArrayRef annotationRectArray = NULL; // Annotation co-ordinates array
-	
-	if (CGPDFDictionaryGetArray(annotationDictionary, "Rect", &annotationRectArray))
-	{
-		CGPDFReal ll_x = 0.0f; CGPDFReal ll_y = 0.0f; // PDFRect lower-left X and Y
-		CGPDFReal ur_x = 0.0f; CGPDFReal ur_y = 0.0f; // PDFRect upper-right X and Y
+	if (CGPDFDictionaryGetArray(annotationDictionary, "Rect", &annotationRectArray)){
+		CGPDFReal ll_x = 0.0f;
+		CGPDFReal ll_y = 0.0f;
+		CGPDFReal ur_x = 0.0f;
+		CGPDFReal ur_y = 0.0f;
 		
 		CGPDFArrayGetNumber(annotationRectArray, 0, &ll_x); // Lower-left X co-ordinate
 		CGPDFArrayGetNumber(annotationRectArray, 1, &ll_y); // Lower-left Y co-ordinate
@@ -211,24 +206,36 @@
 		CGPDFArrayGetNumber(annotationRectArray, 2, &ur_x); // Upper-right X co-ordinate
 		CGPDFArrayGetNumber(annotationRectArray, 3, &ur_y); // Upper-right Y co-ordinate
 		
-		if (ll_x > ur_x) { CGPDFReal t = ll_x; ll_x = ur_x; ur_x = t; } // Normalize Xs
-		if (ll_y > ur_y) { CGPDFReal t = ll_y; ll_y = ur_y; ur_y = t; } // Normalize Ys
+		// Normalize Xs
+		if (ll_x > ur_x) {
+			CGPDFReal t = ll_x;
+			ll_x = ur_x;
+			ur_x = t;
+		}
 		
-		ll_x -= _pageOffsetX; ll_y -= _pageOffsetY; // Offset lower-left co-ordinate
-		ur_x -= _pageOffsetX; ur_y -= _pageOffsetY; // Offset upper-right co-ordinate
+		// Normalize Ys
+		if (ll_y > ur_y) {
+			CGPDFReal t = ll_y;
+			ll_y = ur_y;
+			ur_y = t;
+		}
 		
-		switch (_pageAngle) // Page rotation angle (in degrees)
-		{
-			case 90: // 90 degree page rotation
-			{
+		// offset coordinates
+		ll_x -= _pageOffsetX;
+		ll_y -= _pageOffsetY;
+		ur_x -= _pageOffsetX;
+		ur_y -= _pageOffsetY;
+		
+		// is page rotated?
+		switch (_pageAngle) {
+			case 90: {
 				CGPDFReal swap;
 				swap = ll_y; ll_y = ll_x; ll_x = swap;
 				swap = ur_y; ur_y = ur_x; ur_x = swap;
 				break;
 			}
 				
-			case 270: // 270 degree page rotation
-			{
+			case 270: {
 				CGPDFReal swap;
 				swap = ll_y; ll_y = ll_x; ll_x = swap;
 				swap = ur_y; ur_y = ur_x; ur_x = swap;
@@ -237,8 +244,7 @@
 				break;
 			}
 				
-			case 0: // 0 degree page rotation
-			{
+			case 0: {
 				ll_y = ((0.0f - ll_y) + _pageHeight);
 				ur_y = ((0.0f - ur_y) + _pageHeight);
 				break;
@@ -260,26 +266,22 @@
 
 - (void)buildAnnotationLinksList
 {
-	DXLog(@"");
-	
-	self.links = [NSMutableArray new]; // Links list array
+	self.links = [NSMutableArray new];
 	
 	CGPDFArrayRef pageAnnotations = NULL;
 	CGPDFDictionaryRef pageDictionary = CGPDFPageGetDictionary(_PDFPageRef);
-	if (CGPDFDictionaryGetArray(pageDictionary, "Annots", &pageAnnotations) == true)
-	{
+	if (CGPDFDictionaryGetArray(pageDictionary, "Annots", &pageAnnotations) == true) {
 		NSInteger count = CGPDFArrayGetCount(pageAnnotations);							// Number of annotations
 		
-		for (NSInteger index = 0; index < count; index++)								// Iterate through all annotations
-		{
+		// Iterate through all annotations
+		for (NSInteger index = 0; index < count; index++) {
 			CGPDFDictionaryRef annotationDictionary = NULL;
-			if (CGPDFArrayGetDictionary(pageAnnotations, index, &annotationDictionary) == true)
-			{
+			if (CGPDFArrayGetDictionary(pageAnnotations, index, &annotationDictionary) == true) {
 				const char *annotationSubtype = NULL;
-				if (CGPDFDictionaryGetName(annotationDictionary, "Subtype", &annotationSubtype) == true)
-				{
-					if (strcmp(annotationSubtype, "Link") == 0)							// Found annotation subtype of 'Link'
-					{
+				if (CGPDFDictionaryGetName(annotationDictionary, "Subtype", &annotationSubtype) == true) {
+					
+					// Found annotation subtype of 'Link'
+					if (strcmp(annotationSubtype, "Link") == 0) {
 						ReaderDocumentLink *documentLink = [self linkFromAnnotation:annotationDictionary];
 						if (documentLink != nil) {
 							[_links insertObject:documentLink atIndex:0];				// Add link
@@ -289,55 +291,47 @@
 			}
 		}
 		
-		//		[self highlightPageLinks]; // For link support debugging
+//		[self highlightPageLinks]; // For link support debugging
 	}
 }
 
 - (CGPDFArrayRef)destinationWithName:(const char *)destinationName inDestsTree:(CGPDFDictionaryRef)node
 {
-	DXLog(@"");
-	
 	CGPDFArrayRef destinationArray = NULL;
-	CGPDFArrayRef limitsArray = NULL; // Limits array
+	CGPDFArrayRef limitsArray = NULL;
 	
-	if (CGPDFDictionaryGetArray(node, "Limits", &limitsArray) == true)
-	{
+	// "Limits"
+	if (CGPDFDictionaryGetArray(node, "Limits", &limitsArray) == true) {
 		CGPDFStringRef lowerLimit = NULL; CGPDFStringRef upperLimit = NULL;
-		if (CGPDFArrayGetString(limitsArray, 0, &lowerLimit) == true) // Lower limit
-		{
-			if (CGPDFArrayGetString(limitsArray, 1, &upperLimit) == true) // Upper limit
-			{
-				const char *ll = (const char *)CGPDFStringGetBytePtr(lowerLimit); // Lower string
-				const char *ul = (const char *)CGPDFStringGetBytePtr(upperLimit); // Upper string
+		if (CGPDFArrayGetString(limitsArray, 0, &lowerLimit) == true) {				// Lower limit
+			if (CGPDFArrayGetString(limitsArray, 1, &upperLimit) == true) {			// Upper limit
+				const char *ll = (const char *)CGPDFStringGetBytePtr(lowerLimit);	// Lower string
+				const char *ul = (const char *)CGPDFStringGetBytePtr(upperLimit);	// Upper string
 				
-				if ((strcmp(destinationName, ll) < 0) || (strcmp(destinationName, ul) > 0))
-				{
-					return NULL; // Destination name is outside this node's limits
+				// Destination name is outside this node's limits
+				if ((strcmp(destinationName, ll) < 0) || (strcmp(destinationName, ul) > 0)) {
+					return NULL;
 				}
 			}
 		}
 	}
 	
-	CGPDFArrayRef namesArray = NULL; // Names array
-	
-	if (CGPDFDictionaryGetArray(node, "Names", &namesArray) == true)
-	{
+	// "Names"
+	CGPDFArrayRef namesArray = NULL;
+	if (CGPDFDictionaryGetArray(node, "Names", &namesArray) == true) {
 		NSInteger namesCount = CGPDFArrayGetCount(namesArray);
-		for (NSInteger index = 0; index < namesCount; index += 2)
-		{
+		for (NSInteger index = 0; index < namesCount; index += 2) {
 			CGPDFStringRef destName; // Destination name string
 			
-			if (CGPDFArrayGetString(namesArray, index, &destName) == true)
-			{
+			if (CGPDFArrayGetString(namesArray, index, &destName) == true) {
 				const char *dn = (const char *)CGPDFStringGetBytePtr(destName);
-				if (strcmp(dn, destinationName) == 0) // Found the destination name
-				{
-					if (CGPDFArrayGetArray(namesArray, (index + 1), &destinationArray) == false)
-					{
-						CGPDFDictionaryRef destinationDictionary = NULL; // Destination dictionary
+				
+				// Found the destination name
+				if (strcmp(dn, destinationName) == 0) {
+					if (CGPDFArrayGetArray(namesArray, (index + 1), &destinationArray) == false) {
+						CGPDFDictionaryRef destinationDictionary = NULL;
 						
-						if (CGPDFArrayGetDictionary(namesArray, (index + 1), &destinationDictionary) == true)
-						{
+						if (CGPDFArrayGetDictionary(namesArray, (index + 1), &destinationDictionary) == true) {
 							CGPDFDictionaryGetArray(destinationDictionary, "D", &destinationArray);
 						}
 					}
@@ -348,19 +342,19 @@
 		}
 	}
 	
-	CGPDFArrayRef kidsArray = NULL; // Kids array
-	
-	if (CGPDFDictionaryGetArray(node, "Kids", &kidsArray) == true)
-	{
+	// "Kids"
+	CGPDFArrayRef kidsArray = NULL;
+	if (CGPDFDictionaryGetArray(node, "Kids", &kidsArray) == true) {
 		NSInteger kidsCount = CGPDFArrayGetCount(kidsArray);
-		for (NSInteger index = 0; index < kidsCount; index++)
-		{
-			CGPDFDictionaryRef kidNode = NULL; // Kid node dictionary
+		for (NSInteger index = 0; index < kidsCount; index++) {
+			CGPDFDictionaryRef kidNode = NULL;
 			
-			if (CGPDFArrayGetDictionary(kidsArray, index, &kidNode) == true) // Recurse into node
-			{
+			// Recurse into node
+			if (CGPDFArrayGetDictionary(kidsArray, index, &kidNode) == true) {
 				destinationArray = [self destinationWithName:destinationName inDestsTree:kidNode];
-				if (destinationArray != NULL) return destinationArray; // Return destination array
+				if (destinationArray != NULL) {
+					return destinationArray;
+				}
 			}
 		}
 	}
@@ -370,118 +364,109 @@
 
 - (id)annotationLinkTarget:(CGPDFDictionaryRef)annotationDictionary
 {
-	DXLog(@"");
-	
-	id linkTarget = nil; // Link target object
+	id linkTarget = nil;
 	
 	CGPDFStringRef destName = NULL; const char *destString = NULL;
 	CGPDFDictionaryRef actionDictionary = NULL; CGPDFArrayRef destArray = NULL;
-	if (CGPDFDictionaryGetDictionary(annotationDictionary, "A", &actionDictionary) == true)
-	{
-		const char *actionType = NULL; // Annotation action type string
+	if (CGPDFDictionaryGetDictionary(annotationDictionary, "A", &actionDictionary) == true) {
 		
-		if (CGPDFDictionaryGetName(actionDictionary, "S", &actionType) == true)
-		{
-			if (strcmp(actionType, "GoTo") == 0) // GoTo action type
-			{
-				if (CGPDFDictionaryGetArray(actionDictionary, "D", &destArray) == false)
-				{
+		// Annotation action type string
+		const char *actionType = NULL;
+		if (CGPDFDictionaryGetName(actionDictionary, "S", &actionType) == true) {
+			
+			// GoTo action type
+			if (strcmp(actionType, "GoTo") == 0) {
+				if (CGPDFDictionaryGetArray(actionDictionary, "D", &destArray) == false) {
 					CGPDFDictionaryGetString(actionDictionary, "D", &destName);
 				}
 			}
-			else // Handle other link action type possibility
-			{
-				if (strcmp(actionType, "URI") == 0) // URI action type
-				{
-					CGPDFStringRef uriString = NULL; // Action's URI string
+			
+			// Handle other link action type possibility
+			else {
+				
+				// URI action type
+				if (strcmp(actionType, "URI") == 0) {
+					CGPDFStringRef uriString = NULL;
 					
-					if (CGPDFDictionaryGetString(actionDictionary, "URI", &uriString) == true)
-					{
-						const char *uri = (const char *)CGPDFStringGetBytePtr(uriString); // Destination URI string
-						
-						linkTarget = [NSURL URLWithString:[NSString stringWithCString:uri encoding:NSASCIIStringEncoding]];
+					if (CGPDFDictionaryGetString(actionDictionary, "URI", &uriString) == true) {
+						const char *uri = (const char *)CGPDFStringGetBytePtr(uriString);
+						NSString *linkString = [NSString stringWithCString:uri encoding:NSASCIIStringEncoding];
+						linkTarget = [NSURL URLWithString:linkString];
 					}
 				}
 			}
 		}
 	}
-	else // Handle other link target possibilities
-	{
-		if (CGPDFDictionaryGetArray(annotationDictionary, "Dest", &destArray) == false)
-		{
-			if (CGPDFDictionaryGetString(annotationDictionary, "Dest", &destName) == false)
-			{
+	
+	// Handle other link target possibilities
+	else {
+		if (CGPDFDictionaryGetArray(annotationDictionary, "Dest", &destArray) == false) {
+			if (CGPDFDictionaryGetString(annotationDictionary, "Dest", &destName) == false) {
 				CGPDFDictionaryGetName(annotationDictionary, "Dest", &destString);
 			}
 		}
 	}
 	
-	if (destName != NULL) // Handle a destination name
-	{
+	// Handle a destination name
+	if (destName != NULL) {
 		CGPDFDictionaryRef catalogDictionary = CGPDFDocumentGetCatalog(_PDFDocRef);
-		CGPDFDictionaryRef namesDictionary = NULL; // Destination names in the document
 		
-		if (CGPDFDictionaryGetDictionary(catalogDictionary, "Names", &namesDictionary) == true)
-		{
-			CGPDFDictionaryRef destsDictionary = NULL; // Document destinations dictionary
+		// Destination names in the document
+		CGPDFDictionaryRef namesDictionary = NULL;
+		if (CGPDFDictionaryGetDictionary(catalogDictionary, "Names", &namesDictionary) == true) {
+			CGPDFDictionaryRef destsDictionary = NULL;
 			
-			if (CGPDFDictionaryGetDictionary(namesDictionary, "Dests", &destsDictionary) == true)
-			{
-				const char *destinationName = (const char *)CGPDFStringGetBytePtr(destName); // Name
-				
+			if (CGPDFDictionaryGetDictionary(namesDictionary, "Dests", &destsDictionary) == true) {
+				const char *destinationName = (const char *)CGPDFStringGetBytePtr(destName);
 				destArray = [self destinationWithName:destinationName inDestsTree:destsDictionary];
 			}
 		}
 	}
 	
-	if (destString != NULL) // Handle a destination string
-	{
+	// Handle a destination string
+	if (destString != NULL) {
 		CGPDFDictionaryRef catalogDictionary = CGPDFDocumentGetCatalog(_PDFDocRef);
 		CGPDFDictionaryRef destsDictionary = NULL; // Document destinations dictionary
 		
-		if (CGPDFDictionaryGetDictionary(catalogDictionary, "Dests", &destsDictionary) == true)
-		{
-			CGPDFDictionaryRef targetDictionary = NULL; // Destination target dictionary
+		if (CGPDFDictionaryGetDictionary(catalogDictionary, "Dests", &destsDictionary) == true) {
+			CGPDFDictionaryRef targetDictionary = NULL;
 			
-			if (CGPDFDictionaryGetDictionary(destsDictionary, destString, &targetDictionary) == true)
-			{
+			if (CGPDFDictionaryGetDictionary(destsDictionary, destString, &targetDictionary) == true) {
 				CGPDFDictionaryGetArray(targetDictionary, "D", &destArray);
 			}
 		}
 	}
 	
-	if (destArray != NULL) // Handle a destination array
-	{
-		NSInteger targetPageNumber = 0; // The target page number
+	// Handle a destination array
+	if (destArray != NULL) {
+		NSInteger targetPageNumber = 0;
+		CGPDFDictionaryRef pageDictionaryFromDestArray = NULL;
 		
-		CGPDFDictionaryRef pageDictionaryFromDestArray = NULL; // Target reference
-		
-		if (CGPDFArrayGetDictionary(destArray, 0, &pageDictionaryFromDestArray) == true)
-		{
-			NSInteger pageCount = CGPDFDocumentGetNumberOfPages(_PDFDocRef); // Pages
+		if (CGPDFArrayGetDictionary(destArray, 0, &pageDictionaryFromDestArray) == true) {
+			NSInteger pageCount = CGPDFDocumentGetNumberOfPages(_PDFDocRef);
 			
-			for (NSInteger pageNumber = 1; pageNumber <= pageCount; pageNumber++)
-			{
+			for (NSInteger pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
 				CGPDFPageRef pageRef = CGPDFDocumentGetPage(_PDFDocRef, pageNumber);
 				CGPDFDictionaryRef pageDictionaryFromPage = CGPDFPageGetDictionary(pageRef);
-				if (pageDictionaryFromPage == pageDictionaryFromDestArray) // Found it
-				{
+				
+				// Found it
+				if (pageDictionaryFromPage == pageDictionaryFromDestArray) {
 					targetPageNumber = pageNumber; break;
 				}
 			}
 		}
-		else // Try page number from array possibility
-		{
+		
+		// Try page number from array possibility
+		else {
 			CGPDFInteger pageNumber = 0; // Page number in array
 			
-			if (CGPDFArrayGetInteger(destArray, 0, &pageNumber) == true)
-			{
+			if (CGPDFArrayGetInteger(destArray, 0, &pageNumber) == true) {
 				targetPageNumber = (pageNumber + 1); // 1-based
 			}
 		}
 		
-		if (targetPageNumber > 0) // We have a target page number
-		{
+		// We have a target page number
+		if (targetPageNumber > 0) {
 			linkTarget = [NSNumber numberWithInteger:targetPageNumber];
 		}
 	}
@@ -489,28 +474,27 @@
 	return linkTarget;
 }
 
+/**
+ *  Handle a single tap.
+ */
 - (id)singleTap:(UITapGestureRecognizer *)recognizer
 {
-	DXLog(@"");
-	
-	id result = nil; // Tap result object
-	
-	if (recognizer.state == UIGestureRecognizerStateRecognized)
-	{
-		if (_links.count > 0) // Process the single tap
-		{
+	if (recognizer.state == UIGestureRecognizerStateRecognized) {
+		
+		// if we have links...
+		if ([_links count] > 0) {
 			CGPoint point = [recognizer locationInView:self];
-			for (ReaderDocumentLink *link in _links) // Enumerate links
-			{
-				if (CGRectContainsPoint(link.rect, point) == true) // Found it
-				{
-					result = [self annotationLinkTarget:link.dictionary]; break;
+			
+			// ...loop through to find the tapped one
+			for (ReaderDocumentLink *link in _links) {
+				if (CGRectContainsPoint(link.rect, point)) {
+					return [self annotationLinkTarget:link.dictionary];
 				}
 			}
 		}
 	}
 	
-	return result;
+	return nil;
 }
 
 
@@ -521,8 +505,6 @@
  */
 - (void)drawLayer:(CATiledLayer *)layer inContext:(CGContextRef)context
 {
-	DXLog(@"Drawing bounding box %@", NSStringFromCGRect(CGContextGetClipBoundingBox(context)));
-	
 	// Block any other threads
 	CGPDFPageRef drawPDFPageRef = NULL;
 	CGPDFDocumentRef drawPDFDocRef = NULL;
@@ -557,10 +539,11 @@
 
 #pragma mark -
 
-//
-//	ReaderDocumentLink class implementation
-//
 
+
+/**
+ *  ReaderDocumentLink class implementation.
+ */
 @implementation ReaderDocumentLink
 
 #pragma mark Properties
@@ -572,8 +555,6 @@
 
 + (id)newWithRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary
 {
-	DXLog(@"");
-	
 	return [[ReaderDocumentLink alloc] initWithRect:linkRect dictionary:linkDictionary];
 }
 
@@ -581,10 +562,7 @@
 
 - (id)initWithRect:(CGRect)linkRect dictionary:(CGPDFDictionaryRef)linkDictionary
 {
-	DXLog(@"");
-	
-	if ((self = [super init]))
-	{
+	if ((self = [super init])) {
 		_dictionary = linkDictionary;
 		_rect = linkRect;
 	}

@@ -102,7 +102,6 @@
 
 + (NSString *)relativeFilePath:(NSString *)fullFilePath
 {
-	DXLog(@"");
 	assert(fullFilePath != nil); // Ensure that the full file path is not nil
 	NSString *applicationPath = [ReaderDocument applicationPath]; // Get the application path
 	NSRange range = [fullFilePath rangeOfString:applicationPath]; // Look for the application path
@@ -158,8 +157,6 @@
 
 + (BOOL)isPDF:(NSString *)filePath
 {
-	DXLog(@"");
-
 	BOOL state = NO;
 	if (filePath != nil) // Must have a file path
 	{
@@ -188,8 +185,6 @@
 
 - (id)initWithFilePath:(NSString *)fullFilePath password:(NSString *)phrase
 {
-	DXLog(@"");
-
 	id object = nil; // ReaderDocument object
 
 	if ([ReaderDocument isPDF:fullFilePath] == YES) {						// File must exist
@@ -245,27 +240,22 @@
 #pragma mark - Archiving/NSCoding
 - (BOOL)archiveWithFileName:(NSString *)filename
 {
-	DXLog(@"");
 	NSString *archiveFilePath = [ReaderDocument archiveFilePath:filename];
 	return [NSKeyedArchiver archiveRootObject:self toFile:archiveFilePath];
 }
 
 - (void)saveReaderDocument
 {
-	DXLog(@"");
 	[self archiveWithFileName:[self fileName]];
 }
 
 - (void)updateProperties
 {
-	DXLog(@"");
 }
 
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-	DXLog(@"");
-	
 	[encoder encodeObject:_guid forKey:@"FileGUID"];
 	[encoder encodeObject:_fileName forKey:@"FileName"];
 	[encoder encodeObject:_fileDate forKey:@"FileDate"];
@@ -278,8 +268,6 @@
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
-	DXLog(@"");
-	
 	if ((self = [super init])) {
 		self.guid = [decoder decodeObjectForKey:@"FileGUID"];
 		self.fileName = [decoder decodeObjectForKey:@"FileName"];
@@ -300,5 +288,6 @@
 	
 	return self;
 }
+
 
 @end

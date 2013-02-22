@@ -41,8 +41,6 @@
 
 + (CFTimeInterval)fadeDuration
 {
-	DXLog(@"");
-	
 	return 0.001; // iOS bug workaround
 	
 	//return 0.0; // No fading wanted
@@ -52,17 +50,14 @@
 
 - (id)init
 {
-	DXLog(@"");
-	
-	if ((self = [super init]))
-	{
-		self.levelsOfDetail = LEVELS_OF_DETAIL; // Zoom (?) levels
-		UIScreen *mainScreen = [UIScreen mainScreen]; // Main screen
-		CGFloat screenScale = [mainScreen scale]; // Main screen scale
+	if ((self = [super init])) {
+		self.levelsOfDetail = LEVELS_OF_DETAIL;			// Zoom levels (including 1.0)
+		UIScreen *mainScreen = [UIScreen mainScreen];	// Main screen
+		CGFloat screenScale = [mainScreen scale];		// Main screen scale
 		
 		self.levelsOfDetailBias = (screenScale > 1.0f) ? 1 : LEVELS_OF_DETAIL_BIAS;
 		
-		CGRect screenBounds = [mainScreen bounds]; // Main screen bounds
+		CGRect screenBounds = [mainScreen bounds];		// Main screen bounds
 		CGFloat w_pixels = (screenBounds.size.width * screenScale);
 		CGFloat h_pixels = (screenBounds.size.height * screenScale);
 		CGFloat max = ((w_pixels < h_pixels) ? h_pixels : w_pixels);
