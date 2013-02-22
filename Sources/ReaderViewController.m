@@ -755,13 +755,11 @@
 - (void)tappedInToolbar:(ReaderMainToolbar *)toolbar printButton:(UIButton *)button
 {
 #if READER_ENABLE_PRINT
-	Class printInteractionController = NSClassFromString(@"UIPrintInteractionController");
-
-	if ((printInteractionController != nil) && [printInteractionController isPrintingAvailable]) {
+	if ([UIPrintInteractionController isPrintingAvailable]) {
 		NSData *pdfData = [self documentDataFor:ReaderContentTargetTypePrint];
-		printInteraction = [printInteractionController sharedPrintController];
-		if ([printInteractionController canPrintData:pdfData] == YES) {
-			UIPrintInfo *printInfo = [NSClassFromString(@"UIPrintInfo") printInfo];
+		printInteraction = [UIPrintInteractionController sharedPrintController];
+		if ([UIPrintInteractionController canPrintData:pdfData] == YES) {
+			UIPrintInfo *printInfo = [UIPrintInfo printInfo];
 			
 			printInfo.duplex = UIPrintInfoDuplexLongEdge;
 			printInfo.outputType = UIPrintInfoOutputGeneral;
@@ -774,22 +772,21 @@
 			if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 				[printInteraction presentFromRect:button.bounds
 										   inView:button animated:YES
-								completionHandler:
-					^(UIPrintInteractionController *pic, BOOL completed, NSError *error) {
-						if ((completed == NO) && (error != nil)) {
-							DXLog(@"%s %@", __FUNCTION__, error);
-						}
-					}
-				];
+								completionHandler:^(UIPrintInteractionController *pic, BOOL completed, NSError *error) {
+									if (!completed && error) {
+										NSLog(@"%s %@", __FUNCTION__, error);
+									}
+								}
+				 ];
 			}
 			else {				// Presume UIUserInterfaceIdiomPhone
-				[printInteraction presentAnimated:YES completionHandler:
-					^(UIPrintInteractionController *pic, BOOL completed, NSError *error) {
-						if ((completed == NO) && (error != nil)) {
-							DXLog(@"%s %@", __FUNCTION__, error);
-						}
-					}
-				];
+				[printInteraction presentAnimated:YES
+								completionHandler:^(UIPrintInteractionController *pic, BOOL completed, NSError *error) {
+									if (!completed && error) {
+										NSLog(@"%s %@", __FUNCTION__, error);
+									}
+								}
+				 ];
 			}
 		}
 		else {

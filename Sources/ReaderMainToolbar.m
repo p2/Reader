@@ -158,8 +158,7 @@
 
 #if READER_ENABLE_PRINT
 		if (object.password == nil) {		// We can only print documents without passwords
-			Class printInteractionController = NSClassFromString(@"UIPrintInteractionController");
-			if ((printInteractionController != nil) && [printInteractionController isPrintingAvailable]) {
+			if ([UIPrintInteractionController isPrintingAvailable]) {
 				rightButtonX -= (PRINT_BUTTON_WIDTH + BUTTON_SPACE);
 				
 				UIButton *printButton = [UIButton buttonWithType:UIButtonTypeCustom];
