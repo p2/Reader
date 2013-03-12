@@ -823,7 +823,13 @@
 		//[self presentModalViewController:mailComposer animated:YES];
 	}
 	else if (attachment) {
-		NSLog(@"PDF is too big: %d KB", [attachment length] / 1024);
+		NSString *message = [NSString stringWithFormat:@"This PDF is too big for email: %d MB (15 MB limit)", [attachment length] / 1024 / 1024];
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"PDF too big"
+														message:message
+													   delegate:nil
+											  cancelButtonTitle:@"OK"
+											  otherButtonTitles:nil];
+		[alert show];
 	}
 	else {
 		NSLog(@"Did not get data!");
@@ -860,9 +866,16 @@
 	if ((result == MFMailComposeResultFailed) && (error != NULL)) {
 		DXLog(@"%@", error);
 	}
+	else if (MFMailComposeResultSent == result) {
+		[self didSendEmail];
+	}
 	
 	[self dismissViewControllerAnimated:YES completion:NULL];
 	//[self dismissModalViewControllerAnimated:YES];
+}
+
+- (void)didSendEmail
+{
 }
 
 
