@@ -58,6 +58,7 @@ typedef enum {
 @property (nonatomic, assign) ReaderContentTargetType currentRenderTarget;
 
 - (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase;
+- (void)updateViewRectWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase;
 
 - (id)singleTap:(UITapGestureRecognizer *)recognizer;
 

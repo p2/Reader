@@ -85,7 +85,7 @@
 	NSAssert(!(delegate == nil), @"delegate == nil");
 	NSAssert(!(document == nil), @"ReaderDocument == nil");
 	
-	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+//	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
 	CGRect viewRect = self.view.bounds; // View controller's view bounds
 
 	NSString *toolbarTitle = [document.fileName stringByDeletingPathExtension];

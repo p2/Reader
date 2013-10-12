@@ -68,86 +68,25 @@
 
 - (id)initWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase
 {
+	NSParameterAssert(nil != fileURL);
+	
+	// determine needed frame
+	[self updateViewRectWithURL:fileURL page:page password:phrase];
+	
 	CGRect viewRect = CGRectZero;
-	
-	if (fileURL) {
-		_PDFDocRef = CGPDFDocumentCreateX((__bridge CFURLRef)fileURL, phrase);
-		if (_PDFDocRef) {
-			
-			// check page bounds
-			if (page < 1) {
-				page = 1;
-			}
-			
-			NSInteger numPages = CGPDFDocumentGetNumberOfPages(_PDFDocRef);
-			if (page > numPages) {
-				page = numPages;
-			}
-			
-			// Get page
-			_PDFPageRef = CGPDFDocumentGetPage(_PDFDocRef, page);
-			if (_PDFPageRef) {
-				CGPDFPageRetain(_PDFPageRef);
-				
-				CGRect cropBoxRect = CGPDFPageGetBoxRect(_PDFPageRef, kCGPDFCropBox);
-				CGRect mediaBoxRect = CGPDFPageGetBoxRect(_PDFPageRef, kCGPDFMediaBox);
-				CGRect effectiveRect = CGRectIntersection(cropBoxRect, mediaBoxRect);
-				_pageAngle = CGPDFPageGetRotationAngle(_PDFPageRef);
-				
-				// Page rotation angle (in degrees)
-				switch (_pageAngle) {
-					default:
-					case 0:
-					case 180:
-					{
-						_pageWidth = effectiveRect.size.width;
-						_pageHeight = effectiveRect.size.height;
-						_pageOffsetX = effectiveRect.origin.x;
-						_pageOffsetY = effectiveRect.origin.y;
-						break;
-					}
-						
-					case 90:
-					case 270:
-					{
-						_pageWidth = effectiveRect.size.height;
-						_pageHeight = effectiveRect.size.width;
-						_pageOffsetX = effectiveRect.origin.y;
-						_pageOffsetY = effectiveRect.origin.x;
-						break;
-					}
-				}
-				
-				NSInteger page_w = (NSInteger)_pageWidth;
-				NSInteger page_h = (NSInteger)_pageHeight;
-				
-				if (page_w % 2) {
-					page_w--;
-				}
-				if (page_h % 2) {
-					page_h--;
-				}
-				
-				viewRect.size = CGSizeMake(page_w, page_h);
-			}
-			else {
-				CGPDFDocumentRelease(_PDFDocRef), _PDFDocRef = NULL;
-				NSAssert(NO, @"CGPDFPageRef == NULL");
-			}
-		}
-		else  {
-			NSAssert(NO, @"CGPDFDocumentRef == NULL");
-		}
+	NSInteger page_w = (NSInteger)_pageWidth;
+	NSInteger page_h = (NSInteger)_pageHeight;
+	if (page_w % 2) {
+		page_w--;
 	}
-	else {
-		NSAssert(NO, @"fileURL == nil");
+	if (page_h % 2) {
+		page_h--;
 	}
+	viewRect.size = CGSizeMake(page_w, page_h);
 	
-	// now we initialize
+	// initialize
 	if ((self = [self initWithFrame:viewRect])) {
-		_page = page;
-		
-		[self buildAnnotationLinksList];		// links
+		[self buildAnnotationLinksList];
 	}
 	return self;
 }
@@ -157,6 +96,60 @@
 - (CGRect)pageRect
 {
 	return CGRectMake(_pageOffsetX, _pageOffsetY, _pageWidth, _pageHeight);
+}
+
+- (void)updateViewRectWithURL:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase
+{
+	// read the PDF
+	_PDFDocRef = CGPDFDocumentCreateX((__bridge CFURLRef)fileURL, phrase);
+	NSAssert(NULL != _PDFDocRef, @"Failed to create PDF reference from %@", fileURL);
+	
+	// check page bounds
+	if (page < 1) {
+		page = 1;
+	}
+	
+	NSInteger numPages = CGPDFDocumentGetNumberOfPages(_PDFDocRef);
+	if (page > numPages) {
+		page = numPages;
+	}
+	
+	// Get page
+	_PDFPageRef = CGPDFDocumentGetPage(_PDFDocRef, page);
+	NSAssert(NULL != _PDFPageRef, @"CGPDFDocumentGetPage failed to get page %d", page);
+	
+	CGPDFPageRetain(_PDFPageRef);
+	
+	CGRect cropBoxRect = CGPDFPageGetBoxRect(_PDFPageRef, kCGPDFCropBox);
+	CGRect mediaBoxRect = CGPDFPageGetBoxRect(_PDFPageRef, kCGPDFMediaBox);
+	CGRect effectiveRect = CGRectIntersection(cropBoxRect, mediaBoxRect);
+	_pageAngle = CGPDFPageGetRotationAngle(_PDFPageRef);
+	
+	// Page rotation angle (in degrees)
+	switch (_pageAngle) {
+		default:
+		case 0:
+		case 180:
+		{
+			_pageWidth = effectiveRect.size.width;
+			_pageHeight = effectiveRect.size.height;
+			_pageOffsetX = effectiveRect.origin.x;
+			_pageOffsetY = effectiveRect.origin.y;
+			break;
+		}
+			
+		case 90:
+		case 270:
+		{
+			_pageWidth = effectiveRect.size.height;
+			_pageHeight = effectiveRect.size.width;
+			_pageOffsetX = effectiveRect.origin.y;
+			_pageOffsetY = effectiveRect.origin.x;
+			break;
+		}
+	}
+	
+	_page = page;
 }
 
 
