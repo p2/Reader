@@ -271,11 +271,6 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 @implementation ReaderContentThumb
 
-//#pragma mark Properties
-
-//@synthesize ;
-
-#pragma mark ReaderContentThumb instance methods
 
 - (id)initWithFrame:(CGRect)frame
 {

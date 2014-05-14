@@ -28,13 +28,11 @@
 
 #import "ReaderDocument.h"
 #import "ReaderContentView.h"
-#import "ReaderMainToolbar.h"
 #import "ReaderMainPagebar.h"
 #import "ThumbsViewController.h"
 
 
 @class ReaderViewController;
-@class ReaderMainToolbar;
 
 @protocol ReaderViewControllerDelegate <NSObject>
 
@@ -44,9 +42,8 @@
 @end
 
 
-@interface ReaderViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate, MFMailComposeViewControllerDelegate,
-													ReaderMainToolbarDelegate, ReaderMainPagebarDelegate, ReaderContentViewDelegate,
-													ThumbsViewControllerDelegate>
+@interface ReaderViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate,
+													ReaderMainPagebarDelegate, ReaderContentViewDelegate, ThumbsViewControllerDelegate>
 {
 @private
 	UIPrintInteractionController *printInteraction;
@@ -58,8 +55,7 @@
 @property (nonatomic, weak, readwrite) id <ReaderViewControllerDelegate> delegate;
 @property (nonatomic, strong, readonly) ReaderDocument *document;
 
-@property (nonatomic, strong) UIScrollView *theScrollView;
-@property (nonatomic, strong) ReaderMainToolbar *mainToolbar;
+@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) ReaderMainPagebar *mainPagebar;
 @property (nonatomic, strong) NSMutableDictionary *contentViews;
 
@@ -67,17 +63,21 @@
 @property (nonatomic, readonly, assign) NSUInteger currentPage;
 @property (nonatomic, readonly, strong) NSDate *lastHideTime;
 
++ (UINavigationController *)presentableViewControllerForDocument:(ReaderDocument *)document withDelegate:(id<ReaderViewControllerDelegate>)delegate;
+
 - (id)initWithReaderDocument:(ReaderDocument *)object;
 - (void)showDocument:(id)object;
 
 - (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSUInteger)pageNumber;
 - (NSData *)documentDataFor:(ReaderContentTargetType)dataType;
 
+- (BOOL)toolbarsHidden;
+- (void)showToolbarsAnimated:(BOOL)animated;
+- (void)hideToolbarsAnimated:(BOOL)animated;
+
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer;
 - (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer;
 - (void)handleLongPress:(UILongPressGestureRecognizer *)recognizer;
-
-- (void)didSendEmail;
 
 - (Class)classForViewPages;
 

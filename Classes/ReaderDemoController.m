@@ -106,16 +106,15 @@
 	ReaderDocument *document = [ReaderDocument newWithDocumentFilePath:filePath password:phrase];
 	if (document != nil) // Must have a valid ReaderDocument object in order to proceed with things
 	{
-		ReaderViewController *readerViewController = [[ReaderViewController alloc] initWithReaderDocument:document];
-		readerViewController.delegate = self; // Set the ReaderViewController delegate to self
+		UINavigationController *navi = [ReaderViewController presentableViewControllerForDocument:document withDelegate:self];
 
 #if DEMO_VIEW_CONTROLLER_PUSH
-		[self.navigationController pushViewController:readerViewController animated:YES];
+		[self.navigationController pushViewController:navi animated:YES];
 #else
-		readerViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-		readerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+		navi.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+		navi.modalPresentationStyle = UIModalPresentationFullScreen;
 
-		[self presentViewController:readerViewController animated:YES completion:NULL];
+		[self presentViewController:navi animated:YES completion:NULL];
 #endif
 	}
 }
