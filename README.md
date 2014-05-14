@@ -1,5 +1,9 @@
+PDF Reader Core for iOS
+=======================
 
-## PDF Reader Core for iOS
+This is a fork of [vfr/Reader](https://github.com/vfr/Reader) that has been modified to the point where upstream changes can no longer be merged entirely.
+Below is the original README, unmodified and thus not entirely correct for this fork, as of Reader v2.7.
+
 
 ### Introduction
 
