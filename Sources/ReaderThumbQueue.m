@@ -24,15 +24,10 @@
 //
 
 #import "ReaderThumbQueue.h"
-#import "CGPDFDocument.h"
+
 
 @implementation ReaderThumbQueue
 
-//#pragma mark Properties
-
-//@synthesize ;
-
-#pragma mark ReaderThumbQueue class methods
 
 + (ReaderThumbQueue *)sharedInstance
 {
@@ -43,7 +38,6 @@
 	return object;
 }
 
-#pragma mark ReaderThumbQueue instance methods
 
 - (id)init
 {
@@ -67,7 +61,6 @@
 
 - (void)addLoadOperation:(NSOperation *)operation
 {
-	DXLog(@"");
 	if ([operation isKindOfClass:[ReaderThumbOperation class]]) {
 		[loadQueue addOperation:operation];
 	}
@@ -75,7 +68,6 @@
 
 - (void)addWorkOperation:(NSOperation *)operation
 {
-	DXLog(@"");
 	if ([operation isKindOfClass:[ReaderThumbOperation class]]) {
 		[workQueue addOperation:operation];
 	}
@@ -83,7 +75,6 @@
 
 - (void)cancelOperationsWithGUID:(NSString *)guid
 {
-	DXLog(@"");
 	[loadQueue setSuspended:YES];
 	[workQueue setSuspended:YES];
 	
@@ -105,7 +96,6 @@
 
 - (void)cancelAllOperations
 {
-	DXLog(@"");
 	[loadQueue cancelAllOperations];
 	[workQueue cancelAllOperations];
 }

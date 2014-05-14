@@ -27,23 +27,15 @@
 #import "ReaderThumbQueue.h"
 #import "ReaderThumbFetch.h"
 #import "ReaderThumbView.h"
-#import "CGPDFDocument.h"
-
-@implementation ReaderThumbCache
-
-#pragma mark Constants
 
 #define CACHE_SIZE 2 * 1024 * 1024
 
-//#pragma mark Properties
 
-//@synthesize ;
+@implementation ReaderThumbCache
 
-#pragma mark ReaderThumbCache class methods
 
 + (ReaderThumbCache *)sharedInstance
 {
-	DXLog(@"");
 	static dispatch_once_t predicate = 0;
 	static ReaderThumbCache *object = nil; // Object
 	dispatch_once(&predicate, ^{ object = [self new]; });
@@ -53,7 +45,6 @@
 
 + (NSString *)appCachesPath
 {
-	DXLog(@"");
 	static dispatch_once_t predicate = 0;
 	static NSString *theCachesPath = nil; // Application caches path string
 	
@@ -68,7 +59,6 @@
 
 + (NSString *)thumbCachePathForGUID:(NSString *)guid
 {
-	DXLog(@"");
 	NSString *cachesPath = [ReaderThumbCache appCachesPath];
 	
 	return [cachesPath stringByAppendingPathComponent:guid];
@@ -76,7 +66,6 @@
 
 + (void)createThumbCacheWithGUID:(NSString *)guid
 {
-	DXLog(@"");
 	NSFileManager *fileManager = [NSFileManager new];
 	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid];
 	[fileManager createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:NULL];
@@ -84,9 +73,7 @@
 
 + (void)removeThumbCacheWithGUID:(NSString *)guid
 {
-	DXLog(@"");
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0),
-	^{
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 		NSFileManager *fileManager = [NSFileManager new];
 		NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid];
 		[fileManager removeItemAtPath:cachePath error:NULL]; // Remove thumb cache directory
@@ -95,7 +82,6 @@
 
 + (void)touchThumbCacheWithGUID:(NSString *)guid
 {
-	DXLog(@"");
 	NSFileManager *fileManager = [NSFileManager new];
 	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:guid];
 	NSDictionary *attributes = [NSDictionary dictionaryWithObject:[NSDate date] forKey:NSFileModificationDate];
@@ -104,10 +90,7 @@
 
 + (void)purgeThumbCachesOlderThan:(NSTimeInterval)age
 {
-	DXLog(@"");
-	
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0),
-	^{
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 		NSDate *now = [NSDate date];
 		NSString *cachesPath = [ReaderThumbCache appCachesPath];
 		NSFileManager *fileManager = [NSFileManager new];
@@ -123,10 +106,8 @@
 					NSDate *cacheDate = [attributes objectForKey:NSFileModificationDate]; // Cache date
 					
 					NSTimeInterval seconds = [now timeIntervalSinceDate:cacheDate]; // Cache age
-					if (seconds > age) // Older than so remove the thumb cache
-					{
+					if (seconds > age) {
 						[fileManager removeItemAtPath:cachePath error:NULL];
-						DXLog(@"purged %@", cacheName);
 					}
 				}
 			}
@@ -177,9 +158,6 @@
 			NSUInteger bytes = (NSUInteger)(image.size.width * image.size.height * 4.0f);
 			[thumbCache setObject:image forKey:key cost:bytes]; // Cache image
 		}
-	}
-	else {
-		DXLog(@"Nothing to cache, image: %@, key: %@", image, key);
 	}
 }
 

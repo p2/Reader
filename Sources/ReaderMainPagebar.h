@@ -24,7 +24,6 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import "ReaderThumbView.h"
 
 @class ReaderMainPagebar;
@@ -41,7 +40,7 @@
 
 @interface ReaderMainPagebar : UIView
 
-@property (nonatomic, unsafe_unretained) id <ReaderMainPagebarDelegate> delegate;
+@property (nonatomic, weak) id <ReaderMainPagebarDelegate> delegate;
 
 @property (nonatomic, readonly, strong) ReaderDocument *document;
 @property (nonatomic, readonly, strong) ReaderTrackControl *trackControl;

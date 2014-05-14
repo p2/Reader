@@ -36,12 +36,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(frame));
-#endif
-
-	if ((self = [super initWithFrame:frame]))
-	{
+	if ((self = [super initWithFrame:frame])) {
 		self.scrollsToTop = NO;
 		self.autoresizesSubviews = NO;
 		self.delaysContentTouches = NO;
@@ -70,7 +65,6 @@
 
 - (void)dealloc
 {
-	DXLog(@"");
 	thumbCellsQueue = nil;
 	thumbCellsVisible = nil;
 	touchedCell = nil;
@@ -78,10 +72,6 @@
 
 - (void)requeueThumbCell:(ReaderThumbView *)tvCell
 {
-#ifdef DEBUGX
-	NSLog(@"%s %d", __FUNCTION__, tvCell.tag);
-#endif
-
 	[thumbCellsQueue addObject:tvCell];
 	[thumbCellsVisible removeObject:tvCell];
 	tvCell.tag = NSIntegerMin; tvCell.hidden = YES;
@@ -90,10 +80,7 @@
 
 - (void)requeueAllThumbCells
 {
-	DXLog(@"");
-
-	if (thumbCellsVisible.count > 0)
-	{
+	if (thumbCellsVisible.count > 0) {
 		NSArray *visible = [thumbCellsVisible copy];
 		for (ReaderThumbView *tvCell in visible)
 		{
@@ -104,10 +91,6 @@
 
 - (ReaderThumbView *)dequeueThumbCellWithFrame:(CGRect)frame
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(frame));
-#endif
-	
 	ReaderThumbView *theCell = nil;
 
 	if (thumbCellsQueue.count > 0) // Reuse existing cell
@@ -130,10 +113,6 @@
 
 - (NSMutableIndexSet *)visibleIndexSetForContentOffset
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGPoint(self.contentOffset));
-#endif
-
 	CGFloat minY = self.contentOffset.y; // Content offset
 	CGFloat maxY = (minY + self.bounds.size.height - 1.0f);
 	
@@ -155,9 +134,6 @@
 
 - (ReaderThumbView *)thumbCellContainingPoint:(CGPoint)point
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGPoint(point));
-#endif
 	ReaderThumbView *theCell = nil;
 	for (ReaderThumbView *tvCell in thumbCellsVisible)
 	{
@@ -172,10 +148,6 @@
 
 - (CGRect)thumbCellFrameForIndex:(NSInteger)index
 {
-#ifdef DEBUGX
-	NSLog(@"%s %d", __FUNCTION__, index);
-#endif
-	
 	CGRect thumbRect; thumbRect.size = _thumbSize;
 	NSInteger thumbY = (NSInteger)((index / _thumbsX) * _thumbSize.height); // X, Y
 	NSInteger thumbX = (NSInteger)(((index % _thumbsX) * _thumbSize.width) + _thumbX);
@@ -186,10 +158,6 @@
 
 - (void)updateContentSize:(NSUInteger)thumbCount
 {
-#ifdef DEBUGX
-	NSLog(@"%s %d", __FUNCTION__, thumbCount);
-#endif
-	
 	canUpdate = NO; // Disable updates
 	
 	if (thumbCount > 0) // Have some thumbs
@@ -228,10 +196,6 @@
 
 - (void)layoutSubviews
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.bounds));
-#endif
-
 	if (CGSizeEqualToSize(_lastViewSize, CGSizeZero) == true)
 	{
 		_lastViewSize = self.bounds.size; // Initial view size
@@ -278,10 +242,6 @@
 
 - (void)setThumbSize:(CGSize)thumbSize
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGSize(thumbSize));
-#endif
-
 	if (CGSizeEqualToSize(_thumbSize, CGSizeZero) == true)
 	{
 		if (CGSizeEqualToSize(thumbSize, CGSizeZero) == false)
@@ -293,9 +253,6 @@
 
 - (void)reloadThumbsCenterOnIndex:(NSUInteger)index
 {
-#ifdef DEBUGX
-	NSLog(@"%s %d", __FUNCTION__, index);
-#endif
 	assert(delegate != nil); // Check delegate
 	assert(CGSizeEqualToSize(_thumbSize, CGSizeZero) == false);
 	
@@ -349,14 +306,10 @@
 
 - (void)reloadThumbsContentOffset:(CGPoint)newContentOffset
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGPoint(newContentOffset));
-#endif
-	assert(delegate != nil); // Check delegate
-	assert(CGSizeEqualToSize(_thumbSize, CGSizeZero) == false);
+	NSParameterAssert(delegate);
+	NSParameterAssert(!CGSizeEqualToSize(_thumbSize, CGSizeZero));
 	
-	if (self.decelerating == YES) // Stop scroll view movement
-	{
+	if (self.decelerating == YES) {
 		[self setContentOffset:self.contentOffset animated:NO];
 	}
 
@@ -396,10 +349,6 @@
 
 - (void)refreshThumbWithIndex:(NSUInteger)index
 {
-#ifdef DEBUGX
-	NSLog(@"%s %d", __FUNCTION__, index);
-#endif
-	
 	for (ReaderThumbView *tvCell in thumbCellsVisible) // Enumerate visible cells
 	{
 		if ((NSUInteger)tvCell.tag == index) // Found a visible thumb cell with the index value
@@ -416,8 +365,6 @@
 
 - (void)refreshVisibleThumbs
 {
-	DXLog(@"");
-	
 	for (ReaderThumbView *tvCell in thumbCellsVisible) // Enumerate visible cells
 	{
 		if ([delegate respondsToSelector:@selector(thumbsView:refreshThumbCell:forIndex:)])
@@ -429,7 +376,6 @@
 
 - (CGPoint)insetContentOffset
 {
-	DXLog(@"");
 	CGPoint insetContentOffset = self.contentOffset; // Offset
 	insetContentOffset.y += self.contentInset.top; // Inset adjust
 	
@@ -440,8 +386,6 @@
 
 - (void)handleTapGesture:(UITapGestureRecognizer *)recognizer
 {
-	DXLog(@"");
-	
 	if (recognizer.state == UIGestureRecognizerStateRecognized) // Handle the tap
 	{
 		CGPoint point = [recognizer locationInView:recognizer.view]; // Tap location
@@ -452,8 +396,6 @@
 
 - (void)handlePressGesture:(UILongPressGestureRecognizer *)recognizer
 {
-	DXLog(@"");
-	
 	if (recognizer.state == UIGestureRecognizerStateBegan) // Handle the press
 	{
 		if ([delegate respondsToSelector:@selector(thumbsView:didPressThumbWithIndex:)])
@@ -469,10 +411,6 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGPoint(scrollView.contentOffset));
-#endif
-
 	if ((canUpdate == YES) && (_thumbCount > 0)) // Check flag and thumb count
 	{
 		if (CGPointEqualToPoint(scrollView.contentOffset, lastContentOffset) == false)

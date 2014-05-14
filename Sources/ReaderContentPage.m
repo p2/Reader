@@ -116,7 +116,7 @@
 	
 	// Get page
 	_PDFPageRef = CGPDFDocumentGetPage(_PDFDocRef, page);
-	NSAssert(NULL != _PDFPageRef, @"CGPDFDocumentGetPage failed to get page %d", page);
+	NSAssert(NULL != _PDFPageRef, @"CGPDFDocumentGetPage failed to get page %ld", (long)page);
 	
 	CGPDFPageRetain(_PDFPageRef);
 	

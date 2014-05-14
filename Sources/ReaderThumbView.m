@@ -24,7 +24,7 @@
 //
 
 #import "ReaderThumbView.h"
-#import "CGPDFDocument.h"
+
 
 @implementation ReaderThumbView
 
@@ -70,12 +70,10 @@
 
 - (void)showTouched:(BOOL)touched
 {
-	DXLog(@"");
 }
 
 - (void)removeFromSuperview
 {
-	DXLog(@"");
 	_targetTag = 0; // Clear target tag
 	
 	[self.operation cancel];
@@ -85,7 +83,6 @@
 
 - (void)reuse
 {
-	DXLog(@"");
 	_targetTag = 0; // Clear target tag
 	
 	[self.operation cancel];

@@ -117,10 +117,7 @@
 
 - (void)updatePageNumberText:(NSInteger)page
 {
-	DXLog(@"");
-
-	if (page != pageNumberLabel.tag) // Only if page number changed
-	{
+	if (page != pageNumberLabel.tag) {
 		NSInteger pages = [document.pageCount integerValue]; // Total pages
 		NSString *format = NSLocalizedString(@"%d of %d", @"format"); // Format
 		NSString *number = [NSString stringWithFormat:format, page, pages]; // Text
@@ -132,12 +129,9 @@
 
 - (id)initWithFrame:(CGRect)frame document:(ReaderDocument *)object
 {
-	DXLog(@"");
+	NSParameterAssert(object);
 
-	assert(object != nil); // Check
-
-	if ((self = [super initWithFrame:frame]))
-	{
+	if ((self = [super initWithFrame:frame])) {
 		self.autoresizesSubviews = YES;
 		self.userInteractionEnabled = YES;
 		self.contentMode = UIViewContentModeRedraw;
@@ -462,6 +456,7 @@
 		self.contentMode = UIViewContentModeRedraw;
 		self.autoresizingMask = UIViewAutoresizingNone;
 		self.backgroundColor = [UIColor clearColor];
+		self.exclusiveTouch = YES;
 	}
 	
 	return self;
@@ -555,16 +550,10 @@
 
 @implementation ReaderPagebarShadow
 
-//#pragma mark Properties
-
-//@synthesize ;
-
 #pragma mark ReaderPagebarShadow class methods
 
 + (Class)layerClass
 {
-	DXLog(@"");
-
 	return [CAGradientLayer class];
 }
 

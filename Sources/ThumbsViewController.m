@@ -48,8 +48,6 @@
 
 - (id)initWithReaderDocument:(ReaderDocument *)object
 {
-	DXLog(@"");
-
 	id thumbs = nil; // ThumbsViewController object
 
 	if ((object != nil) && ([object isKindOfClass:[ReaderDocument class]]))
@@ -65,29 +63,14 @@
 	return thumbs;
 }
 
-/*
-- (void)loadView
-{
-	DXLog(@"");
-
-	// Implement loadView to create a view hierarchy programmatically, without using a nib.
-}
-*/
-
 - (void)viewDidLoad
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
 	[super viewDidLoad];
 	
 	NSAssert(!(delegate == nil), @"delegate == nil");
 	NSAssert(!(document == nil), @"ReaderDocument == nil");
 	
-//	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
-	CGRect viewRect = self.view.bounds; // View controller's view bounds
-
+	CGRect viewRect = self.view.bounds;
 	NSString *toolbarTitle = [document.fileName stringByDeletingPathExtension];
 	CGRect toolbarRect = viewRect; toolbarRect.size.height = TOOLBAR_HEIGHT;
 	
@@ -117,90 +100,13 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
 	[super viewWillAppear:animated];
 	[theThumbsView reloadThumbsCenterOnIndex:([document.pageNumber integerValue] - 1)]; // Page
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
-	[super viewDidAppear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
-	[super viewWillDisappear:animated];
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@", __FUNCTION__, NSStringFromCGRect(self.view.bounds));
-#endif
-
-	[super viewDidDisappear:animated];
-}
-
-/*- (void)viewDidUnload
-{
-	DXLog(@"");
-	
-	theThumbsView = nil;
-	mainToolbar = nil;
-	
-	[super viewDidUnload];
-}*/
-
-/*- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-	return YES;
-}*/
-
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), toInterfaceOrientation);
-#endif
-}
-
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), interfaceOrientation);
-#endif
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-#ifdef DEBUGX
-	NSLog(@"%s %@ (%d to %d)", __FUNCTION__, NSStringFromCGRect(self.view.bounds), fromInterfaceOrientation, self.interfaceOrientation);
-#endif
-
-	//if (fromInterfaceOrientation == self.interfaceOrientation) return;
-}
-
-- (void)didReceiveMemoryWarning
-{
-	DXLog(@"");
-
-	[super didReceiveMemoryWarning];
-}
 
 - (void)dealloc
 {
-	DXLog(@"");
-	
 	bookmarked = nil;
 	theThumbsView = nil;
 	mainToolbar = nil;
@@ -211,8 +117,6 @@
 
 - (void)tappedInToolbar:(ThumbsMainToolbar *)toolbar showControl:(UISegmentedControl *)control
 {
-	DXLog(@"");
-
 	switch (control.selectedSegmentIndex)
 	{
 		case 0: // Show all page thumbs
@@ -247,7 +151,6 @@
 
 - (void)tappedInToolbar:(ThumbsMainToolbar *)toolbar doneButton:(UIButton *)button
 {
-	DXLog(@"");
 	[delegate dismissThumbsViewController:self]; // Dismiss thumbs display
 }
 
@@ -255,25 +158,20 @@
 
 - (NSUInteger)numberOfThumbsInThumbsView:(ReaderThumbsView *)thumbsView
 {
-	DXLog(@"");
 	return (showBookmarked ? bookmarked.count : [document.pageCount integerValue]);
 }
 
 - (id)thumbsView:(ReaderThumbsView *)thumbsView thumbCellWithFrame:(CGRect)frame
 {
-	DXLog(@"");
-
 	return [[ThumbsPageThumb alloc] initWithFrame:frame];
 }
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView updateThumbCell:(ThumbsPageThumb *)thumbCell forIndex:(NSInteger)index
 {
-	DXLog(@"");
-
 	CGSize size = [thumbCell maximumContentSize]; // Get the cell's maximum content size
 	NSInteger page = (showBookmarked ? [[bookmarked objectAtIndex:index] integerValue] : (index + 1));
 	
-	[thumbCell showText:[NSString stringWithFormat:@"%d", page]]; // Page number place holder
+	[thumbCell showText:[NSString stringWithFormat:@"%ld", (long)page]]; // Page number place holder
 	[thumbCell showBookmark:[document.bookmarks containsIndex:page]]; // Show bookmarked status
 	
 	NSURL *fileURL = document.fileURL;
@@ -286,16 +184,12 @@
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView refreshThumbCell:(ThumbsPageThumb *)thumbCell forIndex:(NSInteger)index
 {
-	DXLog(@"");
-	
 	NSInteger page = (showBookmarked ? [[bookmarked objectAtIndex:index] integerValue] : (index + 1));
 	[thumbCell showBookmark:[document.bookmarks containsIndex:page]]; // Show bookmarked status
 }
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView didSelectThumbWithIndex:(NSInteger)index
 {
-	DXLog(@"");
-	
 	NSInteger page = (showBookmarked ? [[bookmarked objectAtIndex:index] integerValue] : (index + 1));
 	[delegate thumbsViewController:self gotoPage:page]; // Show the selected page
 	[delegate dismissThumbsViewController:self]; // Dismiss thumbs display
@@ -303,8 +197,6 @@
 
 - (void)thumbsView:(ReaderThumbsView *)thumbsView didPressThumbWithIndex:(NSInteger)index
 {
-	DXLog(@"");
-	
 	NSInteger page = (showBookmarked ? [[bookmarked objectAtIndex:index] integerValue] : (index + 1));
 	if ([document.bookmarks containsIndex:page]) [document.bookmarks removeIndex:page]; else [document.bookmarks addIndex:page];
 	updateBookmarked = YES; [thumbsView refreshThumbWithIndex:index]; // Refresh page thumb
@@ -332,8 +224,6 @@
 
 - (CGRect)markRectInImageView
 {
-	DXLog(@"");
-	
 	CGRect iconRect = bookMark.frame; iconRect.origin.y = (-2.0f);
 	iconRect.origin.x = (imageView.bounds.size.width - bookMark.image.size.width - 8.0f);
 	
@@ -342,10 +232,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-	DXLog(@"");
-	
-	if ((self = [super initWithFrame:frame]))
-	{
+	if ((self = [super initWithFrame:frame])) {
 		imageView.contentMode = UIViewContentModeCenter;
 		defaultRect = CGRectInset(self.bounds, CONTENT_INSET, CONTENT_INSET);
 		maximumSize = defaultRect.size; // Maximum thumb content size
@@ -411,7 +298,6 @@
 
 - (void)dealloc
 {
-	DXLog(@"");
 	backView = nil;
 	maskView = nil;
 	textLabel = nil;
@@ -420,14 +306,11 @@
 
 - (CGSize)maximumContentSize
 {
-	DXLog(@"");
 	return maximumSize;
 }
 
 - (void)showImage:(UIImage *)image
 {
-	DXLog(@"");
-
 	CGFloat x = roundf(self.bounds.size.width / 2.0f);
 	CGFloat y = roundf(self.bounds.size.height / 2.0f);
 	
@@ -444,9 +327,7 @@
 
 - (void)reuse
 {
-	DXLog(@"");
-
-	[super reuse]; // Reuse thumb view
+	[super reuse];
 
 	textLabel.text = nil; textLabel.frame = defaultRect;
 	imageView.image = nil; imageView.frame = defaultRect;
@@ -459,21 +340,16 @@
 
 - (void)showBookmark:(BOOL)show
 {
-	DXLog(@"");
-
 	bookMark.hidden = (show ? NO : YES);
 }
 
 - (void)showTouched:(BOOL)touched
 {
-	DXLog(@"");
-
 	maskView.hidden = (touched ? NO : YES);
 }
 
 - (void)showText:(NSString *)text
 {
-	DXLog(@"");
 	textLabel.text = text;
 }
 

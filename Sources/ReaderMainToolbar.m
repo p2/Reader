@@ -97,6 +97,7 @@
 		[doneButton setBackgroundImage:buttonN forState:UIControlStateNormal];
 		doneButton.titleLabel.font = [UIFont systemFontOfSize:14.0f];
 		doneButton.autoresizingMask = UIViewAutoresizingNone;
+		doneButton.exclusiveTouch = YES;
 		
 		[self addSubview:doneButton];
 		leftButtonX += (DONE_BUTTON_WIDTH + BUTTON_SPACE);
@@ -112,6 +113,7 @@
 		[thumbsButton setBackgroundImage:buttonH forState:UIControlStateHighlighted];
 		[thumbsButton setBackgroundImage:buttonN forState:UIControlStateNormal];
 		thumbsButton.autoresizingMask = UIViewAutoresizingNone;
+		thumbsButton.exclusiveTouch = YES;
 		
 		[self addSubview:thumbsButton]; //leftButtonX += (THUMBS_BUTTON_WIDTH + BUTTON_SPACE);
 		

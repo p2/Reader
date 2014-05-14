@@ -32,11 +32,6 @@
 
 @implementation ReaderThumbRender
 
-//#pragma mark Properties
-
-//@synthesize ;
-
-#pragma mark ReaderThumbRender instance methods
 
 - (id)initWithRequest:(ReaderThumbRequest *)object
 {
@@ -54,8 +49,6 @@
 
 - (NSURL *)thumbFileURL
 {
-	DXLog(@"");
-	
 	NSFileManager *fileManager = [NSFileManager new];
 	NSString *cachePath = [ReaderThumbCache thumbCachePathForGUID:request.guid];
 	[fileManager createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:NULL];
@@ -66,8 +59,6 @@
 
 - (void)main
 {
-	DXLog(@"");
-	
 	if (self.isCancelled == YES) {
 		return;
 	}

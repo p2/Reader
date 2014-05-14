@@ -237,7 +237,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 	return containerView;
 }
 
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
 {
 	if ([message respondsToSelector:@selector(contentViewDidZoom:)]) {
 		[message contentViewDidZoom:self];

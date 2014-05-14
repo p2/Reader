@@ -45,7 +45,7 @@
 
 @interface ReaderContentView : UIScrollView <UIScrollViewDelegate>
 
-@property (nonatomic, unsafe_unretained, readwrite) id <ReaderContentViewDelegate> message;
+@property (nonatomic, weak, readwrite) id <ReaderContentViewDelegate> message;
 @property (nonatomic, readonly, strong) ReaderContentPage *contentPage;
 @property (nonatomic, readonly, strong) ReaderContentThumb *thumbView;
 @property (nonatomic, readonly, strong) UIView *containerView;

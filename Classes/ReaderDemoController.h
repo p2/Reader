@@ -24,12 +24,9 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import "ReaderViewController.h"
 
+
 @interface ReaderDemoController : UIViewController <ReaderViewControllerDelegate>
-{
-@private // Instance variables
-}
 
 @end

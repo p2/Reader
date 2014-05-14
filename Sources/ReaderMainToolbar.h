@@ -49,7 +49,7 @@
 	UIImage *markImageY;
 }
 
-@property (nonatomic, unsafe_unretained, readwrite) id <ReaderMainToolbarDelegate> delegate;
+@property (nonatomic, weak, readwrite) id <ReaderMainToolbarDelegate> delegate;
 @property (nonatomic) NSString *title;
 
 - (id)initWithFrame:(CGRect)frame document:(ReaderDocument *)object;

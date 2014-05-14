@@ -27,17 +27,12 @@
 #import "ReaderThumbRender.h"
 #import "ReaderThumbCache.h"
 #import "ReaderThumbView.h"
-#import "CGPDFDocument.h"
 
 #import <ImageIO/ImageIO.h>
 
+
 @implementation ReaderThumbFetch
 
-//#pragma mark Properties
-
-//@synthesize ;
-
-#pragma mark ReaderThumbFetch instance methods
 
 - (id)initWithRequest:(ReaderThumbRequest *)object
 {
@@ -65,7 +60,6 @@
 
 - (void)main
 {
-	DXLog(@"");
 	if (self.isCancelled) {
 		return;
 	}

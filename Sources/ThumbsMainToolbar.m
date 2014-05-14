@@ -25,7 +25,7 @@
 
 #import "ReaderConstants.h"
 #import "ThumbsMainToolbar.h"
-#import "CGPDFDocument.h"
+
 
 @implementation ThumbsMainToolbar
 
@@ -41,29 +41,20 @@
 
 #define TITLE_HEIGHT 28.0f
 
-#pragma mark Properties
-
-@synthesize delegate;
-
-#pragma mark ThumbsMainToolbar instance methods
 
 - (id)initWithFrame:(CGRect)frame
 {
-	DXLog(@"");
 
 	return [self initWithFrame:frame title:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame title:(NSString *)title
 {
-	DXLog(@"");
-
-	if ((self = [super initWithFrame:frame]))
-	{
+	if ((self = [super initWithFrame:frame])) {
 		CGFloat viewWidth = self.bounds.size.width;
 
-		UIImage *imageH = [UIImage imageNamed:@"Reader-Button-H.png"];
-		UIImage *imageN = [UIImage imageNamed:@"Reader-Button-N.png"];
+		UIImage *imageH = [UIImage imageNamed:@"Reader-Button-H"];
+		UIImage *imageN = [UIImage imageNamed:@"Reader-Button-N"];
 
 		UIImage *buttonH = [imageH stretchableImageWithLeftCapWidth:5 topCapHeight:0];
 		UIImage *buttonN = [imageN stretchableImageWithLeftCapWidth:5 topCapHeight:0];
@@ -81,27 +72,30 @@
 		[doneButton setBackgroundImage:buttonN forState:UIControlStateNormal];
 		doneButton.titleLabel.font = [UIFont systemFontOfSize:14.0f];
 		doneButton.autoresizingMask = UIViewAutoresizingNone;
-
+		doneButton.exclusiveTouch = YES;
+		
 		[self addSubview:doneButton];
 
 		titleX += (DONE_BUTTON_WIDTH + BUTTON_SPACE); titleWidth -= (DONE_BUTTON_WIDTH + BUTTON_SPACE);
 
-#if READER_BOOKMARKS // Option
+#if READER_BOOKMARKS
 
 		CGFloat showControlX = (viewWidth - (SHOW_CONTROL_WIDTH + BUTTON_SPACE));
 
-		UIImage *thumbsImage = [UIImage imageNamed:@"Reader-Thumbs.png"];
-		UIImage *bookmarkImage = [UIImage imageNamed:@"Reader-Mark-Y.png"];
+		UIImage *thumbsImage = [UIImage imageNamed:@"Reader-Thumbs"];
+		UIImage *bookmarkImage = [UIImage imageNamed:@"Reader-Mark-Y"];
 		NSArray *buttonItems = [NSArray arrayWithObjects:thumbsImage, bookmarkImage, nil];
-
+		
+		BOOL useTint = [self respondsToSelector:@selector(tintColor)]; // iOS 7 and up
 		UISegmentedControl *showControl = [[UISegmentedControl alloc] initWithItems:buttonItems];
 
+		showControl.tintColor = useTint ? [UIColor blackColor] : [UIColor colorWithWhite:0.8f alpha:1.0f];
 		showControl.frame = CGRectMake(showControlX, BUTTON_Y, SHOW_CONTROL_WIDTH, BUTTON_HEIGHT);
 		showControl.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
 		showControl.segmentedControlStyle = UISegmentedControlStyleBar;
-		showControl.tintColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
 		showControl.selectedSegmentIndex = 0; // Default segment index
-
+		showControl.exclusiveTouch = YES;
+		
 		[showControl addTarget:self action:@selector(showControlTapped:) forControlEvents:UIControlEventValueChanged];
 
 		[self addSubview:showControl]; 
@@ -141,18 +135,14 @@
 
 - (void)showControlTapped:(UISegmentedControl *)control
 {
-	DXLog(@"");
-
-	[delegate tappedInToolbar:self showControl:control];
+	[_delegate tappedInToolbar:self showControl:control];
 }
 
 #pragma mark UIButton action methods
 
 - (void)doneButtonTapped:(UIButton *)button
 {
-	DXLog(@"");
-
-	[delegate tappedInToolbar:self doneButton:button];
+	[_delegate tappedInToolbar:self doneButton:button];
 }
 
 @end

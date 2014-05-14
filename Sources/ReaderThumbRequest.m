@@ -78,7 +78,7 @@
 		self.fileURL = url;
 		self.password = phrase;
 		self.guid = guid ? guid : [[url relativeString] stringByTrimmingCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
-		self.thumbName = [NSString stringWithFormat:@"%07d-%04.0fx%04.0f", page, size.width, size.height];
+		self.thumbName = [NSString stringWithFormat:@"%07ld-%04.0fx%04.0f", (long)page, size.width, size.height];
 		self.cacheKey = [NSString stringWithFormat:@"%@+%@", _thumbName, _guid];
 		
 		self.thumbView = view;

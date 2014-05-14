@@ -29,7 +29,7 @@
 
 #pragma mark Constants
 
-#define DEMO_VIEW_CONTROLLER_PUSH FALSE
+#define DEMO_VIEW_CONTROLLER_PUSH 0
 
 
 #pragma mark UIViewController methods
@@ -53,7 +53,7 @@
 
 	tapLabel.text = @"Tap";
 	tapLabel.textColor = [UIColor whiteColor];
-	tapLabel.textAlignment = UITextAlignmentCenter;
+	tapLabel.textAlignment = NSTextAlignmentCenter;
 	tapLabel.backgroundColor = [UIColor clearColor];
 	tapLabel.font = [UIFont systemFontOfSize:24.0f];
 	tapLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
@@ -71,7 +71,7 @@
 {
 	[super viewWillAppear:animated];
 
-#if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
+#if DEMO_VIEW_CONTROLLER_PUSH
 	[self.navigationController setNavigationBarHidden:NO animated:animated];
 #endif // DEMO_VIEW_CONTROLLER_PUSH
 }
@@ -80,7 +80,7 @@
 {
 	[super viewWillDisappear:animated];
 
-#if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
+#if DEMO_VIEW_CONTROLLER_PUSH
 	[self.navigationController setNavigationBarHidden:YES animated:animated];
 #endif // DEMO_VIEW_CONTROLLER_PUSH
 }
@@ -91,15 +91,6 @@
 		return UIInterfaceOrientationIsPortrait(interfaceOrientation);
 	}
 	return YES;
-}
-
-- (void)didReceiveMemoryWarning
-{
-#ifdef DEBUGX
-	NSLog(@"%s", __FUNCTION__);
-#endif
-
-	[super didReceiveMemoryWarning];
 }
 
 
@@ -118,13 +109,13 @@
 		ReaderViewController *readerViewController = [[ReaderViewController alloc] initWithReaderDocument:document];
 		readerViewController.delegate = self; // Set the ReaderViewController delegate to self
 
-#if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
+#if DEMO_VIEW_CONTROLLER_PUSH
 		[self.navigationController pushViewController:readerViewController animated:YES];
 #else
 		readerViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
 		readerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
 
-		[self presentModalViewController:readerViewController animated:YES];
+		[self presentViewController:readerViewController animated:YES completion:NULL];
 #endif
 	}
 }
@@ -133,10 +124,10 @@
 
 - (void)dismissReaderViewController:(ReaderViewController *)viewController
 {
-#if (DEMO_VIEW_CONTROLLER_PUSH == TRUE)
+#if DEMO_VIEW_CONTROLLER_PUSH
 	[self.navigationController popViewControllerAnimated:YES];
 #else
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:NULL];
 #endif
 	
 	viewController.delegate = nil;
