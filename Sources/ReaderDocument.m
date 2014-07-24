@@ -31,7 +31,6 @@
 
 @property (nonatomic, readwrite, copy) NSString *guid;
 @property (nonatomic, readwrite, strong) NSDate *fileDate;
-@property (nonatomic, readwrite, copy) NSString *fileName;
 @property (nonatomic, readwrite, strong) NSURL *fileURL;
 
 @property (nonatomic, readwrite, strong) NSNumber *fileSize;
@@ -56,7 +55,6 @@
 @synthesize lastOpen = _lastOpen;
 @synthesize password = _password;
 @synthesize fileURL = _fileURL;
-@synthesize fileName = _fileName;
 
 #pragma mark - ReaderDocument class methods
 
@@ -98,16 +96,6 @@
 
 	NSURL *pathURL = [fileManager URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:NULL];
 	return [pathURL path]; // Path to the application's "~/Library/Application Support" directory
-}
-
-+ (NSString *)relativeFilePath:(NSString *)fullFilePath
-{
-	assert(fullFilePath != nil); // Ensure that the full file path is not nil
-	NSString *applicationPath = [ReaderDocument applicationPath]; // Get the application path
-	NSRange range = [fullFilePath rangeOfString:applicationPath]; // Look for the application path
-	assert(range.location != NSNotFound); // Ensure that the application path is in the full file path
-	
-	return [fullFilePath stringByReplacingCharactersInRange:range withString:@""]; // Strip it out
 }
 
 + (NSString *)archiveFilePath:(NSString *)filename
@@ -193,9 +181,9 @@
 			self.password = phrase;
 			self.bookmarks = [NSMutableIndexSet new];						// Bookmarked pages index set
 			self.pageNumber = [NSNumber numberWithInteger:1];				// Start page 1
-			self.fileName = [ReaderDocument relativeFilePath:fullFilePath];
+			self.fileURL = [NSURL fileURLWithPath:fullFilePath];
 			
-			CFURLRef docURLRef = (__bridge CFURLRef)[self fileURL];			// CFURLRef from NSURL
+			CFURLRef docURLRef = (__bridge CFURLRef)self.fileURL;			// CFURLRef from NSURL
 			CGPDFDocumentRef thePDFDocRef = CGPDFDocumentCreateX(docURLRef, _password);
 			if (thePDFDocRef != NULL) {										// Get the number of pages in a document
 				NSInteger pageCount = CGPDFDocumentGetNumberOfPages(thePDFDocRef);
@@ -223,17 +211,7 @@
 
 - (NSString *)fileName
 {
-	return [_fileName lastPathComponent];
-}
-
-- (NSURL *)fileURL
-{
-	if (!_fileURL) {
-		NSString *fullFilePath = [[ReaderDocument applicationPath] stringByAppendingPathComponent:_fileName];
-		self.fileURL = [[NSURL alloc] initFileURLWithPath:fullFilePath isDirectory:NO]; // File URL from full file path
-	}
-
-	return _fileURL;
+	return [_fileURL lastPathComponent];
 }
 
 
@@ -257,7 +235,7 @@
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
 	[encoder encodeObject:_guid forKey:@"FileGUID"];
-	[encoder encodeObject:_fileName forKey:@"FileName"];
+	[encoder encodeObject:_fileURL forKey:@"FileURL"];
 	[encoder encodeObject:_fileDate forKey:@"FileDate"];
 	[encoder encodeObject:_pageCount forKey:@"PageCount"];
 	[encoder encodeObject:_pageNumber forKey:@"PageNumber"];
@@ -270,7 +248,7 @@
 {
 	if ((self = [super init])) {
 		self.guid = [decoder decodeObjectForKey:@"FileGUID"];
-		self.fileName = [decoder decodeObjectForKey:@"FileName"];
+		self.fileURL = [decoder decodeObjectForKey:@"FileURL"];
 		self.fileDate = [decoder decodeObjectForKey:@"FileDate"];
 		self.pageCount = [decoder decodeObjectForKey:@"PageCount"];
 		self.pageNumber = [decoder decodeObjectForKey:@"PageNumber"];
