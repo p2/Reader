@@ -50,7 +50,23 @@
 @property (nonatomic, readonly, strong) ReaderContentThumb *thumbView;
 @property (nonatomic, readonly, strong) UIView *containerView;
 
+/**
+ *	Convenience initializer using `ReaderContentPage` as class.
+ *	@param frame The frame to be used
+ *	@param fileURL The URL to the PDF file
+ *	@param page The page of the PDF we want to show
+ *	@param phrase The password to use for the PDF, if any
+ */
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page password:(NSString *)phrase;
+
+/**
+ *	The designated initializer
+ *	@param frame The frame to be used
+ *	@param fileURL The URL to the PDF file
+ *	@param page The page of the PDF we want to show
+ *	@param aClass The class to use for the contentPage, must be a subclass of "ReaderContentPage", which is automatically chosen if it is nil
+ *	@param phrase The password to use for the PDF, if any
+ */
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page contentPageClass:(Class)aClass password:(NSString *)phrase;
 
 - (void)showPageThumb:(NSURL *)fileURL page:(NSInteger)page password:(NSString *)phrase guid:(NSString *)guid;
@@ -62,11 +78,8 @@
 
 @end
 
-#pragma mark -
 
-//
-//	ReaderContentThumb class interface
-//
+#pragma mark -
 
 @interface ReaderContentThumb : ReaderThumbView
 

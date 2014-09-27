@@ -48,9 +48,9 @@
 #define ZOOM_LEVELS 3
 
 #if READER_SHOW_SHADOWS
-#define CONTENT_INSET 4.0f
+# define CONTENT_INSET 4.f
 #else
-#define CONTENT_INSET 2.0f
+# define CONTENT_INSET 0.f
 #endif
 
 #define PAGE_THUMB_LARGE 240
@@ -84,14 +84,6 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 	return [self initWithFrame:frame fileURL:fileURL page:page contentPageClass:nil password:phrase];
 }
 
-/**
- *	The designated initializer
- *	@param frame The frame to be used
- *	@param fileURL The URL to the PDF file
- *	@param page The page of the PDF we want to show
- *	@param aClass The class to use for the contentPage, must be a subclass of "ReaderContentPage", which is automatically chosen if it is nil
- *	@param phrase The password to use for the PDF, if any
- */
 - (id)initWithFrame:(CGRect)frame fileURL:(NSURL *)fileURL page:(NSUInteger)page contentPageClass:(Class)aClass password:(NSString *)phrase
 {
 	if ((self = [super initWithFrame:frame])) {
@@ -141,7 +133,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 		}
 		
 		[self addObserver:self forKeyPath:@"frame" options:0 context:NULL];
-		self.tag = page; // Tag the view with the page number
+		self.tag = page;									// Tag the view with the page number
 	}
 	
 	return self;
@@ -232,6 +224,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 
 #pragma mark - UIScrollViewDelegate methods
+
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
 	return containerView;
@@ -254,6 +247,7 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 
 #pragma mark - UIResponder instance methods
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
 	[super touchesBegan:touches withEvent:event];
@@ -263,11 +257,8 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 
 @end
 
-#pragma mark -
 
-//
-//	ReaderContentThumb class implementation
-//
+#pragma mark -
 
 @implementation ReaderContentThumb
 
@@ -281,5 +272,6 @@ static inline CGFloat ZoomScaleThatFits(CGSize target, CGSize source)
 	
 	return self;
 }
+
 
 @end

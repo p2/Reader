@@ -31,6 +31,7 @@
 
 @property (nonatomic, readwrite, copy) NSString *guid;
 @property (nonatomic, readwrite, strong) NSDate *fileDate;
+@property (nonatomic, readwrite, copy) NSString *fileName;
 @property (nonatomic, readwrite, strong) NSURL *fileURL;
 
 @property (nonatomic, readwrite, strong) NSNumber *fileSize;
@@ -44,17 +45,6 @@
 
 @implementation ReaderDocument
 
-#pragma mark Properties
-
-@synthesize guid = _guid;
-@synthesize fileDate = _fileDate;
-@synthesize fileSize = _fileSize;
-@synthesize pageCount = _pageCount;
-@synthesize pageNumber = _pageNumber;
-@synthesize bookmarks = _bookmarks;
-@synthesize lastOpen = _lastOpen;
-@synthesize password = _password;
-@synthesize fileURL = _fileURL;
 
 #pragma mark - ReaderDocument class methods
 
@@ -111,25 +101,26 @@
 
 + (ReaderDocument *)unarchiveFromFileName:(NSString *)filename password:(NSString *)phrase
 {
-	ReaderDocument *document = nil; // ReaderDocument object
+	ReaderDocument *document = nil;
 	
-	NSString *withName = [filename lastPathComponent];					// File name only
+	NSString *withName = [filename lastPathComponent];
 	NSString *archiveFilePath = [ReaderDocument archiveFilePath:withName];
-	@try // Unarchive an archived ReaderDocument object from its property list
-	{
+	
+	// Unarchive an archived ReaderDocument object from its property list
+	@try {
 		document = [NSKeyedUnarchiver unarchiveObjectWithFile:archiveFilePath];
-		if ((document != nil) && (phrase != nil)) // Set the document password
-		{
+		if ((document != nil) && (phrase != nil)) {
 			[document setValue:[phrase copy] forKey:@"password"];
 		}
 	}
-	@catch (NSException *exception) // Exception handling (just in case O_o)
-	{
-		#ifdef DEBUG
-			NSLog(@"%s Caught %@: %@", __FUNCTION__, [exception name], [exception reason]);
-		#endif
+	@catch (NSException *exception) {
+		NSLog(@"%s Caught %@: %@", __FUNCTION__, [exception name], [exception reason]);
 	}
 	
+	if (document && ![document.fileName isEqualToString:[filename lastPathComponent]]) {
+		return nil;
+	}
+	document.fileURL = [NSURL fileURLWithPath:filename];
 	return document;
 }
 
@@ -211,11 +202,15 @@
 
 - (NSString *)fileName
 {
-	return [_fileURL lastPathComponent];
+	if (!_fileName) {
+		self.fileName = [_fileURL lastPathComponent];
+	}
+	return _fileName;
 }
 
 
 #pragma mark - Archiving/NSCoding
+
 - (BOOL)archiveWithFileName:(NSString *)filename
 {
 	NSString *archiveFilePath = [ReaderDocument archiveFilePath:filename];
@@ -235,7 +230,7 @@
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
 	[encoder encodeObject:_guid forKey:@"FileGUID"];
-	[encoder encodeObject:_fileURL forKey:@"FileURL"];
+	[encoder encodeObject:_fileName forKey:@"FileName"];
 	[encoder encodeObject:_fileDate forKey:@"FileDate"];
 	[encoder encodeObject:_pageCount forKey:@"PageCount"];
 	[encoder encodeObject:_pageNumber forKey:@"PageNumber"];
@@ -248,7 +243,7 @@
 {
 	if ((self = [super init])) {
 		self.guid = [decoder decodeObjectForKey:@"FileGUID"];
-		self.fileURL = [decoder decodeObjectForKey:@"FileURL"];
+		self.fileName = [decoder decodeObjectForKey:@"FileName"];
 		self.fileDate = [decoder decodeObjectForKey:@"FileDate"];
 		self.pageCount = [decoder decodeObjectForKey:@"PageCount"];
 		self.pageNumber = [decoder decodeObjectForKey:@"PageNumber"];

@@ -103,12 +103,12 @@
 - (void)loadView
 {
 	NSAssert(_document, @"Must have a document");
+	self.edgesForExtendedLayout = UIRectEdgeAll;
+	self.extendedLayoutIncludesOpaqueBars = NO;
+	self.automaticallyAdjustsScrollViewInsets = NO;
 	
 	[super loadView];
 	self.view.backgroundColor = [UIColor whiteColor];
-	if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
-		self.automaticallyAdjustsScrollViewInsets = YES;
-	}
 	
 	// setup the scroll view
 	CGRect viewRect = self.view.bounds;
@@ -117,9 +117,11 @@
 	
 	_scrollView.scrollsToTop = NO;
 	_scrollView.pagingEnabled = YES;
+	_scrollView.alwaysBounceVertical = YES;
 	_scrollView.showsVerticalScrollIndicator = NO;
 	_scrollView.showsHorizontalScrollIndicator = NO;
 	_scrollView.contentMode = UIViewContentModeRedraw;
+	_scrollView.contentInset = UIEdgeInsetsMake(44.f, 0.f, 0.f, 0.f);
 	_scrollView.userInteractionEnabled = YES;
 	_scrollView.autoresizesSubviews = NO;
 	_scrollView.backgroundColor = [UIColor lightGrayColor];
@@ -146,7 +148,7 @@
 	UITapGestureRecognizer *doubleTapTwo = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
 	doubleTapTwo.numberOfTouchesRequired = 2; doubleTapTwo.numberOfTapsRequired = 2; doubleTapTwo.delegate = self;
 	
-	[singleTapOne requireGestureRecognizerToFail:doubleTapOne]; // Single tap requires double tap to fail
+	[singleTapOne requireGestureRecognizerToFail:doubleTapOne];
 	
 	UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
 	
@@ -320,9 +322,6 @@
 		CGRect viewRect = CGRectZero;
 		viewRect.size = _scrollView.bounds.size;
 		CGPoint contentOffset = _scrollView.contentOffset;
-		if (0 == _currentPage && ![self toolbarsHidden]) {
-			contentOffset.y = -_scrollView.contentInset.top;		// when swiping the scroll view really wants to put the PDF below the nav bar for some reason...
-		}
 		
 		for (NSUInteger number = minValue; number <= maxValue; number++) {
 			NSNumber *key = @(number);
@@ -394,7 +393,7 @@
 {
 	[self showDocumentPage:[_document.pageNumber integerValue]];
 	_document.lastOpen = [NSDate date];
-	isVisible = YES; // iOS present modal bodge
+	isVisible = YES;
 }
 
 /**
@@ -406,6 +405,7 @@
 
 
 #pragma mark - Document Handling
+
 /**
  *	@return An NSData representation of the document, depending on READER_REDRAW_FOR_EXPORT either just read from file or re-rendered into a PDF context
  */
@@ -482,6 +482,7 @@
 
 
 #pragma mark - UIScrollViewDelegate methods
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
 	CGFloat contentOffsetX = scrollView.contentOffset.x;
@@ -509,6 +510,7 @@
 
 
 #pragma mark - UIGestureRecognizerDelegate methods
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)recognizer shouldReceiveTouch:(UITouch *)touch
 {
 	return [touch.view isKindOfClass:[UIScrollView class]];
@@ -517,6 +519,7 @@
 
 
 #pragma mark UIGestureRecognizer action methods
+
 - (void)decrementPageNumber
 {
 	// Scroll view did end
@@ -676,6 +679,7 @@
 
 
 #pragma mark - ReaderContentViewDelegate methods
+
 - (void)contentView:(ReaderContentView *)contentView touchesBegan:(NSSet *)touches
 {
 	if (![self toolbarsHidden]) {
@@ -697,6 +701,7 @@
 
 
 #pragma mark - Navigation Bar Methods
+
 - (void)didTapDone:(id)sender
 {
 #if !READER_STANDALONE
@@ -778,6 +783,7 @@
 
 
 #pragma mark - ThumbsViewControllerDelegate methods
+
 - (void)dismissThumbsViewController:(ThumbsViewController *)viewController
 {
 	[self updateBookmarkState];
@@ -793,6 +799,7 @@
 
 
 #pragma mark - ReaderMainPagebarDelegate methods
+
 - (void)pagebar:(ReaderMainPagebar *)pagebar gotoPage:(NSInteger)page
 {
 	[self showDocumentPage:page];
@@ -801,6 +808,7 @@
 
 
 #pragma mark - UIApplication notification methods
+
 - (void)applicationWill:(NSNotification *)notification
 {
 	// Save any ReaderDocument object changes
