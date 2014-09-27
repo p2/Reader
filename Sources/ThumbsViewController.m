@@ -30,6 +30,7 @@
 #import "ReaderDocument.h"
 
 #import <QuartzCore/QuartzCore.h>
+#import <tgmath.h>
 
 @implementation ThumbsViewController
 
@@ -311,8 +312,8 @@
 
 - (void)showImage:(UIImage *)image
 {
-	CGFloat x = roundf(self.bounds.size.width / 2.0f);
-	CGFloat y = roundf(self.bounds.size.height / 2.0f);
+	CGFloat x = (CGFloat)round(self.bounds.size.width / 2.0f);
+	CGFloat y = (CGFloat)round(self.bounds.size.height / 2.0f);
 	
 	CGPoint location = CGPointMake(x, y); // Center point
 	CGRect viewRect = CGRectZero; viewRect.size = image.size;
