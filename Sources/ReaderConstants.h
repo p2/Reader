@@ -28,7 +28,6 @@
 #define READER_BOOKMARKS 0
 #define READER_ENABLE_MAIL 1				///< If 1 adds a mail button to the toolbar
 #define READER_ENABLE_PRINT 1				///< If 1 adds a print button to the toolbar
-#define READER_REDRAW_FOR_EXPORT 1			///< If 1, draws the PDF to a PDF context and uses this new PDF for emailing and printing
 #define READER_ENABLE_THUMBS 0
 #define READER_DISABLE_IDLE 1
 #define READER_SHOW_SHADOWS 0				///< If 1 adds a 4px shadow around full-size PDFs

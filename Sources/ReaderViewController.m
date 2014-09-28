@@ -36,7 +36,9 @@
 @property (nonatomic, readwrite, assign) ReaderContentView *currentPageView;
 
 @property (weak, nonatomic) UIBarButtonItem *actionItem;
-@property (strong, nonatomic) UIDocumentInteractionController *docController;
+
+/// The URL to use when sharing the document.
+@property (strong, nonatomic) NSURL *shareURL;
 
 @end
 
@@ -199,10 +201,6 @@
 		[_document saveReaderDocument];
 		[[ReaderThumbQueue sharedInstance] cancelOperationsWithGUID:_document.guid];
 		[[ReaderThumbCache sharedInstance] removeAllObjects];
-		
-		if (_docController) {
-			[_docController dismissMenuAnimated:YES];
-		}
 	}
 	
 #if READER_DISABLE_IDLE
@@ -235,12 +233,6 @@
 {
 	if (isVisible == NO) {
 		return; // iOS present modal bodge
-	}
-	
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		if (_docController) {
-			[_docController dismissMenuAnimated:YES];
-		}
 	}
 }
 
@@ -406,12 +398,8 @@
 
 #pragma mark - Document Handling
 
-/**
- *	@return An NSData representation of the document, depending on READER_REDRAW_FOR_EXPORT either just read from file or re-rendered into a PDF context
- */
-- (NSData *)documentDataFor:(ReaderContentTargetType)dataType
+- (NSData *)redrawnDocumentDataFor:(ReaderContentTargetType)dataType
 {
-# if READER_REDRAW_FOR_EXPORT
 	NSArray *pages = [_contentViews allValues];
 	if ([pages count] > 0) {
 		NSMutableData* pdfData = [NSMutableData data];
@@ -440,11 +428,7 @@
 	}
 	NSLog(@"There are no pages in our document");
 	return nil;
-# else
-	return [NSData dataWithContentsOfURL:document.fileURL options:(NSDataReadingMapped|NSDataReadingUncached) error:nil];
-# endif
 }
-
 
 /**
  *	We can return a subclass of ReaderContentPage if we want
@@ -711,35 +695,41 @@
 
 - (void)didTapAction:(id)sender
 {
-	// re-render the PDF if needed
-#if READER_REDRAW_FOR_EXPORT
-	NSData *data = [self documentDataFor:ReaderContentTargetTypePrint];
-	NSString *filename = [([self.title length] > 0) ? self.title : @"Exported" stringByAppendingPathExtension:@"pdf"];
-	NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:filename]];
-	NSAssert(fileURL, @"Failed to get a temp URL");
-	if (![data writeToURL:fileURL atomically:YES]) {
-		@throw [NSException exceptionWithName:@"ReaderExportFailed" reason:@"Failed to redraw PDF for email/print" userInfo:nil];
+	self.shareURL = [self preparedForSharing];
+	if (!_shareURL) {
+		NSLog(@"Did not get a prepared action URL, cannot share");
+		return;
 	}
-#else
-	NSURL *fileURL = _document.fileURL;
-#endif
 	
 	// create and show document interaction controller
-	UIDocumentInteractionController *doc = [UIDocumentInteractionController interactionControllerWithURL:fileURL];
-	self.docController = doc;
-	doc.delegate = self;
-	
-	NSAssert(sender == _actionItem, @"I want to present pointing to the action item, but I don't have it");
-	[doc presentOptionsMenuFromBarButtonItem:_actionItem animated:YES];
+	UIActivityViewController *activity = [[UIActivityViewController alloc] initWithActivityItems:@[self] applicationActivities:nil];
+	[self presentViewController:activity animated:YES completion:NULL];
 }
+
+- (NSURL *)preparedForSharing
+{
+	return _document.fileURL;
+}
+
+- (id)activityViewControllerPlaceholderItem:(UIActivityViewController *)activityViewController
+{
+	return _shareURL;
+}
+
+- (id)activityViewController:(UIActivityViewController *)activityViewController itemForActivityType:(NSString *)activityType
+{
+	return _shareURL;
+}
+
+- (NSString *)activityViewController:(UIActivityViewController *)activityViewController subjectForActivityType:(NSString *)activityType
+{
+	return self.title;
+}
+
 
 // TODO: re-implement
 - (void)presentThumbsFromButton:(UIButton *)button
 {
-	if (_docController) {
-		[_docController dismissMenuAnimated:YES];
-	}
-	
 	ThumbsViewController *thumbsViewController = [[ThumbsViewController alloc] initWithReaderDocument:_document];
 	thumbsViewController.delegate = self;
 	thumbsViewController.title = self.title;
@@ -752,10 +742,6 @@
 // TODO: re-implement
 - (void)setBookmarkFromButton:(UIButton *)button
 {
-	if (_docController) {
-		[_docController dismissMenuAnimated:YES];
-	}
-	
 	NSInteger page = [_document.pageNumber integerValue];
 	
 	// add or remove the bookmarked page index
@@ -767,17 +753,6 @@
 	}
 	
 	[self updateBookmarkState];
-}
-
-
-
-#pragma mark - UIDocumentInteractionControllerDelegate
-
-- (void)documentInteractionControllerDidDismissOptionsMenu:(UIDocumentInteractionController *)controller
-{
-	if (controller == _docController) {
-		self.docController = nil;
-	}
 }
 
 

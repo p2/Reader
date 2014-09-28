@@ -42,7 +42,7 @@
 @end
 
 
-@interface ReaderViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate,
+@interface ReaderViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate, UIActivityItemSource,
 													ReaderMainPagebarDelegate, ReaderContentViewDelegate, ThumbsViewControllerDelegate>
 {
 @private
@@ -69,7 +69,12 @@
 - (void)showDocument:(id)object;
 
 - (void)didAddContentView:(ReaderContentView *)aContentView forPage:(NSUInteger)pageNumber;
-- (NSData *)documentDataFor:(ReaderContentTargetType)dataType;
+
+/** Called when the user decides to share the document, which aborts if no URL is returned. Default returns the document URL. */
+- (NSURL *)preparedForSharing;
+
+/**	@return An NSData representation of the document, re-rendered into a PDF context. */
+- (NSData *)redrawnDocumentDataFor:(ReaderContentTargetType)dataType;
 
 - (BOOL)toolbarsHidden;
 - (void)showToolbarsAnimated:(BOOL)animated;
