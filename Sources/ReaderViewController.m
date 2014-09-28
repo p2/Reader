@@ -703,6 +703,9 @@
 	
 	// create and show document interaction controller
 	UIActivityViewController *activity = [[UIActivityViewController alloc] initWithActivityItems:@[self] applicationActivities:nil];
+	if ([activity respondsToSelector:@selector(popoverPresentationController)]) {
+		activity.popoverPresentationController.barButtonItem = _actionItem;
+	}
 	[self presentViewController:activity animated:YES completion:NULL];
 }
 
