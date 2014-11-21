@@ -40,6 +40,9 @@
 /// The URL to use when sharing the document.
 @property (strong, nonatomic) NSURL *shareURL;
 
+/// Need to hold on to our document interaction controller.
+@property (strong, nonatomic) UIDocumentInteractionController *documentInteraction;
+
 @end
 
 
@@ -702,31 +705,27 @@
 	}
 	
 	// create and show document interaction controller
-	UIActivityViewController *activity = [[UIActivityViewController alloc] initWithActivityItems:@[self] applicationActivities:nil];
-	if ([activity respondsToSelector:@selector(popoverPresentationController)]) {
-		activity.popoverPresentationController.barButtonItem = _actionItem;
+	// There is a bug in iOS 8 and 8.1 that makes iOS log the full PDF data to console:
+	// http://openradar.appspot.com/radar?id=5800473659441152
+	// Workaround would be to use UIActivityController, but that one doesn't show apps capable of opening PDF, so we
+	// have to use UIDocumentInteractionController.
+	self.documentInteraction = [UIDocumentInteractionController interactionControllerWithURL:_shareURL];
+	_documentInteraction.delegate = self;
+	_documentInteraction.name = self.title;
+	
+	[_documentInteraction presentOptionsMenuFromBarButtonItem:_actionItem animated:YES];
+}
+
+- (void)documentInteractionControllerDidDismissOptionsMenu:(UIDocumentInteractionController *)controller
+{
+	if (controller == _documentInteraction) {
+		self.documentInteraction = nil;
 	}
-	[self presentViewController:activity animated:YES completion:NULL];
 }
 
 - (NSURL *)preparedForSharing
 {
 	return _document.fileURL;
-}
-
-- (id)activityViewControllerPlaceholderItem:(UIActivityViewController *)activityViewController
-{
-	return _shareURL;
-}
-
-- (id)activityViewController:(UIActivityViewController *)activityViewController itemForActivityType:(NSString *)activityType
-{
-	return _shareURL;
-}
-
-- (NSString *)activityViewController:(UIActivityViewController *)activityViewController subjectForActivityType:(NSString *)activityType
-{
-	return self.title;
 }
 
 

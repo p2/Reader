@@ -42,7 +42,7 @@
 @end
 
 
-@interface ReaderViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate, UIActivityItemSource,
+@interface ReaderViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate, UIDocumentInteractionControllerDelegate,
 													ReaderMainPagebarDelegate, ReaderContentViewDelegate, ThumbsViewControllerDelegate>
 {
 @private
