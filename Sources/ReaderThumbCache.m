@@ -142,7 +142,6 @@
 			request.thumbView.operation = thumbFetch;				// what is this good for?
 			
 			[thumbFetch setQueuePriority:(priority ? NSOperationQueuePriorityNormal : NSOperationQueuePriorityLow)]; // Queue priority
-			[thumbFetch setThreadPriority:(priority ? 0.55 : 0.35)]; // Thread priority
 			
 			[[ReaderThumbQueue sharedInstance] addLoadOperation:thumbFetch];
 		}

@@ -227,26 +227,8 @@
 	return UIInterfaceOrientationMaskAll;
 }
 
-- (BOOL)shouldAutorotate
-{
+- (BOOL)shouldAutorotate {
 	return YES;
-}
-
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-	if (isVisible == NO) {
-		return; // iOS present modal bodge
-	}
-}
-
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration
-{
-	if (isVisible == NO) {
-		return; // iOS present modal bodge
-	}
-	
-	[self updateScrollViewContentViews];
-	lastAppearSize = CGSizeZero; // Reset view size tracking
 }
 
 

@@ -104,7 +104,6 @@
 	else {
 		ReaderThumbRender *thumbRender = [[ReaderThumbRender alloc] initWithRequest:request];
 		[thumbRender setQueuePriority:self.queuePriority];
-		[thumbRender setThreadPriority:(self.threadPriority - 0.1)];
 		
 		if (!self.isCancelled) {
 			request.thumbView.operation = thumbRender; // Update the thumb view operation property to the new operation
